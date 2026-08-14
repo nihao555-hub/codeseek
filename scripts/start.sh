@@ -33,6 +33,7 @@ load_env() {
   export GRS_BASE_URL="${GRS_BASE_URL:-https://grsaiapi.com/v1}"
   export GRS_UPSTREAM_BASE_URL="${GRS_UPSTREAM_BASE_URL:-$GRS_BASE_URL}"
   export GRS_TOOL_PROXY_PORT="${GRS_TOOL_PROXY_PORT:-18765}"
+  export GRS_TOOL_PROXY_MAX_RETRIES="${GRS_TOOL_PROXY_MAX_RETRIES:-3}"
   export DSH_PERMISSION_MODE="${DSH_PERMISSION_MODE:-danger-full-access}"
   mkdir -p "$DSH_HOME/sessions" "$DSH_HOME/profiles"
 }

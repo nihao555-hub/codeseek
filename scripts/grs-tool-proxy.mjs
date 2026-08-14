@@ -11,12 +11,14 @@ import {
   sseEncode,
   toUpstreamChatBody,
 } from './lib/grs-tool-protocol.mjs'
+import { isRetryableGrsFailure, runWithRetries } from './lib/grs-retry.mjs'
 
 const host = process.env.GRS_TOOL_PROXY_HOST || '127.0.0.1'
 const port = Number(process.env.GRS_TOOL_PROXY_PORT || 18765)
 const upstreamBase = (process.env.GRS_UPSTREAM_BASE_URL || process.env.GRS_BASE_URL || 'https://grsaiapi.com/v1').replace(/\/$/, '')
 const passthrough = process.env.GRS_TOOL_PROXY_PASSTHROUGH === '1'
 const timeoutMs = Number(process.env.GRS_TOOL_PROXY_TIMEOUT_MS || 300_000)
+const maxRetries = Number(process.env.GRS_TOOL_PROXY_MAX_RETRIES || 3)
 
 function log(message) {
   const stamp = new Date().toISOString()
@@ -37,25 +39,65 @@ function send(res, status, headers, body) {
   res.end(body)
 }
 
+async function fetchUpstream(url, init) {
+  return runWithRetries(async () => {
+    try {
+      const upstream = await fetch(url, {
+        ...init,
+        signal: AbortSignal.timeout(timeoutMs),
+      })
+      const buf = Buffer.from(await upstream.arrayBuffer())
+      const bodyText = buf.toString('utf8').slice(0, 4000)
+      if (!upstream.ok && isRetryableGrsFailure({ status: upstream.status, bodyText })) {
+        return {
+          retry: true,
+          reason: `${upstream.status} ${bodyText.replace(/\s+/g, ' ').slice(0, 160)}`,
+          status: upstream.status,
+          buf,
+          contentType: upstream.headers.get('content-type') || 'application/json',
+        }
+      }
+      return {
+        retry: false,
+        status: upstream.status,
+        buf,
+        contentType: upstream.headers.get('content-type') || 'application/json',
+      }
+    } catch (error) {
+      if (isRetryableGrsFailure({ error })) {
+        return {
+          retry: true,
+          reason: error instanceof Error ? error.message : String(error),
+          error,
+        }
+      }
+      throw error
+    }
+  }, {
+    maxRetries,
+    onRetry: ({ attempt, maxRetries: max, delay, reason }) => {
+      log(`retry ${attempt}/${max} in ${delay}ms: ${reason}`)
+    },
+  })
+}
+
 async function proxyRaw(req, rawBody, res) {
   const path = (req.url || '/').replace(/^\/v1(?=\/|$)/, '') || '/'
   const target = `${upstreamBase}${path}`
-  const headers = {
-    authorization: req.headers.authorization || '',
-    'content-type': req.headers['content-type'] || 'application/json',
-    accept: req.headers.accept || 'application/json',
-  }
-  const upstream = await fetch(target, {
+  const result = await fetchUpstream(target, {
     method: req.method,
-    headers,
+    headers: {
+      authorization: req.headers.authorization || '',
+      'content-type': req.headers['content-type'] || 'application/json',
+      accept: req.headers.accept || 'application/json',
+    },
     body: req.method === 'GET' || req.method === 'HEAD' ? undefined : rawBody,
-    signal: AbortSignal.timeout(timeoutMs),
   })
-  const buf = Buffer.from(await upstream.arrayBuffer())
-  const outHeaders = {
-    'content-type': upstream.headers.get('content-type') || 'application/json',
+  if (result.error && !result.buf) {
+    send(res, 502, { 'content-type': 'application/json' }, JSON.stringify({ error: { message: result.reason || 'upstream failed' } }))
+    return
   }
-  send(res, upstream.status, outHeaders, buf)
+  send(res, result.status || 502, { 'content-type': result.contentType || 'application/json' }, result.buf)
 }
 
 async function handleChat(req, rawBody, res) {
@@ -74,7 +116,7 @@ async function handleChat(req, rawBody, res) {
   const target = `${upstreamBase}/chat/completions`
   log(`${body.model || '?'} tools=${hasTools ? body.tools.length : 0} rewrite=${hasTools && !passthrough} stream=${stream}`)
 
-  const upstream = await fetch(target, {
+  const result = await fetchUpstream(target, {
     method: 'POST',
     headers: {
       authorization: req.headers.authorization || '',
@@ -82,12 +124,14 @@ async function handleChat(req, rawBody, res) {
       accept: stream ? 'text/event-stream' : 'application/json',
     },
     body: payload,
-    signal: AbortSignal.timeout(timeoutMs),
   })
-
-  const raw = Buffer.from(await upstream.arrayBuffer())
-  if (!upstream.ok) {
-    send(res, upstream.status, { 'content-type': upstream.headers.get('content-type') || 'application/json' }, raw)
+  if (result.error && !result.buf) {
+    send(res, 502, { 'content-type': 'application/json' }, JSON.stringify({ error: { message: result.reason || 'upstream failed' } }))
+    return
+  }
+  const raw = result.buf
+  if (!raw || result.status !== 200) {
+    send(res, result.status || 502, { 'content-type': result.contentType || 'application/json' }, raw || Buffer.from(JSON.stringify({ error: { message: result.reason || 'upstream failed' } })))
     return
   }
 
@@ -152,5 +196,5 @@ const server = http.createServer(async (req, res) => {
 })
 
 server.listen(port, host, () => {
-  log(`listening on http://${host}:${port} -> ${upstreamBase}`)
+  log(`listening on http://${host}:${port} -> ${upstreamBase} (maxRetries=${maxRetries})`)
 })

@@ -18,6 +18,14 @@ llm-pi-ai:
       defaultMaxTokens: 16384
       timeoutMs: 180000
       streamIdleTimeoutMs: 300000
+      retryPolicy:
+        mode: normal
+        maxRetries: 3
+        retryableCodes: [EMPTY_RESPONSE, RATE_LIMIT, SERVER, TIMEOUT, TRANSPORT]
+        backoff:
+          initialDelayMs: 1000
+          maxDelayMs: 8000
+          jitterRatio: 0.1
       models:
         - id: gemini-3.5-flash
           name: Gemini 3.5 Flash
@@ -29,3 +37,5 @@ llm-pi-ai:
           contextWindow: 262144
           maxTokens: 32768
           input: [ text, image ]
+ui-onboarding:
+  welcomeNoticeVersion: 2026-08-13.1

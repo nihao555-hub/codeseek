@@ -70,7 +70,8 @@ run_dsh() {
   local src="$ROOT/vendor/deepseek-harness"
   local tsx_loader="$src/node_modules/tsx/dist/esm/index.mjs"
   if [[ -f "$src/apps/cli/src/bin.ts" && -f "$tsx_loader" ]]; then
-    # 绝对导入 tsx，cwd 保持仓库根，这样 session/工具工作区不是 submodule。
+    # 绝对导入 tsx，并钉死 Harness 的 tsconfig，这样 cwd 可以是仓库根。
+    export TSX_TSCONFIG_PATH="${TSX_TSCONFIG_PATH:-$src/tsconfig.json}"
     cd "$DSH_WORKSPACE"
     exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" "$@"
   fi

@@ -22,6 +22,7 @@ export const api = {
   },
   product: (slug) => req(`/api/products/${slug}`),
   collections: () => req('/api/collections'),
+  shipping: () => req('/api/shipping'),
   quote: (items) => req('/api/quote', { method: 'POST', body: JSON.stringify({ items }) }),
   checkout: (payload) => req('/api/checkout', { method: 'POST', body: JSON.stringify(payload) }),
   order: (id) => req(`/api/orders/${id}`),

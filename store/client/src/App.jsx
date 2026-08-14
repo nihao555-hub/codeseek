@@ -46,6 +46,7 @@ export default function App() {
   const [trackId, setTrackId] = useState('')
   const [form, setForm] = useState({ name: '', email: '', company: '', country: 'DE', incoterm: 'FOB Shenzhen' })
   const [rfq, setRfq] = useState({ email: '', message: '' })
+  const [shipping, setShipping] = useState(null)
 
   const route = hash.replace(/^#/, '') || '/'
 
@@ -56,8 +57,22 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    let cancelled = false
+    api.shipping()
+      .then((data) => { if (!cancelled) setShipping(data) })
+      .catch((err) => { if (!cancelled) setError(err.message) })
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
   }, [lang])
+
+  useEffect(() => {
+    if (shipping?.terms?.length && !shipping.terms.includes(form.incoterm)) {
+      setForm((current) => ({ ...current, incoterm: shipping.terms[0] }))
+    }
+  }, [shipping])
 
   useEffect(() => {
     if (!cartOpen) return
@@ -191,6 +206,12 @@ export default function App() {
               </div>
               <div className="swatch"><b>500ml · CE</b></div>
             </section>
+            {shipping && (
+              <section className="section" aria-label={t(lang, 'shippingPolicyLabel')}>
+                <p>{t(lang, 'shippingPolicy').replace('{amount}', `${shipping.currency} ${shipping.freeExportHandlingUsd}`)}</p>
+                <p className="meta">{t(lang, 'shippingTerms').replace('{terms}', shipping.terms.join(' · '))}</p>
+              </section>
+            )}
             <section className="section">
               <h2>{t(lang, 'featured')}</h2>
               <div className="grid">
@@ -273,11 +294,14 @@ export default function App() {
               <input required type="email" placeholder={t(lang, 'email')} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
               <input placeholder={t(lang, 'company')} value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
               <input placeholder={t(lang, 'country')} value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
-              <select value={form.incoterm} onChange={(e) => setForm({ ...form, incoterm: e.target.value })}>
-                <option>FOB Shenzhen</option>
-                <option>FOB Ningbo</option>
-                <option>EXW</option>
-              </select>
+              <label>
+                {t(lang, 'incoterm')}
+                <select value={form.incoterm} onChange={(e) => setForm({ ...form, incoterm: e.target.value })}>
+                  {(shipping?.terms?.length ? shipping.terms : ['FOB Shenzhen', 'FOB Ningbo']).map((term) => (
+                    <option key={term}>{term}</option>
+                  ))}
+                </select>
+              </label>
               {quote && <p>{t(lang, 'total')} ${quote.totalUsd}</p>}
               <button className="btn" type="submit">{t(lang, 'place')}</button>
             </form>

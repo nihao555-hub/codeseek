@@ -27,6 +27,14 @@ test('health, catalog, checkout and rfq round-trip', async (t) => {
   assert.equal(health.body.ok, true)
   assert.equal(health.body.products, 6)
 
+  const shipping = await json(url, '/api/shipping')
+  assert.equal(shipping.status, 200)
+  assert.deepEqual(shipping.body, {
+    currency: 'USD',
+    freeExportHandlingUsd: 500,
+    terms: ['FOB Shenzhen', 'FOB Ningbo'],
+  })
+
   const fda = await json(url, '/api/products?cert=FDA&category=mug')
   assert.ok(fda.body.products.length >= 1)
   assert.ok(fda.body.products.every((p) => p.certs.includes('FDA') && p.category === 'mug'))

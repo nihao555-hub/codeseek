@@ -55,6 +55,14 @@ function api(req, res, url, orders, rfqs) {
     send(res, 200, { ok: true, products: allProducts().length, service: 'harbor-kiln' })
     return true
   }
+  if (url.pathname === '/api/shipping' && req.method === 'GET') {
+    send(res, 200, {
+      currency: 'USD',
+      freeExportHandlingUsd: 500,
+      terms: ['FOB Shenzhen', 'FOB Ningbo'],
+    })
+    return true
+  }
   if (url.pathname === '/api/collections') {
     send(res, 200, { collections: collections() })
     return true

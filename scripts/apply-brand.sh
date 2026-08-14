@@ -54,21 +54,13 @@ locales.write_text(text)
 
 hero_tsx = root / "packages/client/ui-conversation/src/client/skeleton/EmptyHero.tsx"
 hero = hero_tsx.read_text()
-hero = hero.replace('fill="#6187D8" fillOpacity="0.08"', 'fill="#2DD4BF" fillOpacity="0.12"')
+# 空状态背景回到 Harness 原版淡蓝光晕，不要铺世界地图底图。
+hero = hero.replace('fill="#2DD4BF" fillOpacity="0.12"', 'fill="#6187D8" fillOpacity="0.08"')
 hero_tsx.write_text(hero)
 
 css_path = root / "packages/client/ui-conversation/src/client/skeleton/HeroShell.module.css"
 css = css_path.read_text()
-if "url('/brand/hero-glow.png')" not in css:
-    needle = """.root {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-width: 0;
-  padding: 0 24px;
-}"""
-    repl = """.root {
+overlay = """.root {
   position: relative;
   display: flex;
   align-items: center;
@@ -94,9 +86,18 @@ if "url('/brand/hero-glow.png')" not in css:
   position: relative;
   z-index: 1;
 }"""
-    if needle not in css:
-        raise SystemExit("brand patch miss: HeroShell .root")
-    css_path.write_text(css.replace(needle, repl, 1))
+original_root = """.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 0;
+  padding: 0 24px;
+}"""
+if overlay in css:
+    css_path.write_text(css.replace(overlay, original_root, 1))
+elif original_root not in css and "url('/brand/hero-glow.png')" in css:
+    raise SystemExit("brand patch miss: revert HeroShell hero-glow overlay")
 
 boot_css = root / "packages/client/web/src/AppRoot.module.css"
 boot = boot_css.read_text()

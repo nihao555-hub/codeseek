@@ -37,8 +37,17 @@ test('apply-brand copies the ModelSelect override into the vendor client', () =>
   assert.match(sh, /overrides\/ModelSelect\.module\.css/)
 })
 
+test('apply-brand restores the original empty-hero background', () => {
+  const sh = readFileSync(join(root, 'scripts/apply-brand.sh'), 'utf8')
+  assert.match(sh, /fill="#6187D8" fillOpacity="0\.08"/)
+  assert.match(sh, /if overlay in css:/)
+  assert.match(sh, /revert HeroShell hero-glow overlay/)
+  assert.doesNotMatch(sh, /if "url\('\/brand\/hero-glow\.png'\)" not in css:/)
+})
+
 test('start.sh rebuilds the model-selection client plugin with the web frontend', () => {
   const sh = readFileSync(join(root, 'scripts/start.sh'), 'utf8')
+  assert.match(sh, /@deepseek-ai\/dsh-client-ui-conversation run bundle/)
   assert.match(sh, /@deepseek-ai\/dsh-client-ui-model-selection run bundle/)
   assert.match(sh, /@deepseek-ai\/dsh-web-frontend run build/)
 })

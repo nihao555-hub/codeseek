@@ -27,6 +27,8 @@ cp -f "$BRAND/overrides/manifest.webmanifest" "$PUBLIC/manifest.webmanifest"
 cp -f "$BRAND/overrides/FishLogo.tsx" "$SRC/packages/client/ui-primitives/src/FishLogo.tsx"
 cp -f "$BRAND/overrides/BrandWordmark.tsx" "$SRC/packages/client/ui-primitives/src/BrandWordmark.tsx"
 cp -f "$BRAND/overrides/AppRoot.tsx" "$SRC/packages/client/web/src/AppRoot.tsx"
+cp -f "$BRAND/overrides/ModelSelect.tsx" "$SRC/packages/client/ui-model-selection/src/client/ModelSelect.tsx"
+cp -f "$BRAND/overrides/ModelSelect.module.css" "$SRC/packages/client/ui-model-selection/src/client/ModelSelect.module.css"
 
 python3 - <<'PY'
 from pathlib import Path

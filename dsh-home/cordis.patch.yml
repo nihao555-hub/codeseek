@@ -33,3 +33,7 @@
 - id: fs-sandbox
   config:
     cwd: !!js process.env.DSH_WORKSPACE || process.cwd()
+
+# 暂时不在模型选择栏里出现 DeepSeek 官方那几档（V3 / R1 等）。
+- id: llm-deepseek
+  disabled: true

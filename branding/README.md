@@ -15,3 +15,5 @@ codeseek 超级员工的视觉资产。运行 `scripts/apply-brand.sh` 会覆盖
 ## SVG
 
 `svg/mark.svg`、`svg/wordmark.svg`、`svg/favicon.svg` 用于小尺寸界面，描边跟随 `currentColor`，罗盘星为金色 `#F5C16C`。
+
+模型选择栏的 Gemini / OpenAI 标记在 `overrides/ModelSelect.tsx` 里内联绘制，启动时由 `apply-brand.sh` 覆盖进 Harness 前端。

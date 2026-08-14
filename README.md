@@ -26,7 +26,9 @@ cp .env.example .env   # 填入 GRS_API_KEY
 npm start              # 或 bash scripts/start.sh web
 ```
 
-浏览器打开 http://127.0.0.1:3080 ，选中本仓库作为工作区。
+浏览器打开 http://127.0.0.1:3080 ，选中本仓库作为工作区。`scripts/start.sh web` 还会在 `0.0.0.0:3081` 起一层反代（把 Host 改写回回环，避开 Harness 的本机信任栅栏），方便云端端口转发或临时隧道。不需要公网时设 `DSH_PUBLIC_PROXY=0`。
+
+模型选择栏只保留 GRS 的 **Gemini 3.5 Flash** 和 **GPT-5.6 Sol**（带对应 logo）；DeepSeek 官方那几档暂时关掉。
 
 国内直连把 `.env` 里的 `GRS_BASE_URL` 和 `GRS_UPSTREAM_BASE_URL` 改成 `https://grsai.dakka.com.cn/v1`。`dsh-home/settings.yaml` 的 `baseURL` 继续指向本地工具代理。
 
@@ -34,7 +36,7 @@ npm start              # 或 bash scripts/start.sh web
 
 | 命令 | 作用 |
 | --- | --- |
-| `npm start` / `scripts/start.sh web` | 启动 Web UI |
+| `npm start` / `scripts/start.sh web` | 启动 Web UI（本机 :3080，公网反代 :3081） |
 | `scripts/start.sh headless "任务"` | 无界面跑一条任务 |
 | `scripts/start.sh doctor` | 检查 Node、密钥、GRS 连通、工具代理 |
 | `npm test` | 工具协议解析单测 + 独立站 API 单测 |
@@ -75,7 +77,7 @@ npm run toolkit -- enable github sequential-thinking
 | 路径 | 作用 |
 | --- | --- |
 | `dsh-home/settings.yaml` | GRS 提供方与默认模型 |
-| `dsh-home/cordis.patch.yml` | 人设、默认模型、沙箱 |
+| `dsh-home/cordis.patch.yml` | 人设、默认模型、沙箱；暂时禁用 `llm-deepseek` |
 | `scripts/grs-tool-proxy.mjs` | GRS 文本工具协议 ↔ OpenAI tool_calls |
 | `.dsh/skills/` | 外贸 / 广告 / 开发 / 前端 / 后端技能（见该目录 README） |
 | `toolkit/catalog.json` | 可装配 skill 与 MCP 目录 |

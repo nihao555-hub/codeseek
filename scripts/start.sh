@@ -71,6 +71,28 @@ ensure_tool_proxy() {
   return 1
 }
 
+ensure_public_proxy() {
+  if [[ "${DSH_PUBLIC_PROXY:-1}" == "0" ]]; then
+    return 0
+  fi
+  local port="${DSH_PUBLIC_PORT:-3081}"
+  if curl -sf "http://127.0.0.1:${port}/__proxy_health" >/dev/null 2>&1; then
+    echo "公网反代已在 0.0.0.0:${port} -> 127.0.0.1:${DSH_PORT:-3080}"
+    return 0
+  fi
+  echo "启动公网反代 0.0.0.0:${port} -> 127.0.0.1:${DSH_PORT:-3080}"
+  nohup node "$ROOT/scripts/public-proxy.mjs" >>"$DSH_HOME/public-proxy.log" 2>&1 &
+  local i
+  for i in $(seq 1 25); do
+    if curl -sf "http://127.0.0.1:${port}/__proxy_health" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "公网反代未能启动，见 $DSH_HOME/public-proxy.log" >&2
+  return 1
+}
+
 run_dsh() {
   local src="$ROOT/vendor/deepseek-harness"
   local tsx_loader="$src/node_modules/tsx/dist/esm/index.mjs"
@@ -169,7 +191,12 @@ PY
     echo "未运行（start.sh web/headless 会自动拉起）"
   fi
   echo
-  echo "== GRS Chat API =="
+  echo "== 公网反代 =="
+  if curl -sf "http://127.0.0.1:${DSH_PUBLIC_PORT:-3081}/__proxy_health" >/dev/null 2>&1; then
+    echo "http://127.0.0.1:${DSH_PUBLIC_PORT:-3081}/__proxy_health 正常"
+  else
+    echo "未运行（start.sh web 会自动拉起 0.0.0.0:${DSH_PUBLIC_PORT:-3081}）"
+  fi
   if [[ -z "${GRS_API_KEY:-}" ]]; then
     echo "跳过：没有 GRS_API_KEY"
     return 0
@@ -215,6 +242,9 @@ case "$CMD" in
     ensure_from_source
     ensure_toolkit
     ensure_tool_proxy
+    ensure_public_proxy
+    echo "本机 UI  http://127.0.0.1:${DSH_PORT:-3080}"
+    echo "公网入口 http://0.0.0.0:${DSH_PUBLIC_PORT:-3081} （反代到回环 Web；设 DSH_PUBLIC_PROXY=0 可关）"
     run_dsh web --port "${DSH_PORT:-3080}" "$@"
     ;;
   headless)

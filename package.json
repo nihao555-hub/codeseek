@@ -1,0 +1,15 @@
+{
+  "name": "codeseek",
+  "private": true,
+  "description": "DeepSeek Harness 超级员工：外贸、Meta 广告与开发任务",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "start": "bash scripts/start.sh web",
+    "web": "bash scripts/start.sh web",
+    "headless": "bash scripts/start.sh headless",
+    "doctor": "bash scripts/start.sh doctor",
+    "postinstall": "git submodule update --init --depth 1 vendor/deepseek-harness || true"
+  }
+}

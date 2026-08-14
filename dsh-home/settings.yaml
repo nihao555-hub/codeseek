@@ -1,0 +1,29 @@
+# 用户层设置：热加载。密钥只通过 apiKeyEnv 引用，不写进本文件。
+agent-default-model:
+  provider: grsai
+  model: gemini-3.5-flash
+
+llm-pi-ai:
+  providers:
+    grsai:
+      displayName: GRS AI
+      apiKeyEnv: GRS_API_KEY
+      api: openai-completions
+      # 国内直连改为 https://grsai.dakka.com.cn/v1
+      baseURL: https://grsaiapi.com/v1
+      defaultInput: [text, image]
+      defaultContextWindow: 262144
+      defaultMaxTokens: 16384
+      timeoutMs: 180000
+      streamIdleTimeoutMs: 300000
+      models:
+        - id: gemini-3.5-flash
+          name: Gemini 3.5 Flash
+          contextWindow: 1048576
+          maxTokens: 65536
+          input: [text, image]
+        - id: gpt-5.6-sol
+          name: GPT-5.6 Sol
+          contextWindow: 262144
+          maxTokens: 32768
+          input: [text, image]

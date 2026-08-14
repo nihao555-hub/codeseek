@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <style>
+    .arc { stroke: #14233D; }
+    .star { fill: #F5C16C; }
+    @media (prefers-color-scheme: dark) {
+      .arc { stroke: #E8EEF7; }
+    }
+  </style>
+  <rect width="32" height="32" rx="8" fill="#14233D"/>
+  <path class="arc" d="M23.2 16a7.2 7.2 0 1 1-2.9-5.75" stroke="#2DD4BF" stroke-width="2.6" stroke-linecap="round"/>
+  <path class="star" d="M22.35 7.15l.62 1.42 1.54.18-1.16 1.02.38 1.52-1.38-.82-1.38.82.38-1.52-1.16-1.02 1.54-.18z"/>
+</svg>

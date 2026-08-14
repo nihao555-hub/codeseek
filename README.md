@@ -46,6 +46,7 @@ npm start              # 或 bash scripts/start.sh web
 | `.dsh/skills/` | 外贸 / 广告 / 开发技能 |
 | `AGENTS.md` | 工作区指令 |
 | `.env` | 密钥（不要提交） |
+| `branding/` | logo、字标、空状态装饰 |
 
 密钥只通过环境变量注入：`GRS_API_KEY`、`META_ACCESS_TOKEN`。
 

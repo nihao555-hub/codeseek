@@ -78,6 +78,16 @@ ensure_from_source() {
     echo "正在构建 DeepSeek Harness ..."
     (cd "$src" && pnpm run build)
   fi
+  bash "$ROOT/scripts/apply-brand.sh"
+  local stamp_src stamp_dst
+  stamp_src="$( (cd "$ROOT/branding" && find . -type f ! -name '.applied-stamp' | sort | xargs sha256sum) | sha256sum | awk '{print $1}' )"
+  stamp_dst="$ROOT/branding/.applied-stamp"
+  if [[ ! -f "$src/apps/web/dist/brand/app-icon.png" || "$(cat "$stamp_dst" 2>/dev/null || true)" != "$stamp_src" ]]; then
+    echo "正在重建 Web 前端以应用品牌..."
+    (cd "$src" && pnpm --filter @deepseek-ai/dsh-web-frontend run build)
+    bash "$ROOT/scripts/apply-brand.sh"
+    echo "$stamp_src" > "$stamp_dst"
+  fi
 }
 
 cmd_doctor() {

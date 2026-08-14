@@ -19,6 +19,7 @@ whenToUse: 实现功能、修 bug、写脚本、改配置、排查构建或补�
 
 - DeepSeek Harness 源码在 `vendor/deepseek-harness`（git submodule）。不要为了业务需求去改它，除非在修上游集成问题。
 - 超级员工配置在 `dsh-home/`（`settings.yaml`、`cordis.patch.yml`）和 `.dsh/skills/`。
+- 品牌资源在 `branding/`，用 `scripts/apply-brand.sh` 覆盖进 Web 前端。
 - 启动入口是 `scripts/start.sh`。`DSH_HOME` 指向 `dsh-home/`。
 - 模型提供方 id 是 `grsai`，走 OpenAI 兼容接口。
 

@@ -148,7 +148,9 @@ ensure_from_source() {
   stamp_src="$( (cd "$ROOT/branding" && find . -type f ! -name '.applied-stamp' | sort | xargs sha256sum) | sha256sum | awk '{print $1}' )"
   stamp_dst="$ROOT/branding/.applied-stamp"
   if [[ ! -f "$src/apps/web/dist/brand/app-icon.png" || "$(cat "$stamp_dst" 2>/dev/null || true)" != "$stamp_src" ]]; then
-    echo "正在重建 Web 前端以应用品牌..."
+    echo "正在重建 Web 前端与模型选择插件以应用品牌..."
+    # 模型选择栏是运行时 client plugin（lib/client.js），不会进 Vite shell。
+    (cd "$src" && pnpm --filter @deepseek-ai/dsh-client-ui-model-selection run bundle)
     (cd "$src" && pnpm --filter @deepseek-ai/dsh-web-frontend run build)
     bash "$ROOT/scripts/apply-brand.sh"
     echo "$stamp_src" > "$stamp_dst"

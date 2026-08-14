@@ -37,6 +37,12 @@ test('apply-brand copies the ModelSelect override into the vendor client', () =>
   assert.match(sh, /overrides\/ModelSelect\.module\.css/)
 })
 
+test('start.sh rebuilds the model-selection client plugin with the web frontend', () => {
+  const sh = readFileSync(join(root, 'scripts/start.sh'), 'utf8')
+  assert.match(sh, /@deepseek-ai\/dsh-client-ui-model-selection run bundle/)
+  assert.match(sh, /@deepseek-ai\/dsh-web-frontend run build/)
+})
+
 test('start.sh puts --patch before web app flags like --port', () => {
   const sh = readFileSync(join(root, 'scripts/start.sh'), 'utf8')
   assert.match(sh, /web --patch "\$mcp_patch"/)

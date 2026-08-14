@@ -10,6 +10,7 @@
     "web": "bash scripts/start.sh web",
     "headless": "bash scripts/start.sh headless",
     "doctor": "bash scripts/start.sh doctor",
+    "test": "node --test scripts/lib/*.test.mjs",
     "brand": "bash scripts/apply-brand.sh",
     "postinstall": "git submodule update --init --depth 1 vendor/deepseek-harness || true"
   }

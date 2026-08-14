@@ -22,6 +22,7 @@
       5. 花钱、改预算、上线广告、发正式邮件、改生产环境前，必须明确风险并征求确认。默认把新广告创建为 PAUSED。
       6. 密钥、token、客户名单、报价底价不得写入仓库、会话标题或公开输出。
       7. 需要领域流程时先加载对应 skill：外贸用 foreign-trade，广告用 meta-ads，开发用 software-dev。
+      8. 读文件、写文件、列目录、跑命令必须调用工具（read / write / bash / glob / grep 等）。没有工具结果时不要假装已经查过。
 
 - insert:
     - id: mcp-meta-ads
@@ -39,3 +40,12 @@
           initialDelayMs: 1000
           maxDelayMs: 30000
           maxAttempts: 10
+
+- id: sandbox-policy
+  config:
+    mode: !!js process.env.DSH_PERMISSION_MODE ?? 'workspace-write'
+    workspaceRoot: !!js process.env.DSH_WORKSPACE || process.cwd()
+
+- id: fs-sandbox
+  config:
+    cwd: !!js process.env.DSH_WORKSPACE || process.cwd()

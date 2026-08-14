@@ -14,3 +14,6 @@ dsh-home/profiles/
 dsh-home/attachments/
 dsh-home/storages/
 branding/.applied-stamp
+dsh-home/*.log
+dsh-home/*.pid
+tmp/

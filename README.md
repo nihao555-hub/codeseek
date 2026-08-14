@@ -8,6 +8,8 @@
 
 模型走 GRS 的 OpenAI 兼容中转，默认 `gemini-3.5-flash`，复杂任务可切 `gpt-5.6-sol`。
 
+GRS 目前**不会**返回 OpenAI 原生 `tool_calls`。`scripts/start.sh` 会在本机拉起 `scripts/grs-tool-proxy.mjs`（默认 `http://127.0.0.1:18765/v1`），把工具编进提示词，再把模型输出的 `<tool_call>` 还原成 Harness 能执行的函数调用。
+
 ## 需要的环境
 
 - Node.js `>= 22.19`（推荐 22.22+）
@@ -25,7 +27,7 @@ npm start              # 或 bash scripts/start.sh web
 
 浏览器打开 http://127.0.0.1:3080 ，选中本仓库作为工作区。
 
-国内直连把 `.env` 里的 `GRS_BASE_URL` 改成 `https://grsai.dakka.com.cn/v1`，并同步改 `dsh-home/settings.yaml` 的 `baseURL`。
+国内直连把 `.env` 里的 `GRS_BASE_URL` 和 `GRS_UPSTREAM_BASE_URL` 改成 `https://grsai.dakka.com.cn/v1`。`dsh-home/settings.yaml` 的 `baseURL` 继续指向本地工具代理。
 
 ## 常用命令
 
@@ -33,7 +35,8 @@ npm start              # 或 bash scripts/start.sh web
 | --- | --- |
 | `npm start` / `scripts/start.sh web` | 启动 Web UI |
 | `scripts/start.sh headless "任务"` | 无界面跑一条任务 |
-| `scripts/start.sh doctor` | 检查 Node、密钥、GRS 连通 |
+| `scripts/start.sh doctor` | 检查 Node、密钥、GRS 连通、工具代理 |
+| `npm test` | 工具协议解析单测 |
 
 首次启动会在 submodule 里执行 `pnpm install` 和 `pnpm run build`，时间较长。
 
@@ -42,7 +45,8 @@ npm start              # 或 bash scripts/start.sh web
 | 路径 | 作用 |
 | --- | --- |
 | `dsh-home/settings.yaml` | GRS 提供方与默认模型 |
-| `dsh-home/cordis.patch.yml` | 人设 + Meta MCP |
+| `dsh-home/cordis.patch.yml` | 人设 + Meta MCP + 工作区根目录 |
+| `scripts/grs-tool-proxy.mjs` | GRS 文本工具协议 ↔ OpenAI tool_calls |
 | `.dsh/skills/` | 外贸 / 广告 / 开发技能 |
 | `AGENTS.md` | 工作区指令 |
 | `.env` | 密钥（不要提交） |

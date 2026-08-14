@@ -28,7 +28,12 @@ load_env() {
     set +a
   fi
   export DSH_HOME="${DSH_HOME:-$ROOT/dsh-home}"
+  export DSH_WORKSPACE="${DSH_WORKSPACE:-$ROOT}"
   export GRS_API_KEY="${GRS_API_KEY:-${OPENAI_API_KEY:-}}"
+  export GRS_BASE_URL="${GRS_BASE_URL:-https://grsaiapi.com/v1}"
+  export GRS_UPSTREAM_BASE_URL="${GRS_UPSTREAM_BASE_URL:-$GRS_BASE_URL}"
+  export GRS_TOOL_PROXY_PORT="${GRS_TOOL_PROXY_PORT:-18765}"
+  export DSH_PERMISSION_MODE="${DSH_PERMISSION_MODE:-danger-full-access}"
   mkdir -p "$DSH_HOME/sessions" "$DSH_HOME/profiles"
 }
 
@@ -42,10 +47,30 @@ require_node() {
   fi
 }
 
+ensure_tool_proxy() {
+  local port="${GRS_TOOL_PROXY_PORT:-18765}"
+  if curl -sf "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+    echo "GRS 工具代理已在 127.0.0.1:${port}"
+    return 0
+  fi
+  echo "启动 GRS 工具调用代理 127.0.0.1:${port} -> ${GRS_UPSTREAM_BASE_URL}"
+  nohup node "$ROOT/scripts/grs-tool-proxy.mjs" >>"$DSH_HOME/grs-tool-proxy.log" 2>&1 &
+  local i
+  for i in $(seq 1 25); do
+    if curl -sf "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "工具代理未能启动，见 $DSH_HOME/grs-tool-proxy.log" >&2
+  return 1
+}
+
 run_dsh() {
   local src="$ROOT/vendor/deepseek-harness"
   if [[ -f "$src/apps/cli/src/bin.ts" && -d "$src/node_modules/tsx" ]]; then
-    exec pnpm --dir "$src" exec -- node --import tsx/esm "$src/apps/cli/src/bin.ts" "$@"
+    # pnpm --dir 会把 cwd 指到 submodule；再用 env --chdir 拉回仓库根，工具才能写本仓库。
+    exec pnpm --dir "$src" exec -- env --chdir="$DSH_WORKSPACE" node --import tsx/esm "$src/apps/cli/src/bin.ts" "$@"
   fi
   if [[ -x "$ROOT/node_modules/.bin/dsh" ]]; then
     exec "$ROOT/node_modules/.bin/dsh" "$@"
@@ -122,12 +147,19 @@ PY
     echo "META_ACCESS_TOKEN: 未设置（Meta MCP 将保持关闭）"
   fi
   echo
+  echo "== GRS 工具代理 =="
+  if curl -sf "http://127.0.0.1:${GRS_TOOL_PROXY_PORT:-18765}/health" >/dev/null 2>&1; then
+    echo "http://127.0.0.1:${GRS_TOOL_PROXY_PORT:-18765}/health 正常"
+  else
+    echo "未运行（start.sh web/headless 会自动拉起）"
+  fi
+  echo
   echo "== GRS Chat API =="
   if [[ -z "${GRS_API_KEY:-}" ]]; then
     echo "跳过：没有 GRS_API_KEY"
     return 0
   fi
-  local base="${GRS_BASE_URL:-https://grsaiapi.com/v1}"
+  local base="${GRS_UPSTREAM_BASE_URL:-${GRS_BASE_URL:-https://grsaiapi.com/v1}}"
   local code
   code="$(curl -sS -o /tmp/grs-doctor.json -w "%{http_code}" \
     -H "Authorization: Bearer ${GRS_API_KEY}" \
@@ -166,10 +198,12 @@ fi
 case "$CMD" in
   web)
     ensure_from_source
+    ensure_tool_proxy
     run_dsh web --port "${DSH_PORT:-3080}" "$@"
     ;;
   headless)
     ensure_from_source
+    ensure_tool_proxy
     run_dsh --profile headless "$@"
     ;;
   doctor)

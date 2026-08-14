@@ -91,7 +91,7 @@ export function renderMcpPatch(catalog, enabled) {
     const lines = [
       `    - id: mcp-${entry.id}`,
       `      name: '@deepseek-ai/dsh-mcp-client'`,
-      `      disabled: !!js !(${expr})`,
+      `      disabled: !!js "!(${expr})"`,
       `      config:`,
       `        serverName: ${serverName}`,
       `        transport: ${entry.transport}`,

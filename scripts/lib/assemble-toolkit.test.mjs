@@ -25,8 +25,8 @@ test('renderMcpPatch disables servers unless forced or env', () => {
   assert.match(yaml, /id: mcp-meta-ads/)
   assert.match(yaml, /serverName: meta-ads/)
   assert.match(yaml, /id: mcp-playwright/)
-  assert.match(yaml, /disabled: !!js !\(true \|\| process\.env\.MCP_PLAYWRIGHT === '1'\)/)
-  assert.match(yaml, /disabled: !!js !\(process\.env\.MCP_GITHUB === '1' \|\| Boolean\(process\.env\.GITHUB_TOKEN\)/)
+  assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_PLAYWRIGHT === '1'\)"/)
+  assert.match(yaml, /disabled: !!js "!\(process\.env\.MCP_GITHUB === '1' \|\| Boolean\(process\.env\.GITHUB_TOKEN\)/)
   assert.match(yaml, /url: "https:\/\/mcp\.facebook\.com\/ads"/)
 })
 

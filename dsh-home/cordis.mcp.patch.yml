@@ -5,7 +5,7 @@
 - insert:
     - id: mcp-meta-ads
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_META_ADS === '1' || Boolean(process.env.META_ACCESS_TOKEN))
+      disabled: !!js "!(process.env.MCP_META_ADS === '1' || Boolean(process.env.META_ACCESS_TOKEN))"
       config:
         serverName: meta-ads
         transport: streamable-http
@@ -20,7 +20,7 @@
           maxAttempts: 10
     - id: mcp-github
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_GITHUB === '1' || Boolean(process.env.GITHUB_TOKEN) || Boolean(process.env.GITHUB_PERSONAL_ACCESS_TOKEN))
+      disabled: !!js "!(process.env.MCP_GITHUB === '1' || Boolean(process.env.GITHUB_TOKEN) || Boolean(process.env.GITHUB_PERSONAL_ACCESS_TOKEN))"
       config:
         serverName: github
         transport: stdio
@@ -39,7 +39,7 @@
           maxAttempts: 10
     - id: mcp-github-official
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_GITHUB_OFFICIAL === '1' || Boolean(process.env.GITHUB_TOKEN))
+      disabled: !!js "!(process.env.MCP_GITHUB_OFFICIAL === '1' || Boolean(process.env.GITHUB_TOKEN))"
       config:
         serverName: github-official
         transport: streamable-http
@@ -54,7 +54,7 @@
           maxAttempts: 10
     - id: mcp-playwright
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_PLAYWRIGHT === '1')
+      disabled: !!js "!(process.env.MCP_PLAYWRIGHT === '1')"
       config:
         serverName: playwright
         transport: stdio
@@ -71,7 +71,7 @@
           maxAttempts: 10
     - id: mcp-sequential-thinking
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_SEQUENTIAL === '1')
+      disabled: !!js "!(process.env.MCP_SEQUENTIAL === '1')"
       config:
         serverName: sequential-thinking
         transport: stdio
@@ -88,7 +88,7 @@
           maxAttempts: 10
     - id: mcp-memory
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_MEMORY === '1')
+      disabled: !!js "!(process.env.MCP_MEMORY === '1')"
       config:
         serverName: memory
         transport: stdio
@@ -105,7 +105,7 @@
           maxAttempts: 10
     - id: mcp-filesystem
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_FILESYSTEM === '1')
+      disabled: !!js "!(process.env.MCP_FILESYSTEM === '1')"
       config:
         serverName: filesystem
         transport: stdio
@@ -123,7 +123,7 @@
           maxAttempts: 10
     - id: mcp-fetch
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_FETCH === '1')
+      disabled: !!js "!(process.env.MCP_FETCH === '1')"
       config:
         serverName: fetch
         transport: stdio
@@ -139,7 +139,7 @@
           maxAttempts: 10
     - id: mcp-time
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_TIME === '1')
+      disabled: !!js "!(process.env.MCP_TIME === '1')"
       config:
         serverName: time
         transport: stdio
@@ -155,7 +155,7 @@
           maxAttempts: 10
     - id: mcp-git
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_GIT === '1')
+      disabled: !!js "!(process.env.MCP_GIT === '1')"
       config:
         serverName: git
         transport: stdio
@@ -173,7 +173,7 @@
           maxAttempts: 10
     - id: mcp-postgres
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_POSTGRES === '1' || Boolean(process.env.POSTGRES_URL))
+      disabled: !!js "!(process.env.MCP_POSTGRES === '1' || Boolean(process.env.POSTGRES_URL))"
       config:
         serverName: postgres
         transport: stdio
@@ -191,7 +191,7 @@
           maxAttempts: 10
     - id: mcp-sqlite
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_SQLITE === '1')
+      disabled: !!js "!(process.env.MCP_SQLITE === '1')"
       config:
         serverName: sqlite
         transport: stdio
@@ -209,7 +209,7 @@
           maxAttempts: 10
     - id: mcp-brave-search
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_BRAVE === '1' || Boolean(process.env.BRAVE_API_KEY))
+      disabled: !!js "!(process.env.MCP_BRAVE === '1' || Boolean(process.env.BRAVE_API_KEY))"
       config:
         serverName: brave-search
         transport: stdio
@@ -228,7 +228,7 @@
           maxAttempts: 10
     - id: mcp-slack
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_SLACK === '1' || Boolean(process.env.SLACK_BOT_TOKEN))
+      disabled: !!js "!(process.env.MCP_SLACK === '1' || Boolean(process.env.SLACK_BOT_TOKEN))"
       config:
         serverName: slack
         transport: stdio
@@ -248,7 +248,7 @@
           maxAttempts: 10
     - id: mcp-google-maps
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_GOOGLE_MAPS === '1' || Boolean(process.env.GOOGLE_MAPS_API_KEY))
+      disabled: !!js "!(process.env.MCP_GOOGLE_MAPS === '1' || Boolean(process.env.GOOGLE_MAPS_API_KEY))"
       config:
         serverName: google-maps
         transport: stdio
@@ -267,7 +267,7 @@
           maxAttempts: 10
     - id: mcp-puppeteer
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_PUPPETEER === '1')
+      disabled: !!js "!(process.env.MCP_PUPPETEER === '1')"
       config:
         serverName: puppeteer
         transport: stdio
@@ -284,7 +284,7 @@
           maxAttempts: 10
     - id: mcp-context7
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_CONTEXT7 === '1')
+      disabled: !!js "!(process.env.MCP_CONTEXT7 === '1')"
       config:
         serverName: context7
         transport: stdio
@@ -303,7 +303,7 @@
           maxAttempts: 10
     - id: mcp-stripe
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_STRIPE === '1' || Boolean(process.env.STRIPE_SECRET_KEY))
+      disabled: !!js "!(process.env.MCP_STRIPE === '1' || Boolean(process.env.STRIPE_SECRET_KEY))"
       config:
         serverName: stripe
         transport: streamable-http
@@ -318,7 +318,7 @@
           maxAttempts: 10
     - id: mcp-linear
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_LINEAR === '1' || Boolean(process.env.LINEAR_API_KEY))
+      disabled: !!js "!(process.env.MCP_LINEAR === '1' || Boolean(process.env.LINEAR_API_KEY))"
       config:
         serverName: linear
         transport: streamable-http
@@ -333,7 +333,7 @@
           maxAttempts: 10
     - id: mcp-notion
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_NOTION === '1' || Boolean(process.env.NOTION_TOKEN))
+      disabled: !!js "!(process.env.MCP_NOTION === '1' || Boolean(process.env.NOTION_TOKEN))"
       config:
         serverName: notion
         transport: streamable-http
@@ -348,7 +348,7 @@
           maxAttempts: 10
     - id: mcp-sentry
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_SENTRY === '1' || Boolean(process.env.SENTRY_AUTH_TOKEN) || Boolean(process.env.SENTRY_ACCESS_TOKEN))
+      disabled: !!js "!(process.env.MCP_SENTRY === '1' || Boolean(process.env.SENTRY_AUTH_TOKEN) || Boolean(process.env.SENTRY_ACCESS_TOKEN))"
       config:
         serverName: sentry
         transport: stdio
@@ -367,7 +367,7 @@
           maxAttempts: 10
     - id: mcp-firecrawl
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js !(process.env.MCP_FIRECRAWL === '1' || Boolean(process.env.FIRECRAWL_API_KEY))
+      disabled: !!js "!(process.env.MCP_FIRECRAWL === '1' || Boolean(process.env.FIRECRAWL_API_KEY))"
       config:
         serverName: firecrawl
         transport: stdio

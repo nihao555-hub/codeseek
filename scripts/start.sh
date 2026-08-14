@@ -101,8 +101,14 @@ run_dsh() {
     # 绝对导入 tsx，并钉死 Harness 的 tsconfig，这样 cwd 可以是仓库根。
     export TSX_TSCONFIG_PATH="${TSX_TSCONFIG_PATH:-$src/tsconfig.json}"
     cd "$DSH_WORKSPACE"
+    # --patch 必须跟在 launcher 标志里（`web` 之后、`--port` 之前）。
+    # 放在 app 参数后面会被 web 命令行当成未知选项。
+    if [[ -f "$mcp_patch" && "${1:-}" == "web" ]]; then
+      shift
+      exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" web --patch "$mcp_patch" "$@"
+    fi
     if [[ -f "$mcp_patch" ]]; then
-      exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" "$@" --patch "$mcp_patch"
+      exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" --patch "$mcp_patch" "$@"
     fi
     exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" "$@"
   fi

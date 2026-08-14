@@ -36,3 +36,9 @@ test('apply-brand copies the ModelSelect override into the vendor client', () =>
   assert.match(sh, /ui-model-selection\/src\/client\/ModelSelect\.tsx/)
   assert.match(sh, /overrides\/ModelSelect\.module\.css/)
 })
+
+test('start.sh puts --patch before web app flags like --port', () => {
+  const sh = readFileSync(join(root, 'scripts/start.sh'), 'utf8')
+  assert.match(sh, /web --patch "\$mcp_patch"/)
+  assert.doesNotMatch(sh, /"\$@" --patch/)
+})

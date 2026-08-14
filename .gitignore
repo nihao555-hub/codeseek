@@ -17,3 +17,5 @@ branding/.applied-stamp
 dsh-home/*.log
 dsh-home/*.pid
 tmp/
+store/node_modules/
+store/client/dist/

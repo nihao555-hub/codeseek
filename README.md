@@ -1,10 +1,11 @@
 # codeseek · 超级员工
 
-基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 Agent，用来做三件事：
+基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 Agent，用来做外贸、广告、开发，并附带一个可跑的独立站演示：
 
 - **跨境外贸**：询盘、报价、跟单、合规
 - **Meta 广告**：官方 Ads MCP（`https://mcp.facebook.com/ads`）
 - **开发任务**：改这个仓库里的代码与配置
+- **港窑独立站**：`store/` 里的跨境家居演示站（Vite + React + Node HTTP）
 
 模型走 GRS 的 OpenAI 兼容中转，默认 `gemini-3.5-flash`，复杂任务可切 `gpt-5.6-sol`。
 
@@ -36,9 +37,23 @@ npm start              # 或 bash scripts/start.sh web
 | `npm start` / `scripts/start.sh web` | 启动 Web UI |
 | `scripts/start.sh headless "任务"` | 无界面跑一条任务 |
 | `scripts/start.sh doctor` | 检查 Node、密钥、GRS 连通、工具代理 |
-| `npm test` | 工具协议解析单测 |
+| `npm test` | 工具协议解析单测 + 独立站 API 单测 |
+| `npm run store` | 启动港窑独立站（API :8788 + Vite :5173） |
+| `npm run store:test` | 只跑独立站测试 |
+| `npm run store:build` | 构建独立站前台 |
 
 首次启动会在 submodule 里执行 `pnpm install` 和 `pnpm run build`，时间较长。
+
+## 港窑独立站
+
+跨境家居演示站：6 个 SKU、中英切换、MOQ 报价、满 $500 免出口操作费、T/T 订金下单、批发询盘。
+
+```bash
+cd store && npm install
+npm run store          # http://127.0.0.1:5173  （API 在 :8788）
+```
+
+约定与 API 说明见 `store/README.md`。Agent 改店面时加载 `.dsh/skills/` 里的前端/后端 skill。
 
 ## 配置在哪
 
@@ -47,7 +62,8 @@ npm start              # 或 bash scripts/start.sh web
 | `dsh-home/settings.yaml` | GRS 提供方与默认模型 |
 | `dsh-home/cordis.patch.yml` | 人设 + Meta MCP + 工作区根目录 |
 | `scripts/grs-tool-proxy.mjs` | GRS 文本工具协议 ↔ OpenAI tool_calls |
-| `.dsh/skills/` | 外贸 / 广告 / 开发技能 |
+| `.dsh/skills/` | 外贸 / 广告 / 开发 / 前端 / 后端技能（见该目录 README） |
+| `store/` | Harbor Kiln 演示独立站 |
 | `AGENTS.md` | 工作区指令 |
 | `.env` | 密钥（不要提交） |
 | `branding/` | logo、字标、空状态装饰 |

@@ -23,6 +23,15 @@ test('parses multiple tool calls', () => {
   assert.equal(parsed.calls.map((c) => c.arguments.file_path).join(','), 'AGENTS.md,README.md')
 })
 
+test('parses tool_call JSON that contains raw newlines', () => {
+  const text = `<tool_call>\n{"name":"write","arguments":{"file_path":"/workspace/tmp/a.md","content":"# Title\n\nHello"}}\n</tool_call>`
+  const parsed = parseAssistantToolPayload(text)
+  assert.equal(parsed.calls.length, 1)
+  assert.equal(parsed.calls[0].name, 'write')
+  assert.equal(parsed.calls[0].arguments.file_path, '/workspace/tmp/a.md')
+  assert.match(parsed.calls[0].arguments.content, /Hello/)
+})
+
 test('parses fenced json fallback', () => {
   const text = '```tool_call\n{"name":"write","arguments":{"file_path":"tmp/a.md","content":"hi"}}\n```'
   const parsed = parseAssistantToolPayload(text)

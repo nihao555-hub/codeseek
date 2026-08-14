@@ -22,23 +22,67 @@ function asText(content) {
   return String(content)
 }
 
+function repairJsonControlChars(text) {
+  let out = ''
+  let inString = false
+  let escaped = false
+  for (const ch of text) {
+    if (inString) {
+      if (escaped) {
+        out += ch
+        escaped = false
+        continue
+      }
+      if (ch === '\\') {
+        out += ch
+        escaped = true
+        continue
+      }
+      if (ch === '"') {
+        out += ch
+        inString = false
+        continue
+      }
+      if (ch === '\n') {
+        out += '\\n'
+        continue
+      }
+      if (ch === '\r') {
+        out += '\\r'
+        continue
+      }
+      if (ch === '\t') {
+        out += '\\t'
+        continue
+      }
+      out += ch
+      continue
+    }
+    if (ch === '"') inString = true
+    out += ch
+  }
+  return out
+}
+
 function parseJsonish(raw) {
   const text = String(raw ?? '').trim()
   if (!text) return null
-  try {
-    return JSON.parse(text)
-  } catch {
-    const start = text.indexOf('{')
-    const end = text.lastIndexOf('}')
-    if (start >= 0 && end > start) {
+  const candidates = [text]
+  const start = text.indexOf('{')
+  const end = text.lastIndexOf('}')
+  if (start >= 0 && end > start) candidates.push(text.slice(start, end + 1))
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate)
+    } catch {
       try {
-        return JSON.parse(text.slice(start, end + 1))
+        return JSON.parse(repairJsonControlChars(candidate))
       } catch {
-        return null
+        continue
       }
     }
-    return null
   }
+  return null
 }
 
 function normalizeCall(value, fallbackName) {
@@ -97,6 +141,17 @@ export function parseAssistantToolPayload(text) {
   }
 
   if (calls.length === 0) {
+    const dangling = source.match(/<tool_call\b[^>]*>([\s\S]*)$/i)
+    if (dangling) {
+      const call = parseCallBody(dangling[1], dangling[0])
+      if (call) {
+        calls.push(call)
+        used.push(dangling[0])
+      }
+    }
+  }
+
+  if (calls.length === 0) {
     for (const match of source.matchAll(FENCE_RE)) {
       const call = parseCallBody(match[1], '')
       if (call) {
@@ -145,6 +200,7 @@ export function buildToolProtocolPrompt(tools) {
     '</tool_call>',
     'Rules:',
     '- arguments must be a JSON object matching that tool\'s schema',
+    '- escape newlines inside JSON strings as \\n; keep the object valid JSON',
     '- multiple tools: multiple <tool_call> blocks',
     '- do not wrap the block in markdown fences',
     '- after <tool_result> arrives, continue the task',

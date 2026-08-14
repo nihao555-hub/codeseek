@@ -8,6 +8,8 @@ import {
   sseEncode,
   TOOL_CONTINUE_HINT,
   lastTurnIsToolResult,
+  buildObservationHint,
+  unreadEditPathsFromText,
 } from './grs-tool-protocol.mjs'
 
 test('parses hermes <tool_call> json', () => {
@@ -89,6 +91,47 @@ test('protocol forbids asking the user to continue after one tool', () => {
   })
   assert.match(out.messages[0].content, /Never ask the user to reply/)
   assert.match(out.messages[0].content, /write\/edit\/bash\/read are available/)
+  assert.match(out.messages[0].content, /bash\/cat\/grep do not observe the file/)
+})
+
+test('extracts unread edit paths from harness FS_NOT_OBSERVED errors', () => {
+  const text = 'Error: edit requires reading "/workspace/store/client/src/App.jsx" first -- read the file, then retry'
+  assert.deepEqual(unreadEditPathsFromText(text), ['/workspace/store/client/src/App.jsx'])
+  assert.match(buildObservationHint(text), /Do not retry edit now/)
+  assert.match(buildObservationHint(text), /App\.jsx/)
+})
+
+test('observation error in tool result tells the model to read first', () => {
+  const err = 'Error: edit requires reading "/workspace/store/client/src/App.jsx" first -- read the file, then retry'
+  const out = toUpstreamChatBody({
+    model: 'gemini-3.5-flash',
+    tools: [
+      { type: 'function', function: { name: 'edit', description: 'edit file', parameters: { type: 'object' } } },
+      { type: 'function', function: { name: 'read', description: 'read file', parameters: { type: 'object' } } },
+    ],
+    messages: [
+      { role: 'user', content: 'change App.jsx' },
+      {
+        role: 'assistant',
+        content: '',
+        tool_calls: [{
+          id: 'call_1',
+          type: 'function',
+          function: { name: 'edit', arguments: JSON.stringify({ file_path: '/workspace/store/client/src/App.jsx' }) },
+        }],
+      },
+      {
+        role: 'tool',
+        tool_call_id: 'call_1',
+        name: 'edit',
+        content: err,
+      },
+    ],
+  })
+  const last = out.messages.at(-1).content
+  assert.match(last, /Do not retry edit now/)
+  assert.match(last, /App\.jsx/)
+  assert.match(last, /Immediately emit/)
 })
 
 test('buildClientResponse stream has tool_calls finish', () => {

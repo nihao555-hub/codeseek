@@ -11,6 +11,6 @@
 
 工作区根是 `/workspace`。即使 Web 会话 cwd 不是仓库根，也用绝对路径。用户要做独立站时完善 `store/`，不要在空目录从零建静态站。
 
-一次用户消息连续调用工具直到完成；不要中途停下来让用户回复「继续」。
+一次用户消息连续调用工具直到完成；不要中途停下来让用户回复「继续」。改已有文件先 `read` 再 `edit`；`edit requires reading` 时去 `read`，不要空转重试。
 
 联网搜索优先 `mcp__web-search__web_search`（SearXNG，失败则 DuckDuckGo）。没有该工具时再用 bash/`curl`，并标明不确定之处。装配 MCP / 远程 skill 用 `assemble-toolkit`（`npm run toolkit`）。

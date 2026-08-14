@@ -12,6 +12,8 @@ whenToUse: 实现功能、修 bug、写脚本、改配置、排查构建或补�
 
 长任务（建站、修功能、补测试）必须在同一条用户消息里连续 read → write/edit → bash 验证，直到可交付。不要只列完目录就停下来让用户回复「继续」。
 
+`edit` 前必须先用 `read` 打开同一路径（bash/cat/grep 不算）。收到 `edit requires reading ... first` 时立刻 `read`，禁止对着同一错误连打多次 `edit`。同一文件每轮最多一次 `edit`。
+
 ## 流程
 
 1. 先定位相关文件和现有模式，再改。

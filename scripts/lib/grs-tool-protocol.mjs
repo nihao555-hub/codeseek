@@ -190,9 +190,38 @@ export const TOOL_CONTINUE_HINT = [
   '[runtime] Tool results above already ran in this same user turn.',
   'Keep calling tools with more <tool_call> blocks until the original user task is fully done.',
   'Do not ask the human to reply 继续 / continue / keep going just to take the next step.',
-  'write and edit are already available in this turn — there is no separate file-editing round.',
+  'edit on an existing file requires a successful `read` tool call on that path first (bash/cat/grep do not count).',
   'If cwd is empty or not the repo, use absolute paths under /workspace. The storefront lives at /workspace/store/.',
 ].join(' ')
+
+const EDIT_NEEDS_READ_RE = /edit requires reading "([^"]+)" first/g
+const WRITE_NEEDS_READ_RE = /cannot overwrite existing "([^"]+)" without reading/g
+const STALE_EDIT_RE = /cannot edit "([^"]+)"[\s\S]*re-read the file, then retry/g
+
+export function unreadEditPathsFromText(text) {
+  const paths = new Set()
+  const source = String(text || '')
+  for (const match of source.matchAll(EDIT_NEEDS_READ_RE)) paths.add(match[1])
+  for (const match of source.matchAll(WRITE_NEEDS_READ_RE)) paths.add(match[1])
+  for (const match of source.matchAll(STALE_EDIT_RE)) paths.add(match[1])
+  return [...paths]
+}
+
+export function buildObservationHint(text) {
+  const source = String(text || '')
+  const paths = unreadEditPathsFromText(source)
+  const needsRead = paths.length > 0 || /read the file, then retry|re-read the file, then retry/.test(source)
+  if (!needsRead) return ''
+  const listed = (paths.length ? paths : ['(see path in the error above)']).map((path) => `- ${path}`).join('\n')
+  return [
+    '[runtime] Filesystem policy blocked edit/write: this session has not observed the file with the `read` tool.',
+    'bash, cat, grep, and glob do NOT count as a read.',
+    'Do not retry edit now. Immediately emit `read` for:',
+    listed,
+    'After `read` returns the file contents, emit exactly ONE `edit` for that file.',
+    'Never fire many parallel edits on an unread file.',
+  ].join('\n')
+}
 
 function messageLooksLikeToolResult(message) {
   if (!message || typeof message !== 'object') return false
@@ -237,6 +266,9 @@ export function buildToolProtocolPrompt(tools) {
     '- multiple tools: multiple <tool_call> blocks',
     '- do not wrap the block in markdown fences',
     '- write/edit/bash/read are available in every round of this turn',
+    '- before `edit` (or overwriting an existing file with `write`), call `read` on that exact path; bash/cat/grep do not observe the file',
+    '- if edit errors with "requires reading" or "read the file, then retry", call `read` next — do not retry `edit`',
+    '- one file: at most one `edit` per round; after a successful edit, re-read before another edit',
     '- if no tool is needed because the task is actually finished, answer normally with no <tool_call>',
     'Available tools:',
     catalog || '(none)',
@@ -325,10 +357,13 @@ export function toUpstreamChatBody(body) {
 
   if (useProtocol && lastTurnIsToolResult(merged)) {
     const last = merged[merged.length - 1]
+    const lastText = last && typeof last.content === 'string' ? last.content : ''
+    const observation = buildObservationHint(lastText)
+    const suffix = observation ? `${TOOL_CONTINUE_HINT}\n\n${observation}` : TOOL_CONTINUE_HINT
     if (last && typeof last.content === 'string') {
-      last.content = `${last.content}\n\n${TOOL_CONTINUE_HINT}`
+      last.content = `${last.content}\n\n${suffix}`
     } else {
-      merged.push({ role: 'user', content: TOOL_CONTINUE_HINT })
+      merged.push({ role: 'user', content: suffix })
     }
   }
 

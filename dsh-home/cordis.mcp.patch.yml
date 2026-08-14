@@ -18,6 +18,24 @@
           initialDelayMs: 1000
           maxDelayMs: 30000
           maxAttempts: 10
+    - id: mcp-web-search
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js "!(true || process.env.MCP_WEB_SEARCH === '1')"
+      config:
+        serverName: web-search
+        transport: stdio
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+        command: node
+        args:
+          - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/web-search-mcp.mjs'"
+        env:
+          SEARXNG_URL: !!js "process.env.SEARXNG_URL || 'https://searx.tiekoetter.com;https://priv.au;https://search.ononoki.org;https://opnxng.com;https://paulgo.io'"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
     - id: mcp-github
       name: '@deepseek-ai/dsh-mcp-client'
       disabled: !!js "!(process.env.MCP_GITHUB === '1' || Boolean(process.env.GITHUB_TOKEN) || Boolean(process.env.GITHUB_PERSONAL_ACCESS_TOKEN))"
@@ -31,7 +49,7 @@
           - -y
           - "@modelcontextprotocol/server-github"
         env:
-          GITHUB_PERSONAL_ACCESS_TOKEN: !!js process.env.GITHUB_PERSONAL_ACCESS_TOKEN || process.env.GITHUB_TOKEN || ''
+          GITHUB_PERSONAL_ACCESS_TOKEN: !!js "process.env.GITHUB_PERSONAL_ACCESS_TOKEN || process.env.GITHUB_TOKEN || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -115,7 +133,7 @@
         args:
           - -y
           - "@modelcontextprotocol/server-filesystem"
-          - !!js process.env.DSH_WORKSPACE || process.cwd()
+          - !!js "process.env.DSH_WORKSPACE || process.cwd()"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -165,7 +183,7 @@
         args:
           - mcp-server-git
           - --repository
-          - !!js process.env.DSH_WORKSPACE || process.cwd()
+          - !!js "process.env.DSH_WORKSPACE || process.cwd()"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -183,7 +201,7 @@
         args:
           - -y
           - "@modelcontextprotocol/server-postgres"
-          - !!js process.env.POSTGRES_URL || ''
+          - !!js "process.env.POSTGRES_URL || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -201,7 +219,27 @@
         args:
           - mcp-server-sqlite
           - --db-path
-          - !!js process.env.SQLITE_PATH || '/tmp/codeseek.sqlite'
+          - !!js "process.env.SQLITE_PATH || '/tmp/codeseek.sqlite'"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-searxng
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js "!(process.env.MCP_SEARXNG === '1')"
+      config:
+        serverName: searxng
+        transport: stdio
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - mcp-searxng
+        env:
+          SEARXNG_URL: !!js "process.env.SEARXNG_URL || 'https://searx.tiekoetter.com;https://priv.au;https://search.ononoki.org'"
+          SEARXNG_HTML_FALLBACK: !!js "process.env.SEARXNG_HTML_FALLBACK || 'true'"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -220,7 +258,7 @@
           - -y
           - "@modelcontextprotocol/server-brave-search"
         env:
-          BRAVE_API_KEY: !!js process.env.BRAVE_API_KEY || ''
+          BRAVE_API_KEY: !!js "process.env.BRAVE_API_KEY || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -239,8 +277,8 @@
           - -y
           - "@modelcontextprotocol/server-slack"
         env:
-          SLACK_BOT_TOKEN: !!js process.env.SLACK_BOT_TOKEN || ''
-          SLACK_TEAM_ID: !!js process.env.SLACK_TEAM_ID || ''
+          SLACK_BOT_TOKEN: !!js "process.env.SLACK_BOT_TOKEN || ''"
+          SLACK_TEAM_ID: !!js "process.env.SLACK_TEAM_ID || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -259,7 +297,7 @@
           - -y
           - "@modelcontextprotocol/server-google-maps"
         env:
-          GOOGLE_MAPS_API_KEY: !!js process.env.GOOGLE_MAPS_API_KEY || ''
+          GOOGLE_MAPS_API_KEY: !!js "process.env.GOOGLE_MAPS_API_KEY || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -295,7 +333,7 @@
           - -y
           - "@upstash/context7-mcp"
         env:
-          CONTEXT7_API_KEY: !!js process.env.CONTEXT7_API_KEY || ''
+          CONTEXT7_API_KEY: !!js "process.env.CONTEXT7_API_KEY || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -359,7 +397,7 @@
           - -y
           - "@sentry/mcp-server"
         env:
-          SENTRY_ACCESS_TOKEN: !!js process.env.SENTRY_AUTH_TOKEN || process.env.SENTRY_ACCESS_TOKEN || ''
+          SENTRY_ACCESS_TOKEN: !!js "process.env.SENTRY_AUTH_TOKEN || process.env.SENTRY_ACCESS_TOKEN || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -378,7 +416,7 @@
           - -y
           - firecrawl-mcp
         env:
-          FIRECRAWL_API_KEY: !!js process.env.FIRECRAWL_API_KEY || ''
+          FIRECRAWL_API_KEY: !!js "process.env.FIRECRAWL_API_KEY || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000

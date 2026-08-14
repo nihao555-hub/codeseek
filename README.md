@@ -26,7 +26,7 @@ cp .env.example .env   # 填入 GRS_API_KEY
 npm start              # 或 bash scripts/start.sh web
 ```
 
-浏览器打开 http://127.0.0.1:3080 ，选中本仓库作为工作区。`scripts/start.sh web` 还会在 `0.0.0.0:3081` 起一层反代（把 Host 改写回回环，避开 Harness 的本机信任栅栏），方便云端端口转发或临时隧道。不需要公网时设 `DSH_PUBLIC_PROXY=0`。
+浏览器打开 http://127.0.0.1:3080 ，**工作区请选本仓库根目录 `/workspace`（或你 clone 下来的 codeseek 路径）**。选到空目录时，Agent 仍应读写 `/workspace`，独立站在 `store/`。`scripts/start.sh web` 还会在 `0.0.0.0:3081` 起一层反代（把 Host 改写回回环，避开 Harness 的本机信任栅栏），方便云端端口转发或临时隧道。不需要公网时设 `DSH_PUBLIC_PROXY=0`。
 
 模型选择栏只保留 GRS 的 **Gemini 3.5 Flash** 和 **GPT-5.6 Sol**（带对应 logo）；DeepSeek 官方那几档暂时关掉。
 
@@ -71,6 +71,20 @@ npm run toolkit -- enable github sequential-thinking
 ```
 
 `npm start` 会 sync 并加载 `dsh-home/cordis.mcp.patch.yml`。说明见 `toolkit/README.md`。
+
+## 联网搜索
+
+Web UI 组合默认关掉 Harness 原生 `tool-web`。本仓库默认打开本地 MCP `web-search`：
+
+1. 先查 GitHub 高星开源元搜索 [SearXNG](https://github.com/searxng/searxng)
+2. 公开实例失败（限流、关闭 JSON）再解析 DuckDuckGo HTML
+
+工具名：
+
+- `mcp__web-search__web_search`
+- `mcp__web-search__web_fetch`
+
+自建 SearXNG 写入 `.env` 的 `SEARXNG_URL`（多个实例用分号分隔）。需要完整 SearXNG MCP（分页、读 URL）时：`npm run toolkit -- enable searxng`，对应 [mcp-searxng](https://github.com/ihor-sokoliuk/mcp-searxng)。关掉默认搜索：`npm run toolkit -- disable web-search`。Brave / Firecrawl 仍是可选付费备选。
 
 ## 配置在哪
 

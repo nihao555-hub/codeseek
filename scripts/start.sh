@@ -193,6 +193,14 @@ PY
   echo "== 工具箱 =="
   node "$ROOT/scripts/assemble-toolkit.mjs" doctor
   echo
+  echo "== 联网搜索 =="
+  if grep -q 'web-search' "$ROOT/toolkit/enabled.json" 2>/dev/null; then
+    echo "web-search MCP: enabled.json 已打开（SearXNG → DuckDuckGo）"
+  else
+    echo "web-search MCP: 未在 enabled.json（可用 MCP_WEB_SEARCH=1 打开）"
+  fi
+  echo "SEARXNG_URL: ${SEARXNG_URL:-（未设置，将用公开实例列表）}"
+  echo
   echo "== GRS 工具代理 =="
   if curl -sf "http://127.0.0.1:${GRS_TOOL_PROXY_PORT:-18765}/health" >/dev/null 2>&1; then
     echo "http://127.0.0.1:${GRS_TOOL_PROXY_PORT:-18765}/health 正常"

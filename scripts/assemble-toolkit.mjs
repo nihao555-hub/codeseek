@@ -56,8 +56,15 @@ function enableExpression(entry, forced) {
   return parts.length ? parts.join(' || ') : 'false'
 }
 
-function envJs(from) {
-  return from.map((name) => `process.env.${name}`).join(' || ') + " || ''"
+function jsStringLiteral(value) {
+  return `'${String(value).replaceAll('\\', '\\\\').replaceAll("'", "\\'")}'`
+}
+
+function envJs(spec) {
+  const from = spec.from || []
+  const chain = from.map((name) => `process.env.${name}`).join(' || ')
+  const fallback = spec.default != null ? jsStringLiteral(spec.default) : "''"
+  return chain ? `${chain} || ${fallback}` : fallback
 }
 
 function headerJs(headers) {
@@ -69,7 +76,7 @@ function headerJs(headers) {
 }
 
 function yamlScalar(value) {
-  if (value && typeof value === 'object' && value.js) return `!!js ${value.js}`
+  if (value && typeof value === 'object' && value.js) return `!!js ${JSON.stringify(value.js)}`
   const text = String(value)
   if (/[:#@&*!]|^\s|\s$|^$/.test(text) || text.includes("'")) return JSON.stringify(text)
   return text
@@ -87,7 +94,7 @@ export function renderMcpPatch(catalog, enabled) {
       throw new Error(`serverName 不合法: ${serverName}`)
     }
     const expr = enableExpression(entry, forced.has(entry.id))
-    const timeout = entry.id === 'meta-ads' || entry.id === 'playwright' ? 120000 : 60000
+    const timeout = ['meta-ads', 'playwright', 'searxng', 'web-search'].includes(entry.id) ? 120000 : 60000
     const lines = [
       `    - id: mcp-${entry.id}`,
       `      name: '@deepseek-ai/dsh-mcp-client'`,
@@ -111,7 +118,7 @@ export function renderMcpPatch(catalog, enabled) {
       if (envEntries.length) {
         lines.push(`        env:`)
         for (const [key, spec] of envEntries) {
-          lines.push(`          ${key}: !!js ${envJs(spec.from)}`)
+          lines.push(`          ${key}: !!js ${JSON.stringify(envJs(spec))}`)
         }
       }
     } else {
@@ -188,7 +195,7 @@ export async function fetchRemoteSkills(catalog = loadCatalog(), { only = [], fe
   return results
 }
 
-export async function refreshMcpSnapshot({ fetchImpl = fetch, queries = ['github', 'playwright', 'stripe', 'linear', 'notion', 'sentry', 'context7', 'filesystem'] } = {}) {
+export async function refreshMcpSnapshot({ fetchImpl = fetch, queries = ['github', 'playwright', 'stripe', 'linear', 'notion', 'sentry', 'context7', 'filesystem', 'searxng'] } = {}) {
   const servers = []
   for (const query of queries) {
     const url = `https://registry.modelcontextprotocol.io/v0.1/servers?search=${encodeURIComponent(query)}&version=latest&limit=8`

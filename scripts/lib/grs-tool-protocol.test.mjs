@@ -6,6 +6,8 @@ import {
   buildClientResponse,
   collectCompletion,
   sseEncode,
+  TOOL_CONTINUE_HINT,
+  lastTurnIsToolResult,
 } from './grs-tool-protocol.mjs'
 
 test('parses hermes <tool_call> json', () => {
@@ -56,10 +58,37 @@ test('rewrites native tool messages into xml protocol', () => {
   })
   assert.equal(out.tools, undefined)
   assert.match(out.messages[0].content, /Available tools/)
+  assert.match(out.messages[0].content, /multi-step agent loop/)
   assert.match(out.messages[0].content, /persona/)
   assert.match(out.messages[2].content, /<tool_call>/)
   assert.match(out.messages[3].content, /<tool_result/)
+  assert.match(out.messages[3].content, /Keep calling tools/)
   assert.equal(out.messages[3].role, 'user')
+  assert.equal(lastTurnIsToolResult(out.messages), true)
+  assert.equal(out.messages[3].content.includes(TOOL_CONTINUE_HINT), true)
+})
+
+test('does not nudge continue on a fresh user question', () => {
+  const out = toUpstreamChatBody({
+    model: 'gemini-3.5-flash',
+    tools: [{ type: 'function', function: { name: 'bash', description: 'shell', parameters: { type: 'object' } } }],
+    messages: [
+      { role: 'system', content: 'persona' },
+      { role: 'user', content: 'hello' },
+    ],
+  })
+  assert.equal(lastTurnIsToolResult(out.messages), false)
+  assert.equal(out.messages.at(-1).content.includes('[runtime]'), false)
+})
+
+test('protocol forbids asking the user to continue after one tool', () => {
+  const out = toUpstreamChatBody({
+    model: 'gemini-3.5-flash',
+    tools: [{ type: 'function', function: { name: 'write', description: 'write file', parameters: { type: 'object' } } }],
+    messages: [{ role: 'user', content: 'build the store' }],
+  })
+  assert.match(out.messages[0].content, /Never ask the user to reply/)
+  assert.match(out.messages[0].content, /write\/edit\/bash\/read are available/)
 })
 
 test('buildClientResponse stream has tool_calls finish', () => {

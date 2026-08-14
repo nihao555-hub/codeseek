@@ -12,7 +12,7 @@
     { "id": "todo_write", "description": "任务清单" },
     { "id": "get_goal", "description": "当前会话目标" },
     { "id": "job_*", "description": "后台作业控制" },
-    { "id": "web_search", "description": "Harness 原生搜索；Web overlay 里 tool-web 默认 disabled，用 MCP fetch/brave/context7 代替" }
+    { "id": "web_search", "description": "Harness 原生搜索；Web overlay 里 tool-web 默认 disabled。用默认打开的 MCP web-search（SearXNG，失败则 DuckDuckGo）" }
   ],
   "skills": [
     { "id": "assemble-toolkit", "kind": "local", "group": "platform", "description": "装配本仓库 skill / MCP / 主机工具" },
@@ -152,6 +152,23 @@
       "docs": "https://mcp.facebook.com/ads"
     },
     {
+      "id": "web-search",
+      "title": "联网搜索（SearXNG + DuckDuckGo）",
+      "description": "本地 MCP：先查 GitHub 高星开源元搜索 SearXNG，公开实例失败再解析 DuckDuckGo HTML。工具名 mcp__web-search__web_search / mcp__web-search__web_fetch。",
+      "transport": "stdio",
+      "serverName": "web-search",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/web-search-mcp.mjs'" }],
+      "env": {
+        "SEARXNG_URL": {
+          "from": ["SEARXNG_URL"],
+          "default": "https://searx.tiekoetter.com;https://priv.au;https://search.ononoki.org;https://opnxng.com;https://paulgo.io"
+        }
+      },
+      "enableWhen": { "flag": "MCP_WEB_SEARCH" },
+      "docs": "https://github.com/searxng/searxng"
+    },
+    {
       "id": "github",
       "title": "GitHub（stdio 参考服务器）",
       "description": "仓库、Issue、PR、文件。需要 GitHub PAT。",
@@ -272,6 +289,24 @@
       "args": ["mcp-server-sqlite", "--db-path", { "js": "process.env.SQLITE_PATH || '/tmp/codeseek.sqlite'" }],
       "enableWhen": { "flag": "MCP_SQLITE" },
       "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite"
+    },
+    {
+      "id": "searxng",
+      "title": "SearXNG（开源元搜索）",
+      "description": "完整 SearXNG MCP（分页、读 URL）。自建实例时启用：设 SEARXNG_URL 后 npm run toolkit -- enable searxng。日常默认用本地 web-search。",
+      "transport": "stdio",
+      "serverName": "searxng",
+      "command": "npx",
+      "args": ["-y", "mcp-searxng"],
+      "env": {
+        "SEARXNG_URL": {
+          "from": ["SEARXNG_URL"],
+          "default": "https://searx.tiekoetter.com;https://priv.au;https://search.ononoki.org"
+        },
+        "SEARXNG_HTML_FALLBACK": { "from": ["SEARXNG_HTML_FALLBACK"], "default": "true" }
+      },
+      "enableWhen": { "flag": "MCP_SEARXNG" },
+      "docs": "https://github.com/ihor-sokoliuk/mcp-searxng"
     },
     {
       "id": "brave-search",

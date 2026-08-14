@@ -15,6 +15,9 @@
 - 参考服务器：https://github.com/modelcontextprotocol/servers
 - GitHub 官方 MCP：https://github.com/github/github-mcp-server
 - Playwright：https://github.com/microsoft/playwright-mcp
+- SearXNG 引擎：https://github.com/searxng/searxng （AGPL-3.0）
+- SearXNG MCP：https://github.com/ihor-sokoliuk/mcp-searxng （MIT）
+- 默认本地搜索：`scripts/web-search-mcp.mjs` 先查 SearXNG JSON API，失败则解析 DuckDuckGo HTML
 - Stripe / Linear / Notion 等远程 MCP 需要各自账户与密钥，密钥只放 `.env`。
 
 不要把 token 写进 `catalog.json`、patch 或 commit。

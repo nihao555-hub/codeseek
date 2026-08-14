@@ -186,13 +186,46 @@ function toolSchema(tool) {
   return null
 }
 
+export const TOOL_CONTINUE_HINT = [
+  '[runtime] Tool results above already ran in this same user turn.',
+  'Keep calling tools with more <tool_call> blocks until the original user task is fully done.',
+  'Do not ask the human to reply 继续 / continue / keep going just to take the next step.',
+  'write and edit are already available in this turn — there is no separate file-editing round.',
+  'If cwd is empty or not the repo, use absolute paths under /workspace. The storefront lives at /workspace/store/.',
+].join(' ')
+
+function messageLooksLikeToolResult(message) {
+  if (!message || typeof message !== 'object') return false
+  if (message.role === 'tool' || message.role === 'function') return true
+  if (Array.isArray(message.tool_calls) && message.tool_calls.length > 0) return false
+  const content = asText(message.content)
+  return content.includes('<tool_result')
+}
+
+export function lastTurnIsToolResult(messages) {
+  const list = Array.isArray(messages) ? messages : []
+  for (let i = list.length - 1; i >= 0; i -= 1) {
+    const message = list[i]
+    if (!message || typeof message !== 'object') continue
+    if (message.role === 'assistant') return false
+    if (messageLooksLikeToolResult(message)) return true
+    if (message.role === 'user') return false
+  }
+  return false
+}
+
 export function buildToolProtocolPrompt(tools) {
   const schemas = (tools || []).map(toolSchema).filter(Boolean)
   const catalog = schemas.map((schema) => {
     return `- ${schema.name}: ${schema.description}\n  parameters: ${JSON.stringify(schema.parameters)}`
   }).join('\n')
   return [
-    'You can use tools. When a tool is required, emit one or more <tool_call> blocks, then STOP.',
+    'You are in a multi-step agent loop. One user message can require many tool rounds.',
+    'When a tool is required, emit one or more <tool_call> blocks, then stop generating.',
+    '"Stop generating" only ends this model completion. The runtime will run the tools and call you again with <tool_result>.',
+    'After <tool_result>, continue the same task with more <tool_call> blocks. Do not wait for the human.',
+    'Never ask the user to reply 继续 / continue so you can write files or run the next command.',
+    'Never stop after a single ls/read/bash inspection if the user asked you to implement, fix, or build something.',
     'Do not claim you already read a file or ran a command unless a <tool_result> is in this conversation.',
     'Exact format:',
     '<tool_call>',
@@ -203,8 +236,8 @@ export function buildToolProtocolPrompt(tools) {
     '- escape newlines inside JSON strings as \\n; keep the object valid JSON',
     '- multiple tools: multiple <tool_call> blocks',
     '- do not wrap the block in markdown fences',
-    '- after <tool_result> arrives, continue the task',
-    '- if no tool is needed, answer normally with no <tool_call>',
+    '- write/edit/bash/read are available in every round of this turn',
+    '- if no tool is needed because the task is actually finished, answer normally with no <tool_call>',
     'Available tools:',
     catalog || '(none)',
   ].join('\n')
@@ -287,6 +320,15 @@ export function toUpstreamChatBody(body) {
       last.content = `${last.content}\n\n${message.content}`
     } else {
       merged.push({ ...message })
+    }
+  }
+
+  if (useProtocol && lastTurnIsToolResult(merged)) {
+    const last = merged[merged.length - 1]
+    if (last && typeof last.content === 'string') {
+      last.content = `${last.content}\n\n${TOOL_CONTINUE_HINT}`
+    } else {
+      merged.push({ role: 'user', content: TOOL_CONTINUE_HINT })
     }
   }
 

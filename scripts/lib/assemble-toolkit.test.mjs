@@ -25,9 +25,33 @@ test('renderMcpPatch disables servers unless forced or env', () => {
   assert.match(yaml, /id: mcp-meta-ads/)
   assert.match(yaml, /serverName: meta-ads/)
   assert.match(yaml, /id: mcp-playwright/)
+  assert.match(yaml, /id: mcp-searxng/)
   assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_PLAYWRIGHT === '1'\)"/)
   assert.match(yaml, /disabled: !!js "!\(process\.env\.MCP_GITHUB === '1' \|\| Boolean\(process\.env\.GITHUB_TOKEN\)/)
+  assert.match(yaml, /disabled: !!js "!\(process\.env\.MCP_SEARXNG === '1'\)"/)
   assert.match(yaml, /url: "https:\/\/mcp\.facebook\.com\/ads"/)
+})
+
+test('searxng env has public instance default and html fallback', () => {
+  const catalog = loadCatalog()
+  assert.ok(catalog.mcp.some((item) => item.id === 'searxng'))
+  const yaml = renderMcpPatch(catalog, { mcp: ['searxng'] })
+  assert.match(yaml, /id: mcp-searxng/)
+  assert.match(yaml, /mcp-searxng/)
+  assert.match(yaml, /SEARXNG_URL: !!js /)
+  assert.match(yaml, /searx\.tiekoetter\.com/)
+  assert.match(yaml, /SEARXNG_HTML_FALLBACK: !!js /)
+  assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_SEARXNG === '1'\)"/)
+})
+
+test('web-search local mcp is default-on via enabled patch', () => {
+  const catalog = loadCatalog()
+  assert.ok(catalog.mcp.some((item) => item.id === 'web-search'))
+  const yaml = renderMcpPatch(catalog, { mcp: ['web-search'] })
+  assert.match(yaml, /id: mcp-web-search/)
+  assert.match(yaml, /serverName: web-search/)
+  assert.match(yaml, /web-search-mcp\.mjs/)
+  assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_WEB_SEARCH === '1'\)"/)
 })
 
 test('fetchRemoteSkills writes SKILL.md with whenToUse', async () => {

@@ -21,7 +21,8 @@ test('settings catalog only lists GRS Gemini and GPT seats', () => {
 test('ModelSelect override paints Gemini/OpenAI marks and hides DeepSeek rows', () => {
   const tsx = readFileSync(join(root, 'branding/overrides/ModelSelect.tsx'), 'utf8')
   assert.match(tsx, /\/brand\/models\/gemini\.svg/)
-  assert.match(tsx, /\/brand\/models\/openai\.svg/)
+  assert.match(tsx, /function OpenAILogo/)
+  assert.match(tsx, /M22\.2819 9\.8211/)
   assert.match(tsx, /id\.includes\('gemini'\)/)
   assert.match(tsx, /id\.includes\('gpt'\)/)
   assert.match(tsx, /hay\.includes\('deepseek'\)/)

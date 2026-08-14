@@ -13,6 +13,7 @@
   color: var(--dsw-alias-label-primary);
 }
 
+.logo svg,
 .logo img {
   display: block;
   object-fit: contain;

@@ -26,7 +26,7 @@ cp .env.example .env   # 填入 GRS_API_KEY
 npm start              # 或 bash scripts/start.sh web
 ```
 
-浏览器打开 http://127.0.0.1:3080 ，**工作区请选本仓库根目录 `/workspace`（或你 clone 下来的 codeseek 路径）**。选到空目录时，Agent 仍应读写 `/workspace`，独立站在 `store/`。`scripts/start.sh web` 还会在 `0.0.0.0:3081` 起一层反代（把 Host 改写回回环，避开 Harness 的本机信任栅栏），方便云端端口转发或临时隧道。不需要公网时设 `DSH_PUBLIC_PROXY=0`。
+浏览器打开 http://127.0.0.1:3080 。`scripts/start.sh web` 会把仓库根登记成工作区 **codeseek**（`/workspace` 或你 clone 下来的路径）。新会话请选这一项，不要选空标题或 `pkg`。选错时 Agent 仍应读写 `/workspace`，独立站在 `store/`。`scripts/start.sh web` 还会在 `0.0.0.0:3081` 起一层反代（把 Host 改写回回环，避开 Harness 的本机信任栅栏），方便云端端口转发或临时隧道。不需要公网时设 `DSH_PUBLIC_PROXY=0`。
 
 模型选择栏只保留 GRS 的 **Gemini 3.5 Flash** 和 **GPT-5.6 Sol**（带对应 logo）；DeepSeek 官方那几档暂时关掉。
 

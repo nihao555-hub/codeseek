@@ -156,6 +156,10 @@ async function handleChat(req, rawBody, res) {
 
   const parsed = parseAssistantToolPayload(collected.content)
   if (parsed.calls.length === 0) {
+    const preview = collected.content.replace(/\s+/g, ' ').trim().slice(0, 240)
+    if (/tool_call|<\/invoke>|"name"\s*:/.test(collected.content)) {
+      log(`no tool calls parsed from tool-shaped text: ${preview}`)
+    }
     send(res, 200, { 'content-type': stream ? 'text/event-stream; charset=utf-8' : 'application/json' }, raw)
     return
   }

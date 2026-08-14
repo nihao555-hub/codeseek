@@ -8,6 +8,6 @@
 
 Meta 广告通过官方 MCP `https://mcp.facebook.com/ads` 接入，工具名形如 `mcp__meta-ads__*`。没有 `META_ACCESS_TOKEN` 时该 MCP 不会加载。
 
-联网搜索优先 `mcp__web-search__web_search`（先 GitHub 高星开源元搜索 SearXNG，公开实例失败则 DuckDuckGo）。读 URL 用 `mcp__web-search__web_fetch`。
+联网搜索优先 `mcp__web-search__web_search`（先 GitHub 高星开源元搜索 SearXNG，公开实例失败则 DuckDuckGo）。读 URL 用 `mcp__web-search__web_fetch`。不要调用原生 `web_search`。
 
 优先读取 `/workspace/AGENTS.md`、`.dsh/skills/` 与 `toolkit/catalog.json`。skill 不在 catalog 时跳过，直接改 `/workspace/store/`。多数 MCP 默认关闭；联网搜索默认打开。

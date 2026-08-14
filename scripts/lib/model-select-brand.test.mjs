@@ -9,6 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '../..')
 test('home patch disables the DeepSeek official adapter', () => {
   const yaml = readFileSync(join(root, 'dsh-home/cordis.patch.yml'), 'utf8')
   assert.match(yaml, /- id: llm-deepseek\n  disabled: true/)
+  assert.match(yaml, /- id: web-search-deepseek\n  disabled: true/)
 })
 
 test('settings catalog only lists GRS Gemini and GPT seats', () => {
@@ -70,4 +71,10 @@ test('start.sh puts --patch before web app flags like --port', () => {
   const sh = readFileSync(join(root, 'scripts/start.sh'), 'utf8')
   assert.match(sh, /web --patch "\$mcp_patch"/)
   assert.doesNotMatch(sh, /"\$@" --patch/)
+})
+
+test('start.sh registers the repo workspace before launching web', () => {
+  const sh = readFileSync(join(root, 'scripts/start.sh'), 'utf8')
+  assert.match(sh, /ensure_default_workspace/)
+  assert.match(sh, /scripts\/ensure-workspace\.mjs/)
 })

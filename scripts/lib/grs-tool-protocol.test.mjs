@@ -169,6 +169,27 @@ test('normalizes common Gemini argument aliases', () => {
   assert.equal(normalizeToolArguments('skill', { skill: 'ecommerce-store' }).name, 'ecommerce-store')
 })
 
+test('parses invoke XML parameters and bare JSON tool calls', () => {
+  const xml = '<invoke name="bash"><parameter name="command">ls /workspace/store</parameter></invoke>'
+  const fromXml = parseAssistantToolPayload(xml)
+  assert.equal(fromXml.calls[0].name, 'bash')
+  assert.equal(fromXml.calls[0].arguments.command, 'ls /workspace/store')
+  assert.match(fromXml.calls[0].arguments.description, /ls \/workspace\/store/)
+
+  const bare = parseAssistantToolPayload('{"name":"read","arguments":{"path":"/workspace/AGENTS.md"}}')
+  assert.equal(bare.calls[0].arguments.file_path, '/workspace/AGENTS.md')
+})
+
+test('protocol forbids native web_search without DeepSeek key', () => {
+  const out = toUpstreamChatBody({
+    model: 'gemini-3.5-flash',
+    tools: [{ type: 'function', function: { name: 'write', description: 'write file', parameters: { type: 'object' } } }],
+    messages: [{ role: 'user', content: 'search something' }],
+  })
+  assert.match(out.messages[0].content, /do not call web_search/)
+  assert.match(out.messages[0].content, /mcp__web-search__web_search/)
+})
+
 test('parses tool_call blocks that use argument aliases', () => {
   const text = [
     '<tool_call>{"name":"read","arguments":{"path":"/workspace/AGENTS.md"}}</tool_call>',

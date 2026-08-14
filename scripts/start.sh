@@ -66,6 +66,10 @@ ensure_user_skills() {
   ln -sfn "$src" "$dest"
 }
 
+ensure_default_workspace() {
+  node "$ROOT/scripts/ensure-workspace.mjs"
+}
+
 ensure_toolkit() {
   ensure_user_skills
   node "$ROOT/scripts/assemble-toolkit.mjs" sync >/dev/null
@@ -221,6 +225,23 @@ PY
     echo "dsh-home/skills: 不存在"
   fi
   echo
+  echo "== Web 工作区登记 =="
+  if [[ -f "$DSH_HOME/storages/workspace.json" ]]; then
+    python3 - <<'PY'
+import json, os
+from pathlib import Path
+home = Path(os.environ.get("DSH_HOME", "/workspace/dsh-home")) / "storages/workspace.json"
+data = json.loads(home.read_text())
+order = data.get("global", {}).get("workspaceIds") or []
+rows = data.get("tables", {}).get("workspaces") or {}
+for wid in order:
+    rec = rows.get(wid) or {}
+    print(f"{rec.get('path','?'):<40} title={rec.get('title') or '（空）'}")
+PY
+  else
+    echo "尚无 workspace.json（start.sh web 会写入 $DSH_WORKSPACE）"
+  fi
+  echo
   echo "== 联网搜索 =="
   if grep -q 'web-search' "$ROOT/toolkit/enabled.json" 2>/dev/null; then
     echo "web-search MCP: enabled.json 已打开（SearXNG → DuckDuckGo）"
@@ -286,15 +307,18 @@ case "$CMD" in
   web)
     ensure_from_source
     ensure_toolkit
+    ensure_default_workspace
     ensure_tool_proxy
     ensure_public_proxy
     echo "本机 UI  http://127.0.0.1:${DSH_PORT:-3080}"
     echo "公网入口 http://0.0.0.0:${DSH_PUBLIC_PORT:-3081} （反代到回环 Web；设 DSH_PUBLIC_PROXY=0 可关）"
+    echo "工作区请选 codeseek（$DSH_WORKSPACE）；不要选空标题或 /home/ubuntu/go/pkg"
     run_dsh web --port "${DSH_PORT:-3080}" "$@"
     ;;
   headless)
     ensure_from_source
     ensure_toolkit
+    ensure_default_workspace
     ensure_tool_proxy
     run_dsh --profile headless "$@"
     ;;

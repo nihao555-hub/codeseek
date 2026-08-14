@@ -4,6 +4,7 @@
  */
 
 const TOOL_CALL_RE = /<tool_call\b[^>]*>([\s\S]*?)<\/tool_call>/gi
+const INVOKE_RE = /<invoke\b[^>]*name\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/invoke>/gi
 const FENCE_RE = /```(?:tool_call|toolcall|json)\s*\n([\s\S]*?)```/gi
 
 function asText(content) {
@@ -164,6 +165,15 @@ function normalizeCall(value, fallbackName) {
   return { id, name, arguments: normalizeToolArguments(name, args) }
 }
 
+function parseXmlParameters(body) {
+  const args = {}
+  const re = /<parameter\b[^>]*name\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/parameter>/gi
+  for (const match of String(body || '').matchAll(re)) {
+    args[match[1]] = match[2].trim()
+  }
+  return Object.keys(args).length ? args : null
+}
+
 function parseCallBody(body, openTag) {
   const nameFromTag = /name\s*=\s*["']([^"']+)["']/i.exec(openTag || '')?.[1]
   const trimmed = String(body ?? '').trim()
@@ -172,12 +182,14 @@ function parseCallBody(body, openTag) {
     if (asJson.name || asJson.tool) return normalizeCall(asJson, nameFromTag)
     if (nameFromTag) return normalizeCall({ name: nameFromTag, arguments: asJson })
   }
+  const xmlArgs = parseXmlParameters(trimmed)
+  if (xmlArgs && nameFromTag) return normalizeCall({ name: nameFromTag, arguments: xmlArgs })
   const lines = trimmed.split('\n')
   const first = lines[0]?.trim()
   if (first && /^[A-Za-z0-9_.-]+$/.test(first) && lines.length > 1) {
-    return normalizeCall({ name: first, arguments: parseJsonish(lines.slice(1).join('\n')) || {} })
+    return normalizeCall({ name: first, arguments: parseJsonish(lines.slice(1).join('\n')) || xmlArgs || {} })
   }
-  if (nameFromTag) return normalizeCall({ name: nameFromTag, arguments: asJson || {} })
+  if (nameFromTag) return normalizeCall({ name: nameFromTag, arguments: asJson || xmlArgs || {} })
   return null
 }
 
@@ -211,12 +223,30 @@ export function parseAssistantToolPayload(text) {
   }
 
   if (calls.length === 0) {
+    for (const match of source.matchAll(INVOKE_RE)) {
+      const call = parseCallBody(match[2], `name="${match[1]}"`)
+      if (call) {
+        calls.push(call)
+        used.push(match[0])
+      }
+    }
+  }
+
+  if (calls.length === 0) {
     for (const match of source.matchAll(FENCE_RE)) {
       const call = parseCallBody(match[1], '')
       if (call) {
         calls.push(call)
         used.push(match[0])
       }
+    }
+  }
+
+  if (calls.length === 0) {
+    const lone = normalizeCall(parseJsonish(source))
+    if (lone) {
+      calls.push(lone)
+      used.push(source)
     }
   }
 
@@ -252,6 +282,7 @@ export const TOOL_CONTINUE_HINT = [
   'edit on an existing file requires a successful `read` tool call on that path first (bash/cat/grep do not count).',
   'If cwd is empty or not the repo, use absolute paths under /workspace. The storefront lives at /workspace/store/.',
   'If skill is unknown, skip it and keep implementing under /workspace/store/.',
+  'Do not call web_search; use mcp__web-search__web_search.',
 ].join(' ')
 
 const EDIT_NEEDS_READ_RE = /edit requires reading "([^"]+)" first/g
@@ -325,6 +356,7 @@ export function buildToolProtocolPrompt(tools) {
     '- read/write/edit require file_path (not path/file)',
     '- bash requires command and description (5-10 words; description is shown in the UI)',
     '- glob requires pattern; skill requires name',
+    '- do not call web_search / web_fetch (they need DEEPSEEK_API_KEY). Search with mcp__web-search__web_search; fetch URLs with mcp__web-search__web_fetch',
     '- if skill says unknown, skip it and keep editing /workspace/store/ with absolute paths',
     '- escape newlines inside JSON strings as \\n; keep the object valid JSON',
     '- multiple tools: multiple <tool_call> blocks',

@@ -68,9 +68,11 @@ ensure_tool_proxy() {
 
 run_dsh() {
   local src="$ROOT/vendor/deepseek-harness"
-  if [[ -f "$src/apps/cli/src/bin.ts" && -d "$src/node_modules/tsx" ]]; then
-    # pnpm --dir 会把 cwd 指到 submodule；再用 env --chdir 拉回仓库根，工具才能写本仓库。
-    exec pnpm --dir "$src" exec -- env --chdir="$DSH_WORKSPACE" node --import tsx/esm "$src/apps/cli/src/bin.ts" "$@"
+  local tsx_loader="$src/node_modules/tsx/dist/esm/index.mjs"
+  if [[ -f "$src/apps/cli/src/bin.ts" && -f "$tsx_loader" ]]; then
+    # 绝对导入 tsx，cwd 保持仓库根，这样 session/工具工作区不是 submodule。
+    cd "$DSH_WORKSPACE"
+    exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" "$@"
   fi
   if [[ -x "$ROOT/node_modules/.bin/dsh" ]]; then
     exec "$ROOT/node_modules/.bin/dsh" "$@"

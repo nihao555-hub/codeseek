@@ -1,0 +1,1373 @@
+{
+  "fetchedAt": "2026-08-14T10:42:06.114Z",
+  "count": 56,
+  "servers": [
+    {
+      "query": "github",
+      "name": "ai.smithery/Hint-Services-obsidian-github-mcp",
+      "description": "Connect AI assistants to your GitHub-hosted Obsidian vault to seamlessly access, search, and analy…",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://server.smithery.ai/@Hint-Services/obsidian-github-mcp/mcp",
+          "headers": [
+            {
+              "description": "Bearer token for Smithery authentication",
+              "isRequired": true,
+              "value": "Bearer {smithery_api_key}",
+              "isSecret": true,
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "github",
+      "name": "ai.smithery/saidsef-mcp-github-pr-issue-analyser",
+      "description": "A Model Context Protocol (MCP) application for automated GitHub PR analysis and issue management.…",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://server.smithery.ai/@saidsef/mcp-github-pr-issue-analyser/mcp",
+          "headers": [
+            {
+              "description": "Bearer token for Smithery authentication",
+              "value": "Bearer {smithery_api_key}",
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "github",
+      "name": "ai.smithery/smithery-ai-github",
+      "description": "Access the GitHub API, enabling file operations, repository management, search functionality, and…",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://server.smithery.ai/@smithery-ai/github/mcp",
+          "headers": [
+            {
+              "description": "Bearer token for Smithery authentication",
+              "isRequired": true,
+              "value": "Bearer {smithery_api_key}",
+              "isSecret": true,
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "github",
+      "name": "com.mcparmory/github",
+      "description": "Manage repositories, users, releases, and automate GitHub workflows",
+      "packages": [
+        {
+          "registryType": "pypi",
+          "identifier": "mcparmory-github",
+          "version": "1.0.6",
+          "runtimeHint": "uvx",
+          "transport": {
+            "type": "stdio"
+          }
+        },
+        {
+          "registryType": "oci",
+          "identifier": "ghcr.io/mcparmory/github:1.0.6",
+          "runtimeHint": "docker",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "github",
+      "name": "com.thenextgennexus/github-mcp-server",
+      "description": "GitHub repo analytics: stars, trending, code search, contributor maps for project research.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://nexgendata-mcp-proxy.steve-corbeil.workers.dev/github-mcp-server/mcp",
+          "headers": [
+            {
+              "description": "Apify API token. Free tier at console.apify.com",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "github",
+      "name": "dev.reapx/github-repos",
+      "description": "Scrape GitHub repository metadata, stars, forks, topics, licences and activity. Pay per row.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://mcp.apify.com/?actors=reapx/github-repo-scraper",
+          "headers": [
+            {
+              "description": "Your own Apify API token as 'Bearer <token>'. Get one free at https://console.apify.com/account/integrations, or buy a prepaid, spend-capped token with no signup at https://agi.apify.com. Runs bill to your own account, per result returned.",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "github",
+      "name": "io.github.000safah000-ai/blackhawk-mcp",
+      "description": "BlackHawkMCP - connect AI to Google Sheets",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "blackhawk-mcp",
+          "version": "1.0.0",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Google OAuth2 client ID",
+              "isRequired": true,
+              "format": "string",
+              "name": "GOOGLE_CLIENT_ID"
+            },
+            {
+              "description": "Google OAuth2 client secret",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "GOOGLE_CLIENT_SECRET"
+            },
+            {
+              "description": "OAuth2 redirect URI",
+              "format": "string",
+              "name": "GOOGLE_REDIRECT_URI"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "github",
+      "name": "io.github.0580iris-lang/x711-gas-station",
+      "description": "Pay-per-use tool API for AI agents. Free tier, x402 USDC micropayments, or API key.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://x711.io/mcp"
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "com.clauxel.playwrightselectorguard/playwrightselectorguard-mcp",
+      "description": "Playwright selector risk checks with healing suggestions and receipts.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://playwrightselectorguard.clauxel.com/mcp",
+          "headers": [
+            {
+              "description": "Bearer token from the product website.",
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "com.pulsemcp/playwright-stealth",
+      "description": "Browser automation using Playwright with optional stealth mode to bypass anti-bot protection.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "registryBaseUrl": "https://registry.npmjs.org",
+          "identifier": "playwright-stealth-mcp-server",
+          "version": "0.2.3",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "stdio"
+          },
+          "runtimeArguments": [
+            {
+              "value": "-y",
+              "type": "positional"
+            }
+          ],
+          "environmentVariables": [
+            {
+              "description": "Enable stealth mode with anti-detection measures.",
+              "default": "false",
+              "name": "STEALTH_MODE"
+            },
+            {
+              "description": "Custom User-Agent string for stealth mode.",
+              "name": "STEALTH_USER_AGENT"
+            },
+            {
+              "description": "Mask Linux in User-Agent as Windows to avoid fingerprint mismatch.",
+              "default": "true",
+              "name": "STEALTH_MASK_LINUX"
+            },
+            {
+              "description": "Custom locale for Accept-Language header in stealth mode.",
+              "default": "en-US,en",
+              "name": "STEALTH_LOCALE"
+            },
+            {
+              "description": "Run browser in headless mode.",
+              "default": "true",
+              "name": "HEADLESS"
+            },
+            {
+              "description": "Default timeout for Playwright actions in milliseconds.",
+              "default": "30000",
+              "name": "TIMEOUT"
+            },
+            {
+              "description": "Default timeout for page navigation in milliseconds.",
+              "default": "60000",
+              "name": "NAVIGATION_TIMEOUT"
+            },
+            {
+              "description": "Directory for storing screenshots.",
+              "default": "/tmp/playwright-screenshots",
+              "name": "SCREENSHOT_STORAGE_PATH"
+            },
+            {
+              "description": "Directory for storing video recordings.",
+              "default": "/tmp/playwright-videos",
+              "name": "VIDEO_STORAGE_PATH"
+            },
+            {
+              "description": "Proxy server URL for connections.",
+              "name": "PROXY_URL"
+            },
+            {
+              "description": "Proxy authentication username.",
+              "isSecret": true,
+              "name": "PROXY_USERNAME"
+            },
+            {
+              "description": "Proxy authentication password.",
+              "isSecret": true,
+              "name": "PROXY_PASSWORD"
+            },
+            {
+              "description": "Comma-separated list of hosts to bypass proxy.",
+              "name": "PROXY_BYPASS"
+            },
+            {
+              "description": "Comma-separated list of browser permissions to grant.",
+              "name": "BROWSER_PERMISSIONS"
+            },
+            {
+              "description": "Ignore HTTPS certificate errors.",
+              "default": "true",
+              "name": "IGNORE_HTTPS_ERRORS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "com.thenextgennexus/playwright-mcp-server",
+      "description": "Headless browser primitives for AI agents when sites need real JS rendering.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://nexgendata-mcp-proxy.steve-corbeil.workers.dev/playwright-mcp-server/mcp",
+          "headers": [
+            {
+              "description": "Apify API token. Free tier at console.apify.com",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "io.github.dinesh-nalla-se/playwright-mcp",
+      "description": "Playwright Tools for MCP",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@dinesh-nalla-se/playwright-mcp",
+          "version": "0.0.47",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Your API key for the service",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "YOUR_API_KEY"
+            }
+          ]
+        },
+        {
+          "registryType": "oci",
+          "identifier": "docker.io/dineshn51331/playwright-mcp:1.0.0",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Your API key for the service",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "YOUR_API_KEY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "io.github.hubertgajewski/playwright-report-mcp",
+      "description": "Run Playwright tests and surface structured results for AI agents doing test failure analysis.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "playwright-report-mcp",
+          "version": "3.3.0",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "path.delimiter-separated list of directories the per-call workingDirectory parameter may point at. Entries may be absolute or relative (resolved once against the server's launch cwd at startup). Defaults to '.' (authorizes only the launch directory).",
+              "format": "string",
+              "name": "PW_ALLOWED_DIRS"
+            },
+            {
+              "description": "Absolute path override for the JSON reporter output file. Defaults to <workingDirectory>/test-results/results.json, computed per call.",
+              "format": "string",
+              "name": "PW_RESULTS_FILE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "io.github.microsoft/playwright-mcp",
+      "description": "Playwright Tools for MCP",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@playwright/mcp",
+          "version": "0.0.79",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "io.github.oguzc/playwright-wizard-mcp",
+      "description": "MCP server providing Playwright test generation wizard with intelligent prompts and best practices",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "playwright-wizard-mcp",
+          "version": "0.1.6",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "playwright",
+      "name": "io.github.vola-trebla/playwright-network-chaos-mcp",
+      "description": "MCP server that gives AI agents dynamic network chaos control over Playwright browser sessions",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "playwright-network-chaos-mcp",
+          "version": "0.2.1",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "com.stripe/mcp",
+      "description": "MCP server integrating with Stripe - tools for customers, products, payments, and more.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://mcp.stripe.com"
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "io.github.CSOAI-ORG/meok-stripe-acp-checkout-mcp",
+      "description": "MEOK Stripe ACP Checkout MCP — ChatGPT shopping bridge. Issues + verifies + signs Stripe Agentic",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://api.meok.ai/v1/a2a/stripe-acp-checkout"
+        }
+      ],
+      "packages": [
+        {
+          "registryType": "pypi",
+          "identifier": "meok-stripe-acp-checkout-mcp",
+          "version": "1.0.4",
+          "runtimeHint": "python",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "io.github.CSOAI-ORG/stripe-billing-mcp",
+      "description": "stripe-billing-mcp MCP server by MEOK AI Labs",
+      "packages": [
+        {
+          "registryType": "pypi",
+          "identifier": "stripe-billing-mcp",
+          "version": "1.0.4",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "io.github.codespar/mcp-stripe",
+      "description": "MCP server for Stripe — global payments API (PaymentIntents, Checkout, Billing, Refunds)",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@codespar/mcp-stripe",
+          "version": "0.2.2",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Stripe secret key (sk_test_... for test mode, sk_live_... for live mode). The key prefix selects the environment — no separate base URL.",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "STRIPE_SECRET_KEY"
+            },
+            {
+              "description": "Optional Stripe API version to pin via the Stripe-Version header (e.g. '2024-06-20'). When omitted, Stripe uses the account's default version.",
+              "format": "string",
+              "name": "STRIPE_API_VERSION"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "io.github.codespar/mcp-stripe-acp",
+      "description": "Stripe ACP — AI agent checkout, payment delegation, products, invoices",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@codespar/mcp-stripe-acp",
+          "version": "0.1.4",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "API key for stripe-acp",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "STRIPE_API_KEY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "io.github.friendlygeorge/stripe-mcp-server",
+      "description": "MCP server for Stripe API — customers, charges, payments, subscriptions, products, and invoices",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "stripe-mcp-server",
+          "version": "1.0.0",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "io.github.infoinlet-marketplace/mcp-stripe",
+      "description": "Read-only Stripe for AI agents — customers, charges, subscriptions, invoices, balance.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@infoinlet/mcp-stripe",
+          "version": "0.1.1",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "stripe",
+      "name": "io.github.lordbasilaiassistant-sudo/stripe-analytics",
+      "description": "Stripe analytics — revenue, customers, subscriptions, refunds, churn from Claude.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "mcp-stripe-analytics",
+          "version": "1.0.1",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Your Stripe secret API key",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "STRIPE_SECRET_KEY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "linear",
+      "name": "app.linear/linear",
+      "description": "MCP server for Linear project management and issue tracking",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://mcp.linear.app/mcp"
+        }
+      ]
+    },
+    {
+      "query": "linear",
+      "name": "io.github.Evozim/linear-broker",
+      "description": "Integrates agents with Linear software development workflows.",
+      "remotes": [
+        {
+          "type": "sse",
+          "url": "https://linear-broker-mcp.vercel.app/api/mcp",
+          "headers": [
+            {
+              "description": "Base64-encoded EIP-3009 TransferWithAuthorization signature. Required for premium settlement.",
+              "isSecret": true,
+              "name": "payment-signature"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "linear",
+      "name": "io.github.adelaidasofia/linear-mcp",
+      "description": "Multi-workspace Linear MCP — PAT auth, 57 tools + 3 prompts, substrate enforcement, drop-in.",
+      "packages": [
+        {
+          "registryType": "pypi",
+          "identifier": "adelaidasofia-linear-mcp",
+          "version": "0.3.2",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Personal API Key from linear.app/settings/account/security",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "LINEAR_PAT"
+            }
+          ]
+        },
+        {
+          "registryType": "mcpb",
+          "identifier": "https://github.com/adelaidasofia/linear-mcp/releases/download/v0.3.2/linear-mcp.mcpb",
+          "version": "0.3.2",
+          "fileSha256": "bd6c92b5ecb35a585679d43f2b2259e4ee03fa6d6f6e3eb6b54eed17289db372",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Personal API Key from linear.app/settings/account/security",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "LINEAR_PAT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "linear",
+      "name": "io.github.pipeworx-io/linear",
+      "description": "Linear MCP — wraps the Linear GraphQL API (OAuth)",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://gateway.pipeworx.io/linear/mcp"
+        }
+      ]
+    },
+    {
+      "query": "linear",
+      "name": "io.github.toolwright-adk/linear-bootstrap",
+      "description": "Bootstrap Linear projects from natural language — milestones, epics, issues, and dependencies.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@toolwright-adk/linear-bootstrap",
+          "version": "0.1.3",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Linear API key (create at linear.app/settings/api)",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "LINEAR_API_KEY"
+            },
+            {
+              "description": "API key for an OpenAI-compatible LLM provider",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "LLM_API_KEY"
+            },
+            {
+              "description": "Base URL for the LLM API (e.g. https://openrouter.ai/api/v1)",
+              "isRequired": true,
+              "format": "string",
+              "name": "LLM_BASE_URL"
+            },
+            {
+              "description": "Model ID for plan generation (e.g. anthropic/claude-sonnet-4.6)",
+              "isRequired": true,
+              "format": "string",
+              "name": "LLM_MODEL"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "linear",
+      "name": "io.usefulapi/linear",
+      "description": "Search, read and create Linear issues, projects, teams and cycles.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://linear.usefulapi.io/mcp"
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "ai.smithery/smithery-notion",
+      "description": "A Notion workspace is a collaborative environment where teams can organize work, manage projects,…",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://server.smithery.ai/@smithery/notion/mcp",
+          "headers": [
+            {
+              "description": "Bearer token for Smithery authentication",
+              "isRequired": true,
+              "value": "Bearer {smithery_api_key}",
+              "isSecret": true,
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "com.mcparmory/notion",
+      "description": "Create, update, and manage pages, databases, and workspace users",
+      "packages": [
+        {
+          "registryType": "pypi",
+          "identifier": "mcparmory-notion",
+          "version": "1.0.2",
+          "runtimeHint": "uvx",
+          "transport": {
+            "type": "stdio"
+          }
+        },
+        {
+          "registryType": "oci",
+          "identifier": "ghcr.io/mcparmory/notion:1.0.2",
+          "runtimeHint": "docker",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "com.notion/mcp",
+      "description": "Official Notion MCP server",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://mcp.notion.com/mcp"
+        },
+        {
+          "type": "sse",
+          "url": "https://mcp.notion.com/sse"
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "io.github.ai-aviate/better-notion",
+      "description": "Operate Notion with a single Markdown document — read, create, and update pages in one call.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "better-mcp-notion",
+          "version": "0.3.2",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Notion API key (starts with ntn_)",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "NOTION_API_KEY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "io.github.awkoy/notion-mcp-server",
+      "description": "Token-auth Notion MCP: pages, databases, blocks, comments, files. Runs headless in CI and agents.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "notion-mcp-server",
+          "version": "2.13.0",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Notion Personal Access Token (ntn_...) or Internal Integration Secret. Create at https://app.notion.com/developers/tokens",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "NOTION_TOKEN"
+            },
+            {
+              "description": "Optional default parent page ID used by create_page / create_database when no parent is passed.",
+              "name": "NOTION_PAGE_ID"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "io.github.infoinlet-marketplace/mcp-notion",
+      "description": "Notion for AI agents — search, read pages/blocks, query databases, create pages.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@infoinlet/mcp-notion",
+          "version": "0.1.1",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "io.github.misterwigglesworth/easy-notion",
+      "description": "Markdown-first Notion MCP server — 92% fewer tokens, 26 tools, round-trip fidelity.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "easy-notion-mcp",
+          "version": "0.2.3",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Notion integration token",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "NOTION_TOKEN"
+            },
+            {
+              "description": "Default parent page ID for create_page (optional — falls back to workspace root in OAuth mode)",
+              "format": "string",
+              "name": "NOTION_ROOT_PAGE_ID"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "notion",
+      "name": "io.github.n24q02m/better-notion-mcp",
+      "description": "Markdown-first MCP server for Notion API with 8 composite tools and 39 actions.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://notion.n24q02m.com/mcp"
+        }
+      ],
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@n24q02m/better-notion-mcp",
+          "version": "2.38.0",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Notion integration token. Create at https://www.notion.so/my-integrations",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "NOTION_TOKEN"
+            }
+          ]
+        },
+        {
+          "registryType": "oci",
+          "identifier": "docker.io/n24q02m/better-notion-mcp:latest",
+          "runtimeHint": "docker",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Notion integration token. Create at https://www.notion.so/my-integrations",
+              "isRequired": true,
+              "isSecret": true,
+              "name": "NOTION_TOKEN"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "sentry",
+      "name": "com.mcparmory/sentry",
+      "description": "Track errors, manage performance alerts, and configure dashboards and monitors",
+      "packages": [
+        {
+          "registryType": "pypi",
+          "identifier": "mcparmory-sentry",
+          "version": "1.0.2",
+          "runtimeHint": "uvx",
+          "transport": {
+            "type": "stdio"
+          }
+        },
+        {
+          "registryType": "oci",
+          "identifier": "ghcr.io/mcparmory/sentry:1.0.2",
+          "runtimeHint": "docker",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "sentry",
+      "name": "io.github.friendlygeorge/sentry-mcp-server",
+      "description": "MCP server for Sentry — error tracking, issues, releases, events, and projects for AI assistants.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "sentry-mcp-server",
+          "version": "1.0.0",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Sentry auth token from Settings → Auth Tokens. Needs org:read, project:read, event:read, issue:read, issue:write scopes.",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "SENTRY_AUTH_TOKEN"
+            },
+            {
+              "description": "Sentry API base URL. Defaults to https://sentry.io/api/0/. Override for self-hosted Sentry.",
+              "format": "string",
+              "name": "SENTRY_BASE_URL"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "sentry",
+      "name": "io.github.getsentry/sentry-mcp",
+      "description": "MCP server for Sentry - error monitoring, issue tracking, and debugging for AI assistants",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@sentry/mcp-server",
+          "version": "0.25.0",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Your Sentry user authentication token",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "SENTRY_ACCESS_TOKEN"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "sentry",
+      "name": "io.github.perceptdot/sentry",
+      "description": "AI agent vision for Sentry error tracking — with ROI measurement. perceptdot.com",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@perceptdot/sentry",
+          "version": "0.1.5",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "sentry",
+      "name": "io.github.rezmeplxrf/insightsentry_mcp",
+      "description": "MCP server for InsightSentry financial data API - market data, options, screeners, and more",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@insightsentry/mcp",
+          "version": "1.4.35",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "InsightSentry API key from https://insightsentry.com/dashboard",
+              "format": "string",
+              "isSecret": true,
+              "name": "INSIGHTSENTRY_API_KEY"
+            },
+            {
+              "description": "Optional directory for the saved insight login config. Use this when the CLI and MCP server run with different home directories.",
+              "format": "string",
+              "name": "INSIGHTSENTRY_CONFIG_DIR"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "sentry",
+      "name": "io.github.sentrysurface/sentrysurface",
+      "description": "Cybersecurity MCP server for URL scanning, threat intelligence, and domain reputation.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://api.sentrysurface.io/mcp/mcp",
+          "headers": [
+            {
+              "description": "Bearer header using ptnet_mcp_ key, for example: Bearer ptnet_mcp_xxx",
+              "format": "string",
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "sentry",
+      "name": "io.github.valtirman/ndasentry",
+      "description": "Anonymous NDA risk analysis for AI agents. $9 per report. No signup, no data retention.",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://nda-mcp-production.up.railway.app/mcp"
+        }
+      ]
+    },
+    {
+      "query": "context7",
+      "name": "ai.smithery/renCosta2025-context7fork",
+      "description": "Get up-to-date, version-specific documentation and code examples from official sources directly in…",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://server.smithery.ai/@renCosta2025/context7fork/mcp",
+          "headers": [
+            {
+              "description": "Bearer token for Smithery authentication",
+              "value": "Bearer {smithery_api_key}",
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "context7",
+      "name": "com.clauxel.context7docs/context7docs-mcp",
+      "description": "A paid remote MCP for Context7 MCP docs, built to return verdicts, receipts, usage logs, and audit-r",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://context7docs.clauxel.com/mcp",
+          "headers": [
+            {
+              "description": "Bearer token from the product website.",
+              "name": "Authorization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "context7",
+      "name": "io.github.upstash/context7",
+      "description": "Up-to-date code docs for any prompt",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@upstash/context7-mcp",
+          "version": "1.0.31",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "API key for authentication",
+              "format": "string",
+              "isSecret": true,
+              "name": "CONTEXT7_API_KEY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "com.pulsemcp/remote-filesystem",
+      "description": "MCP server for remote filesystem operations on cloud storage (Google Cloud Storage).",
+      "packages": [
+        {
+          "registryType": "npm",
+          "registryBaseUrl": "https://registry.npmjs.org",
+          "identifier": "remote-filesystem-mcp-server",
+          "version": "0.1.5",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "stdio"
+          },
+          "runtimeArguments": [
+            {
+              "value": "-y",
+              "type": "positional"
+            }
+          ],
+          "environmentVariables": [
+            {
+              "description": "Google Cloud Storage bucket name.",
+              "isRequired": true,
+              "name": "GCS_BUCKET"
+            },
+            {
+              "description": "Google Cloud project ID.",
+              "name": "GCS_PROJECT_ID"
+            },
+            {
+              "description": "Service account email for inline credentials.",
+              "name": "GCS_CLIENT_EMAIL"
+            },
+            {
+              "description": "Service account private key for inline credentials.",
+              "isSecret": true,
+              "name": "GCS_PRIVATE_KEY"
+            },
+            {
+              "description": "Path to Google Cloud service account key file.",
+              "name": "GOOGLE_APPLICATION_CREDENTIALS"
+            },
+            {
+              "description": "Root path prefix to restrict access within bucket.",
+              "name": "GCS_ROOT_PATH"
+            },
+            {
+              "description": "Make uploaded files publicly accessible.",
+              "default": "false",
+              "name": "GCS_MAKE_PUBLIC"
+            },
+            {
+              "description": "Comma-separated tool groups: readonly or readwrite.",
+              "name": "ENABLED_TOOLGROUPS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "io.github.Digital-Defiance/mcp-filesystem",
+      "description": "Advanced filesystem operations with strict security boundaries for AI agents",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@ai-capabilities-suite/mcp-filesystem",
+          "version": "0.1.9",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Absolute path to workspace directory (all operations confined here)",
+              "isRequired": true,
+              "format": "string",
+              "name": "WORKSPACE_ROOT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "io.github.Oncorporation/filesystem-server",
+      "description": "Secure filesystem access for AI agents with configurable directory and file type restrictions",
+      "packages": [
+        {
+          "registryType": "pypi",
+          "identifier": "vs-filesystem-mcp-server",
+          "version": "0.1.3",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "io.github.bytedance/mcp-server-filesystem",
+      "description": "MCP server for filesystem access",
+      "packages": [
+        {
+          "registryType": "npm",
+          "registryBaseUrl": "https://registry.npmjs.org",
+          "identifier": "@agent-infra/mcp-server-filesystem",
+          "version": "latest",
+          "transport": {
+            "type": "stdio"
+          },
+          "packageArguments": [
+            {
+              "description": "Comma-separated list of allowed directories for file operations",
+              "isRequired": true,
+              "format": "string",
+              "type": "named",
+              "name": "allowed-directories"
+            }
+          ]
+        },
+        {
+          "registryType": "npm",
+          "registryBaseUrl": "https://registry.npmjs.org",
+          "identifier": "@agent-infra/mcp-server-filesystem",
+          "version": "latest",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "sse",
+            "url": "http://127.0.0.1:{port}/sse"
+          },
+          "packageArguments": [
+            {
+              "description": "Comma-separated list of allowed directories for file operations",
+              "isRequired": true,
+              "format": "string",
+              "type": "named",
+              "name": "allowed-directories"
+            },
+            {
+              "description": "Server port number",
+              "isRequired": true,
+              "format": "number",
+              "default": "8089",
+              "type": "named",
+              "name": "port"
+            }
+          ]
+        },
+        {
+          "registryType": "npm",
+          "registryBaseUrl": "https://registry.npmjs.org",
+          "identifier": "@agent-infra/mcp-server-filesystem",
+          "version": "latest",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "streamable-http",
+            "url": "http://127.0.0.1:{port}/mcp"
+          },
+          "packageArguments": [
+            {
+              "description": "Comma-separated list of allowed directories for file operations",
+              "isRequired": true,
+              "format": "string",
+              "type": "named",
+              "name": "allowed-directories"
+            },
+            {
+              "description": "Server port number",
+              "isRequired": true,
+              "format": "number",
+              "default": "8089",
+              "type": "named",
+              "name": "port"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "io.github.domdomegg/filesystem-mcp",
+      "description": "Read, create, and edit files.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "filesystem-mcp",
+          "version": "1.3.0",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "stdio"
+          }
+        },
+        {
+          "registryType": "npm",
+          "identifier": "filesystem-mcp",
+          "version": "1.3.0",
+          "runtimeHint": "npx",
+          "transport": {
+            "type": "streamable-http",
+            "url": "http://localhost:3000/mcp"
+          },
+          "environmentVariables": [
+            {
+              "description": "Transport type.",
+              "isRequired": true,
+              "value": "http",
+              "name": "MCP_TRANSPORT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "io.github.fieldcure/filesystem",
+      "description": "Secure MCP server for sandboxed filesystem operations with document parsing support.",
+      "packages": [
+        {
+          "registryType": "nuget",
+          "registryBaseUrl": "https://api.nuget.org/v3/index.json",
+          "identifier": "FieldCure.Mcp.Filesystem",
+          "version": "1.1.2",
+          "runtimeHint": "dnx",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "io.github.infoinlet-marketplace/mcp-filesystem",
+      "description": "Hardened filesystem for AI agents — jailed root, read-only default, traversal/symlink-safe.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@infoinlet/mcp-filesystem",
+          "version": "0.1.1",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    },
+    {
+      "query": "filesystem",
+      "name": "io.github.j0hanz/filesystem-context",
+      "description": "🔍 Read-only MCP server for secure filesystem exploration, searching, and analysis",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "@j0hanz/filesystem-context-mcp",
+          "version": "1.0.9",
+          "transport": {
+            "type": "stdio"
+          }
+        }
+      ]
+    }
+  ]
+}

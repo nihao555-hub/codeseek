@@ -36,4 +36,12 @@
 | `code-review` | 审查清单 |
 | `systematic-debugging` | 先证据后改代码 |
 
-正文是本仓库原创摘要，不是上游 LICENSE 不明文件的逐字拷贝。改独立站时代码在 `/workspace/store/`。
+| `assemble-toolkit` | 查看/启用/拉取 skill 与 MCP |
+| `mcp-integration` | 往 catalog 加 MCP |
+| `skill-creator` | 新建本地 SKILL.md |
+| `git-workflow` / `github-ops` | git 与 GitHub |
+| `browser-qa` / `web-research` / `document-ops` | 浏览器、调研、文档 |
+
+远程 skill（Apache 示例）用 `npm run toolkit -- fetch-skills` 拉取，见 `toolkit/catalog.json`。完整 MCP 列表同样在该文件。不要提交密钥。
+
+改独立站时代码在 `/workspace/store/`。

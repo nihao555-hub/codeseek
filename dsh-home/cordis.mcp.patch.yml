@@ -1,0 +1,386 @@
+# 由 scripts/assemble-toolkit.mjs sync 生成。不要手改；改 toolkit/catalog.json 或 toolkit/enabled.json。
+# 每个 MCP 默认关闭：有对应密钥、或 MCP_<FLAG>=1、或写入 enabled.json 后才会加载。
+# 工具名形如 mcp__<serverName>__<rawName>。
+
+- insert:
+    - id: mcp-meta-ads
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_META_ADS === '1' || Boolean(process.env.META_ACCESS_TOKEN))
+      config:
+        serverName: meta-ads
+        transport: streamable-http
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+        url: "https://mcp.facebook.com/ads"
+        headers: !!js "process.env.META_ACCESS_TOKEN ? { \"Authorization\": 'Bearer ' + process.env.META_ACCESS_TOKEN } : {}"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-github
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_GITHUB === '1' || Boolean(process.env.GITHUB_TOKEN) || Boolean(process.env.GITHUB_PERSONAL_ACCESS_TOKEN))
+      config:
+        serverName: github
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-github"
+        env:
+          GITHUB_PERSONAL_ACCESS_TOKEN: !!js process.env.GITHUB_PERSONAL_ACCESS_TOKEN || process.env.GITHUB_TOKEN || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-github-official
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_GITHUB_OFFICIAL === '1' || Boolean(process.env.GITHUB_TOKEN))
+      config:
+        serverName: github-official
+        transport: streamable-http
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        url: "https://api.githubcopilot.com/mcp/"
+        headers: !!js "process.env.GITHUB_TOKEN ? { \"Authorization\": 'Bearer ' + process.env.GITHUB_TOKEN } : {}"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-playwright
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_PLAYWRIGHT === '1')
+      config:
+        serverName: playwright
+        transport: stdio
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@playwright/mcp@latest"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-sequential-thinking
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_SEQUENTIAL === '1')
+      config:
+        serverName: sequential-thinking
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-sequential-thinking"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-memory
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_MEMORY === '1')
+      config:
+        serverName: memory
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-memory"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-filesystem
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_FILESYSTEM === '1')
+      config:
+        serverName: filesystem
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-filesystem"
+          - !!js process.env.DSH_WORKSPACE || process.cwd()
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-fetch
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_FETCH === '1')
+      config:
+        serverName: fetch
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: uvx
+        args:
+          - mcp-server-fetch
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-time
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_TIME === '1')
+      config:
+        serverName: time
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: uvx
+        args:
+          - mcp-server-time
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-git
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_GIT === '1')
+      config:
+        serverName: git
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: uvx
+        args:
+          - mcp-server-git
+          - --repository
+          - !!js process.env.DSH_WORKSPACE || process.cwd()
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-postgres
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_POSTGRES === '1' || Boolean(process.env.POSTGRES_URL))
+      config:
+        serverName: postgres
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-postgres"
+          - !!js process.env.POSTGRES_URL || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-sqlite
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_SQLITE === '1')
+      config:
+        serverName: sqlite
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: uvx
+        args:
+          - mcp-server-sqlite
+          - --db-path
+          - !!js process.env.SQLITE_PATH || '/tmp/codeseek.sqlite'
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-brave-search
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_BRAVE === '1' || Boolean(process.env.BRAVE_API_KEY))
+      config:
+        serverName: brave-search
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-brave-search"
+        env:
+          BRAVE_API_KEY: !!js process.env.BRAVE_API_KEY || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-slack
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_SLACK === '1' || Boolean(process.env.SLACK_BOT_TOKEN))
+      config:
+        serverName: slack
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-slack"
+        env:
+          SLACK_BOT_TOKEN: !!js process.env.SLACK_BOT_TOKEN || ''
+          SLACK_TEAM_ID: !!js process.env.SLACK_TEAM_ID || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-google-maps
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_GOOGLE_MAPS === '1' || Boolean(process.env.GOOGLE_MAPS_API_KEY))
+      config:
+        serverName: google-maps
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-google-maps"
+        env:
+          GOOGLE_MAPS_API_KEY: !!js process.env.GOOGLE_MAPS_API_KEY || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-puppeteer
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_PUPPETEER === '1')
+      config:
+        serverName: puppeteer
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@modelcontextprotocol/server-puppeteer"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-context7
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_CONTEXT7 === '1')
+      config:
+        serverName: context7
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@upstash/context7-mcp"
+        env:
+          CONTEXT7_API_KEY: !!js process.env.CONTEXT7_API_KEY || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-stripe
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_STRIPE === '1' || Boolean(process.env.STRIPE_SECRET_KEY))
+      config:
+        serverName: stripe
+        transport: streamable-http
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        url: "https://mcp.stripe.com"
+        headers: !!js "process.env.STRIPE_SECRET_KEY ? { \"Authorization\": 'Bearer ' + process.env.STRIPE_SECRET_KEY } : {}"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-linear
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_LINEAR === '1' || Boolean(process.env.LINEAR_API_KEY))
+      config:
+        serverName: linear
+        transport: streamable-http
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        url: "https://mcp.linear.app/mcp"
+        headers: !!js "process.env.LINEAR_API_KEY ? { \"Authorization\": 'Bearer ' + process.env.LINEAR_API_KEY } : {}"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-notion
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_NOTION === '1' || Boolean(process.env.NOTION_TOKEN))
+      config:
+        serverName: notion
+        transport: streamable-http
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        url: "https://mcp.notion.com/mcp"
+        headers: !!js "process.env.NOTION_TOKEN ? { \"Authorization\": 'Bearer ' + process.env.NOTION_TOKEN } : {}"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-sentry
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_SENTRY === '1' || Boolean(process.env.SENTRY_AUTH_TOKEN) || Boolean(process.env.SENTRY_ACCESS_TOKEN))
+      config:
+        serverName: sentry
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - "@sentry/mcp-server"
+        env:
+          SENTRY_ACCESS_TOKEN: !!js process.env.SENTRY_AUTH_TOKEN || process.env.SENTRY_ACCESS_TOKEN || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-firecrawl
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js !(process.env.MCP_FIRECRAWL === '1' || Boolean(process.env.FIRECRAWL_API_KEY))
+      config:
+        serverName: firecrawl
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: npx
+        args:
+          - -y
+          - firecrawl-mcp
+        env:
+          FIRECRAWL_API_KEY: !!js process.env.FIRECRAWL_API_KEY || ''
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10

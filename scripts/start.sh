@@ -48,6 +48,10 @@ require_node() {
   fi
 }
 
+ensure_toolkit() {
+  node "$ROOT/scripts/assemble-toolkit.mjs" sync >/dev/null
+}
+
 ensure_tool_proxy() {
   local port="${GRS_TOOL_PROXY_PORT:-18765}"
   if curl -sf "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
@@ -70,10 +74,14 @@ ensure_tool_proxy() {
 run_dsh() {
   local src="$ROOT/vendor/deepseek-harness"
   local tsx_loader="$src/node_modules/tsx/dist/esm/index.mjs"
+  local mcp_patch="${DSH_HOME}/cordis.mcp.patch.yml"
   if [[ -f "$src/apps/cli/src/bin.ts" && -f "$tsx_loader" ]]; then
     # 绝对导入 tsx，并钉死 Harness 的 tsconfig，这样 cwd 可以是仓库根。
     export TSX_TSCONFIG_PATH="${TSX_TSCONFIG_PATH:-$src/tsconfig.json}"
     cd "$DSH_WORKSPACE"
+    if [[ -f "$mcp_patch" ]]; then
+      exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" "$@" --patch "$mcp_patch"
+    fi
     exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" "$@"
   fi
   if [[ -x "$ROOT/node_modules/.bin/dsh" ]]; then
@@ -151,6 +159,9 @@ PY
     echo "META_ACCESS_TOKEN: 未设置（Meta MCP 将保持关闭）"
   fi
   echo
+  echo "== 工具箱 =="
+  node "$ROOT/scripts/assemble-toolkit.mjs" doctor
+  echo
   echo "== GRS 工具代理 =="
   if curl -sf "http://127.0.0.1:${GRS_TOOL_PROXY_PORT:-18765}/health" >/dev/null 2>&1; then
     echo "http://127.0.0.1:${GRS_TOOL_PROXY_PORT:-18765}/health 正常"
@@ -202,20 +213,25 @@ fi
 case "$CMD" in
   web)
     ensure_from_source
+    ensure_toolkit
     ensure_tool_proxy
     run_dsh web --port "${DSH_PORT:-3080}" "$@"
     ;;
   headless)
     ensure_from_source
+    ensure_toolkit
     ensure_tool_proxy
     run_dsh --profile headless "$@"
     ;;
   doctor)
     cmd_doctor
     ;;
+  toolkit)
+    node "$ROOT/scripts/assemble-toolkit.mjs" "$@"
+    ;;
   *)
     echo "未知命令: $CMD" >&2
-    echo "用法: scripts/start.sh [web|headless|doctor]" >&2
+    echo "用法: scripts/start.sh [web|headless|doctor|toolkit]" >&2
     exit 1
     ;;
 esac

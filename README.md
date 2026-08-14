@@ -41,6 +41,8 @@ npm start              # 或 bash scripts/start.sh web
 | `npm run store` | 启动港窑独立站（API :8788 + Vite :5173） |
 | `npm run store:test` | 只跑独立站测试 |
 | `npm run store:build` | 构建独立站前台 |
+| `npm run toolkit -- list` | 列出可装配的 skill / MCP / 主机工具 |
+| `npm run toolkit -- enable github` | 强制打开某个 MCP 并生成 patch |
 
 首次启动会在 submodule 里执行 `pnpm install` 和 `pnpm run build`，时间较长。
 
@@ -55,15 +57,29 @@ npm run store          # http://127.0.0.1:5173  （API 在 :8788）
 
 约定与 API 说明见 `store/README.md`。Agent 改店面时加载 `.dsh/skills/` 里的前端/后端 skill。
 
+## 装配自己的工具
+
+Skill、MCP、主机工具目录在 `toolkit/catalog.json`。默认 MCP 全关，避免没密钥时拖垮启动。
+
+```bash
+npm run toolkit -- list
+npm run toolkit -- fetch-skills          # 拉取允许的远程 SKILL.md
+npm run toolkit -- enable github sequential-thinking
+# 或在 .env 写 GITHUB_TOKEN / MCP_PLAYWRIGHT=1
+```
+
+`npm start` 会 sync 并加载 `dsh-home/cordis.mcp.patch.yml`。说明见 `toolkit/README.md`。
+
 ## 配置在哪
 
 | 路径 | 作用 |
 | --- | --- |
 | `dsh-home/settings.yaml` | GRS 提供方与默认模型 |
-| `dsh-home/cordis.patch.yml` | 人设 + Meta MCP + 工作区根目录 |
+| `dsh-home/cordis.patch.yml` | 人设、默认模型、沙箱 |
 | `scripts/grs-tool-proxy.mjs` | GRS 文本工具协议 ↔ OpenAI tool_calls |
 | `.dsh/skills/` | 外贸 / 广告 / 开发 / 前端 / 后端技能（见该目录 README） |
-| `store/` | Harbor Kiln 演示独立站 |
+| `toolkit/catalog.json` | 可装配 skill 与 MCP 目录 |
+| `dsh-home/cordis.mcp.patch.yml` | 由 `assemble-toolkit sync` 生成的 MCP 插件层 |
 | `AGENTS.md` | 工作区指令 |
 | `.env` | 密钥（不要提交） |
 | `branding/` | logo、字标、空状态装饰 |

@@ -1,4 +1,4 @@
-# 家目录层补丁：覆盖默认模型、部署人设，并接入 Meta Ads MCP。
+# 家目录层补丁：覆盖默认模型、部署人设、沙箱。MCP 由 scripts/assemble-toolkit.mjs 生成 dsh-home/cordis.mcp.patch.yml。
 # 按 id 整段替换 config，新增行用 insert。
 
 - id: agent-default-model
@@ -21,25 +21,9 @@
       4. 改代码前读现有实现；改广告前先读账户现状。不要凭空新建一套。
       5. 花钱、改预算、上线广告、发正式邮件、改生产环境前，必须明确风险并征求确认。默认把新广告创建为 PAUSED。
       6. 密钥、token、客户名单、报价底价不得写入仓库、会话标题或公开输出。
-      7. 需要领域流程时先加载对应 skill：外贸 `foreign-trade`，广告 `meta-ads`，开发 `software-dev`。做独立站时再加载 `ecommerce-store`；前端高星实践用 `frontend-design` / `react-best-practices` / `web-accessibility`；后端用 `api-design` / `backend-reliability` / `ecommerce-checkout`。清单在 `.dsh/skills/README.md`。
+      7. 需要领域流程时先加载对应 skill：外贸 `foreign-trade`，广告 `meta-ads`，开发 `software-dev`。做独立站时再加载 `ecommerce-store`；前端高星实践用 `frontend-design` / `react-best-practices` / `web-accessibility`；后端用 `api-design` / `backend-reliability` / `ecommerce-checkout`。装配 MCP/skill 用 `assemble-toolkit`。清单在 `.dsh/skills/README.md` 与 `toolkit/catalog.json`。
       8. 读文件、写文件、列目录、跑命令必须调用工具（read / write / bash / glob / grep 等）。没有工具结果时不要假装已经查过。
-
-- insert:
-    - id: mcp-meta-ads
-      name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js (!process.env.META_ACCESS_TOKEN)
-      config:
-        transport: streamable-http
-        serverName: meta-ads
-        url: https://mcp.facebook.com/ads
-        headers: !!js "process.env.META_ACCESS_TOKEN ? { Authorization: 'Bearer ' + process.env.META_ACCESS_TOKEN } : {}"
-        toolCallTimeoutMs: 120000
-        failOnStartupError: false
-        reconnect:
-          enabled: true
-          initialDelayMs: 1000
-          maxDelayMs: 30000
-          maxAttempts: 10
+      9. MCP 默认关闭。有对应密钥或 `toolkit/enabled.json` / `MCP_*=1` 才会加载。工具名 `mcp__<server>__<tool>`。没有连上时先说缺口，不要假装已经调通。
 
 - id: sandbox-policy
   config:

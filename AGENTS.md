@@ -9,4 +9,4 @@
 
 模型走 GRS OpenAI 兼容中转。密钥只来自环境变量，不要写入仓库。
 
-没有 DeepSeek 官方搜索密钥时，用工作区文件、bash 和公开网页调研，并标明不确定之处。
+没有 DeepSeek 官方搜索密钥时，用工作区文件、bash 和公开网页调研，并标明不确定之处。装配 MCP / 远程 skill 用 `assemble-toolkit`（`npm run toolkit`）。

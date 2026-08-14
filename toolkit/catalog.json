@@ -1,0 +1,396 @@
+{
+  "version": 1,
+  "updated": "2026-08-14",
+  "hostTools": [
+    { "id": "bash", "description": "在工作区跑 shell 命令" },
+    { "id": "read", "description": "读文件；Web 会话 cwd 可能是 /，请用绝对路径 /workspace/..." },
+    { "id": "write", "description": "写新文件" },
+    { "id": "edit", "description": "按精确片段替换文件内容（str_replace）" },
+    { "id": "glob", "description": "按文件名模式搜索" },
+    { "id": "grep", "description": "按内容搜索" },
+    { "id": "skill", "description": "加载 .dsh/skills/<name>/SKILL.md" },
+    { "id": "todo_write", "description": "任务清单" },
+    { "id": "get_goal", "description": "当前会话目标" },
+    { "id": "job_*", "description": "后台作业控制" },
+    { "id": "web_search", "description": "Harness 原生搜索；Web overlay 里 tool-web 默认 disabled，用 MCP fetch/brave/context7 代替" }
+  ],
+  "skills": [
+    { "id": "assemble-toolkit", "kind": "local", "group": "platform", "description": "装配本仓库 skill / MCP / 主机工具" },
+    { "id": "foreign-trade", "kind": "local", "group": "business" },
+    { "id": "meta-ads", "kind": "local", "group": "business" },
+    { "id": "software-dev", "kind": "local", "group": "engineering" },
+    { "id": "ecommerce-store", "kind": "local", "group": "store" },
+    { "id": "frontend-design", "kind": "local", "group": "frontend" },
+    { "id": "react-best-practices", "kind": "local", "group": "frontend" },
+    { "id": "react-storefront", "kind": "local", "group": "frontend" },
+    { "id": "web-accessibility", "kind": "local", "group": "frontend" },
+    { "id": "frontend-performance", "kind": "local", "group": "frontend" },
+    { "id": "seo-independent-site", "kind": "local", "group": "frontend" },
+    { "id": "i18n-storefront", "kind": "local", "group": "frontend" },
+    { "id": "copywriting-conversion", "kind": "local", "group": "frontend" },
+    { "id": "api-design", "kind": "local", "group": "backend" },
+    { "id": "backend-reliability", "kind": "local", "group": "backend" },
+    { "id": "ecommerce-checkout", "kind": "local", "group": "backend" },
+    { "id": "auth-and-secrets", "kind": "local", "group": "engineering" },
+    { "id": "testing-and-qa", "kind": "local", "group": "engineering" },
+    { "id": "code-review", "kind": "local", "group": "engineering" },
+    { "id": "systematic-debugging", "kind": "local", "group": "engineering" },
+    { "id": "mcp-integration", "kind": "local", "group": "platform" },
+    { "id": "git-workflow", "kind": "local", "group": "engineering" },
+    { "id": "github-ops", "kind": "local", "group": "engineering" },
+    { "id": "document-ops", "kind": "local", "group": "office" },
+    { "id": "browser-qa", "kind": "local", "group": "engineering" },
+    { "id": "web-research", "kind": "local", "group": "research" },
+    { "id": "skill-creator", "kind": "local", "group": "platform" },
+    {
+      "id": "mcp-builder",
+      "kind": "remote",
+      "group": "platform",
+      "whenToUse": "从零写一个 MCP server（TypeScript 或 Python）时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/mcp-builder/SKILL.md",
+        "license": "see upstream LICENSE.txt",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/mcp-builder/SKILL.md"
+      }
+    },
+    {
+      "id": "webapp-testing",
+      "kind": "remote",
+      "group": "engineering",
+      "whenToUse": "用 Playwright 测 Web UI、截图、填表时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/webapp-testing/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/webapp-testing/SKILL.md"
+      }
+    },
+    {
+      "id": "doc-coauthoring",
+      "kind": "remote",
+      "group": "office",
+      "whenToUse": "与用户共写长文档、迭代大纲与段落时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/doc-coauthoring/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/doc-coauthoring/SKILL.md"
+      }
+    },
+    {
+      "id": "brand-guidelines",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "按品牌规范出视觉或文案时使用；港窑店面仍以 ecommerce-store 为准。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/brand-guidelines/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/brand-guidelines/SKILL.md"
+      }
+    },
+    {
+      "id": "canvas-design",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "做海报、画布、静态视觉构图时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/canvas-design/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/canvas-design/SKILL.md"
+      }
+    },
+    {
+      "id": "theme-factory",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "生成多套主题色与字体搭配时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/theme-factory/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/theme-factory/SKILL.md"
+      }
+    },
+    {
+      "id": "internal-comms",
+      "kind": "remote",
+      "group": "office",
+      "whenToUse": "写内部通报、更新邮件、状态备忘时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/internal-comms/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/internal-comms/SKILL.md"
+      }
+    },
+    {
+      "id": "web-artifacts-builder",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "做可分享的单页 HTML 工件时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/web-artifacts-builder/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/web-artifacts-builder/SKILL.md"
+      }
+    }
+  ],
+  "mcp": [
+    {
+      "id": "meta-ads",
+      "title": "Meta Ads（官方）",
+      "description": "Facebook / Instagram 广告。工具名 mcp__meta-ads__*。新广告保持 PAUSED。",
+      "transport": "streamable-http",
+      "serverName": "meta-ads",
+      "url": "https://mcp.facebook.com/ads",
+      "headers": { "Authorization": { "bearer": "META_ACCESS_TOKEN" } },
+      "enableWhen": { "anyEnv": ["META_ACCESS_TOKEN"], "flag": "MCP_META_ADS" },
+      "docs": "https://mcp.facebook.com/ads"
+    },
+    {
+      "id": "github",
+      "title": "GitHub（stdio 参考服务器）",
+      "description": "仓库、Issue、PR、文件。需要 GitHub PAT。",
+      "transport": "stdio",
+      "serverName": "github",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": { "from": ["GITHUB_PERSONAL_ACCESS_TOKEN", "GITHUB_TOKEN"] } },
+      "enableWhen": { "anyEnv": ["GITHUB_TOKEN", "GITHUB_PERSONAL_ACCESS_TOKEN"], "flag": "MCP_GITHUB" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-github"
+    },
+    {
+      "id": "github-official",
+      "title": "GitHub 官方远程 MCP",
+      "description": "api.githubcopilot.com/mcp/ ，Bearer 用 GITHUB_TOKEN。",
+      "transport": "streamable-http",
+      "serverName": "github-official",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": { "bearer": "GITHUB_TOKEN" } },
+      "enableWhen": { "anyEnv": ["GITHUB_TOKEN"], "flag": "MCP_GITHUB_OFFICIAL" },
+      "docs": "https://github.com/github/github-mcp-server"
+    },
+    {
+      "id": "playwright",
+      "title": "Playwright",
+      "description": "真实浏览器点击、截图、填表。首次 npx 会下载浏览器。",
+      "transport": "stdio",
+      "serverName": "playwright",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "enableWhen": { "flag": "MCP_PLAYWRIGHT" },
+      "docs": "https://github.com/microsoft/playwright-mcp"
+    },
+    {
+      "id": "sequential-thinking",
+      "title": "Sequential Thinking",
+      "description": "多步推理草稿板，无外部密钥。",
+      "transport": "stdio",
+      "serverName": "sequential-thinking",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "enableWhen": { "flag": "MCP_SEQUENTIAL" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-sequential-thinking"
+    },
+    {
+      "id": "memory",
+      "title": "Memory",
+      "description": "本地知识图谱记忆。",
+      "transport": "stdio",
+      "serverName": "memory",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "enableWhen": { "flag": "MCP_MEMORY" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-memory"
+    },
+    {
+      "id": "filesystem",
+      "title": "Filesystem MCP",
+      "description": "额外文件系统 MCP（Harness 已有 read/write，一般不必开）。",
+      "transport": "stdio",
+      "serverName": "filesystem",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", { "js": "process.env.DSH_WORKSPACE || process.cwd()" }],
+      "enableWhen": { "flag": "MCP_FILESYSTEM" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-filesystem"
+    },
+    {
+      "id": "fetch",
+      "title": "Fetch",
+      "description": "把 URL 拉成可读文本。需要 uvx（pipx/uv）。",
+      "transport": "stdio",
+      "serverName": "fetch",
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "enableWhen": { "flag": "MCP_FETCH" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch"
+    },
+    {
+      "id": "time",
+      "title": "Time",
+      "description": "时区与时间转换。",
+      "transport": "stdio",
+      "serverName": "time",
+      "command": "uvx",
+      "args": ["mcp-server-time"],
+      "enableWhen": { "flag": "MCP_TIME" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/time"
+    },
+    {
+      "id": "git",
+      "title": "Git",
+      "description": "只读/受限 git 操作 MCP。日常仍优先用 bash git。",
+      "transport": "stdio",
+      "serverName": "git",
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", { "js": "process.env.DSH_WORKSPACE || process.cwd()" }],
+      "enableWhen": { "flag": "MCP_GIT" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/git"
+    },
+    {
+      "id": "postgres",
+      "title": "PostgreSQL",
+      "description": "查询 Postgres。",
+      "transport": "stdio",
+      "serverName": "postgres",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", { "js": "process.env.POSTGRES_URL || ''" }],
+      "enableWhen": { "anyEnv": ["POSTGRES_URL"], "flag": "MCP_POSTGRES" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-postgres"
+    },
+    {
+      "id": "sqlite",
+      "title": "SQLite",
+      "description": "本地 SQLite。路径 SQLITE_PATH。",
+      "transport": "stdio",
+      "serverName": "sqlite",
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", { "js": "process.env.SQLITE_PATH || '/tmp/codeseek.sqlite'" }],
+      "enableWhen": { "flag": "MCP_SQLITE" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite"
+    },
+    {
+      "id": "brave-search",
+      "title": "Brave Search",
+      "description": "网页搜索。",
+      "transport": "stdio",
+      "serverName": "brave-search",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": { "BRAVE_API_KEY": { "from": ["BRAVE_API_KEY"] } },
+      "enableWhen": { "anyEnv": ["BRAVE_API_KEY"], "flag": "MCP_BRAVE" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search"
+    },
+    {
+      "id": "slack",
+      "title": "Slack",
+      "description": "频道与消息。",
+      "transport": "stdio",
+      "serverName": "slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": { "from": ["SLACK_BOT_TOKEN"] },
+        "SLACK_TEAM_ID": { "from": ["SLACK_TEAM_ID"] }
+      },
+      "enableWhen": { "anyEnv": ["SLACK_BOT_TOKEN"], "flag": "MCP_SLACK" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-slack"
+    },
+    {
+      "id": "google-maps",
+      "title": "Google Maps",
+      "description": "地理编码与地点。",
+      "transport": "stdio",
+      "serverName": "google-maps",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-google-maps"],
+      "env": { "GOOGLE_MAPS_API_KEY": { "from": ["GOOGLE_MAPS_API_KEY"] } },
+      "enableWhen": { "anyEnv": ["GOOGLE_MAPS_API_KEY"], "flag": "MCP_GOOGLE_MAPS" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-google-maps"
+    },
+    {
+      "id": "puppeteer",
+      "title": "Puppeteer",
+      "description": "无头 Chrome。更推荐 Playwright。",
+      "transport": "stdio",
+      "serverName": "puppeteer",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "enableWhen": { "flag": "MCP_PUPPETEER" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-puppeteer"
+    },
+    {
+      "id": "context7",
+      "title": "Context7",
+      "description": "按库名拉最新官方文档。可选 CONTEXT7_API_KEY。",
+      "transport": "stdio",
+      "serverName": "context7",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": { "CONTEXT7_API_KEY": { "from": ["CONTEXT7_API_KEY"] } },
+      "enableWhen": { "flag": "MCP_CONTEXT7" },
+      "docs": "https://github.com/upstash/context7"
+    },
+    {
+      "id": "stripe",
+      "title": "Stripe 官方远程 MCP",
+      "description": "客户、产品、支付。演示站不要拿这个当真收款。",
+      "transport": "streamable-http",
+      "serverName": "stripe",
+      "url": "https://mcp.stripe.com",
+      "headers": { "Authorization": { "bearer": "STRIPE_SECRET_KEY" } },
+      "enableWhen": { "anyEnv": ["STRIPE_SECRET_KEY"], "flag": "MCP_STRIPE" },
+      "docs": "https://docs.stripe.com/mcp"
+    },
+    {
+      "id": "linear",
+      "title": "Linear 官方远程 MCP",
+      "description": "Issue 与项目管理。",
+      "transport": "streamable-http",
+      "serverName": "linear",
+      "url": "https://mcp.linear.app/mcp",
+      "headers": { "Authorization": { "bearer": "LINEAR_API_KEY" } },
+      "enableWhen": { "anyEnv": ["LINEAR_API_KEY"], "flag": "MCP_LINEAR" },
+      "docs": "https://linear.app/docs/mcp"
+    },
+    {
+      "id": "notion",
+      "title": "Notion 远程 MCP",
+      "description": "页面与数据库。",
+      "transport": "streamable-http",
+      "serverName": "notion",
+      "url": "https://mcp.notion.com/mcp",
+      "headers": { "Authorization": { "bearer": "NOTION_TOKEN" } },
+      "enableWhen": { "anyEnv": ["NOTION_TOKEN"], "flag": "MCP_NOTION" },
+      "docs": "https://developers.notion.com/docs/mcp"
+    },
+    {
+      "id": "sentry",
+      "title": "Sentry",
+      "description": "错误与 issue。",
+      "transport": "stdio",
+      "serverName": "sentry",
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server"],
+      "env": { "SENTRY_ACCESS_TOKEN": { "from": ["SENTRY_AUTH_TOKEN", "SENTRY_ACCESS_TOKEN"] } },
+      "enableWhen": { "anyEnv": ["SENTRY_AUTH_TOKEN", "SENTRY_ACCESS_TOKEN"], "flag": "MCP_SENTRY" },
+      "docs": "https://github.com/getsentry/sentry-mcp"
+    },
+    {
+      "id": "firecrawl",
+      "title": "Firecrawl",
+      "description": "把网页爬成干净 markdown。",
+      "transport": "stdio",
+      "serverName": "firecrawl",
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": { "FIRECRAWL_API_KEY": { "from": ["FIRECRAWL_API_KEY"] } },
+      "enableWhen": { "anyEnv": ["FIRECRAWL_API_KEY"], "flag": "MCP_FIRECRAWL" },
+      "docs": "https://docs.firecrawl.dev/mcp"
+    }
+  ]
+}

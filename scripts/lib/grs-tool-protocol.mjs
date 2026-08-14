@@ -85,6 +85,65 @@ function parseJsonish(raw) {
   return null
 }
 
+function firstString(obj, keys) {
+  for (const key of keys) {
+    const value = obj[key]
+    if (typeof value === 'string' && value.trim()) return value
+  }
+  return undefined
+}
+
+function shortCommandDescription(command) {
+  const one = String(command || '').replace(/\s+/g, ' ').trim()
+  if (!one) return 'Run command'
+  return one.length > 72 ? `${one.slice(0, 69)}...` : one
+}
+
+function assignCanonical(out, canonical, aliases) {
+  const current = out[canonical]
+  if (!(typeof current === 'string' && current.trim())) {
+    const picked = firstString(out, aliases)
+    if (picked) out[canonical] = picked
+  }
+  for (const alias of aliases) delete out[alias]
+}
+
+/**
+ * Gemini 常把 file_path 写成 path、漏掉 bash 必填的 description。
+ * 在交给 Harness 之前把常见别名收成 schema 字段。
+ */
+export function normalizeToolArguments(name, args) {
+  const out = { ...(args && typeof args === 'object' && !Array.isArray(args) ? args : {}) }
+  const tool = String(name || '')
+
+  if (tool === 'read' || tool === 'write' || tool === 'edit') {
+    assignCanonical(out, 'file_path', ['path', 'filepath', 'file', 'filename'])
+  }
+
+  if (tool === 'bash') {
+    assignCanonical(out, 'command', ['cmd', 'script', 'shell'])
+    if (!(typeof out.description === 'string' && out.description.trim()) && typeof out.command === 'string') {
+      out.description = shortCommandDescription(out.command)
+    }
+  }
+
+  if (tool === 'glob') {
+    assignCanonical(out, 'pattern', ['glob', 'glob_pattern', 'globPattern', 'query'])
+    assignCanonical(out, 'path', ['directory', 'dir', 'root', 'cwd', 'file_path'])
+  }
+
+  if (tool === 'grep') {
+    assignCanonical(out, 'pattern', ['query', 'regex', 'search'])
+    assignCanonical(out, 'path', ['directory', 'dir', 'file_path', 'file'])
+  }
+
+  if (tool === 'skill') {
+    assignCanonical(out, 'name', ['skill', 'skill_name', 'id'])
+  }
+
+  return out
+}
+
 function normalizeCall(value, fallbackName) {
   if (value == null) return null
   if (typeof value === 'string') {
@@ -102,7 +161,7 @@ function normalizeCall(value, fallbackName) {
   const id = typeof value.id === 'string' && value.id.startsWith('call_')
     ? value.id
     : undefined
-  return { id, name, arguments: args }
+  return { id, name, arguments: normalizeToolArguments(name, args) }
 }
 
 function parseCallBody(body, openTag) {
@@ -192,6 +251,7 @@ export const TOOL_CONTINUE_HINT = [
   'Do not ask the human to reply 继续 / continue / keep going just to take the next step.',
   'edit on an existing file requires a successful `read` tool call on that path first (bash/cat/grep do not count).',
   'If cwd is empty or not the repo, use absolute paths under /workspace. The storefront lives at /workspace/store/.',
+  'If skill is unknown, skip it and keep implementing under /workspace/store/.',
 ].join(' ')
 
 const EDIT_NEEDS_READ_RE = /edit requires reading "([^"]+)" first/g
@@ -262,6 +322,10 @@ export function buildToolProtocolPrompt(tools) {
     '</tool_call>',
     'Rules:',
     '- arguments must be a JSON object matching that tool\'s schema',
+    '- read/write/edit require file_path (not path/file)',
+    '- bash requires command and description (5-10 words; description is shown in the UI)',
+    '- glob requires pattern; skill requires name',
+    '- if skill says unknown, skip it and keep editing /workspace/store/ with absolute paths',
     '- escape newlines inside JSON strings as \\n; keep the object valid JSON',
     '- multiple tools: multiple <tool_call> blocks',
     '- do not wrap the block in markdown fences',

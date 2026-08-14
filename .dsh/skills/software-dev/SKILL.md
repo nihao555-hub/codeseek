@@ -8,7 +8,7 @@ whenToUse: 实现功能、修 bug、写脚本、改配置、排查构建或补�
 
 你在 DeepSeek Harness 里改这个仓库。默认 `gemini-3.5-flash`；架构设计、棘手 bug、大范围重构改用 `gpt-5.6-sol`。
 
-独立站在 `/workspace/store/`。改店面时加载 `ecommerce-store`，并按任务再加载 `frontend-design` / `react-best-practices` / `api-design` / `ecommerce-checkout` 等。完整清单见 `.dsh/skills/README.md`。
+独立站在 `/workspace/store/`。改店面时加载 `ecommerce-store`，并按任务再加载 `frontend-design` / `react-best-practices` / `api-design` / `ecommerce-checkout` 等。`skill` 报 unknown 时跳过，用绝对路径继续改 `/workspace/store/`。完整清单见 `.dsh/skills/README.md`。
 
 长任务（建站、修功能、补测试）必须在同一条用户消息里连续 read → write/edit → bash 验证，直到可交付。不要只列完目录就停下来让用户回复「继续」。
 

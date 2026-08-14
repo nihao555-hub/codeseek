@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { lstatSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = join(import.meta.dirname, '../../.dsh/skills')
@@ -23,4 +23,12 @@ test('every project skill has matching kebab-case frontmatter', () => {
     assert.match(fm, /^description: .+/m)
     assert.match(fm, /^whenToUse: .+/m)
   }
+})
+
+test('dsh-home/skills is a symlink to project skills', () => {
+  const link = join(import.meta.dirname, '../../dsh-home/skills')
+  const target = join(import.meta.dirname, '../../.dsh/skills')
+  assert.equal(lstatSync(link).isSymbolicLink(), true)
+  assert.equal(realpathSync(link), realpathSync(target))
+  assert.equal(statSync(join(link, 'ecommerce-store', 'SKILL.md')).isFile(), true)
 })

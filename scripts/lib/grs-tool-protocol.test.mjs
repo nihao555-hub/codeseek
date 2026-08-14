@@ -10,6 +10,7 @@ import {
   lastTurnIsToolResult,
   buildObservationHint,
   unreadEditPathsFromText,
+  normalizeToolArguments,
 } from './grs-tool-protocol.mjs'
 
 test('parses hermes <tool_call> json', () => {
@@ -92,6 +93,9 @@ test('protocol forbids asking the user to continue after one tool', () => {
   assert.match(out.messages[0].content, /Never ask the user to reply/)
   assert.match(out.messages[0].content, /write\/edit\/bash\/read are available/)
   assert.match(out.messages[0].content, /bash\/cat\/grep do not observe the file/)
+  assert.match(out.messages[0].content, /file_path \(not path\/file\)/)
+  assert.match(out.messages[0].content, /bash requires command and description/)
+  assert.match(out.messages[0].content, /if skill says unknown/)
 })
 
 test('extracts unread edit paths from harness FS_NOT_OBSERVED errors', () => {
@@ -146,6 +150,36 @@ test('buildClientResponse stream has tool_calls finish', () => {
   const named = chunks.find((c) => c.choices[0].delta.tool_calls?.[0]?.function?.name)
   assert.equal(named.choices[0].delta.tool_calls[0].function.name, 'bash')
   assert.match(sseEncode(chunks), /data: \[DONE\]/)
+})
+
+test('normalizes common Gemini argument aliases', () => {
+  assert.equal(
+    normalizeToolArguments('read', { path: '/workspace/store/client/src/App.jsx' }).file_path,
+    '/workspace/store/client/src/App.jsx',
+  )
+  assert.equal(normalizeToolArguments('read', { path: '/workspace/a.js' }).path, undefined)
+  const bash = normalizeToolArguments('bash', { cmd: 'ls /workspace/store' })
+  assert.equal(bash.command, 'ls /workspace/store')
+  assert.equal(bash.description, 'ls /workspace/store')
+  assert.equal(bash.cmd, undefined)
+  assert.equal(
+    normalizeToolArguments('glob', { glob_pattern: '**/*.jsx' }).pattern,
+    '**/*.jsx',
+  )
+  assert.equal(normalizeToolArguments('skill', { skill: 'ecommerce-store' }).name, 'ecommerce-store')
+})
+
+test('parses tool_call blocks that use argument aliases', () => {
+  const text = [
+    '<tool_call>{"name":"read","arguments":{"path":"/workspace/AGENTS.md"}}</tool_call>',
+    '<tool_call>{"name":"bash","arguments":{"command":"ls /workspace/store"}}</tool_call>',
+    '<tool_call>{"name":"glob","arguments":{"glob":"**/*"}}</tool_call>',
+  ].join('\n')
+  const parsed = parseAssistantToolPayload(text)
+  assert.equal(parsed.calls[0].arguments.file_path, '/workspace/AGENTS.md')
+  assert.equal(parsed.calls[1].arguments.command, 'ls /workspace/store')
+  assert.match(parsed.calls[1].arguments.description, /ls \/workspace\/store/)
+  assert.equal(parsed.calls[2].arguments.pattern, '**/*')
 })
 
 test('collectCompletion reads sse text', () => {

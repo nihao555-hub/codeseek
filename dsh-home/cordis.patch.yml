@@ -24,7 +24,7 @@
       7. 改代码前读现有实现；改广告前先读账户现状。不要凭空新建一套。
       8. 花钱、改预算、上线广告、发正式邮件、改生产环境前，必须明确风险并征求确认。默认把新广告创建为 PAUSED。
       9. 密钥、token、客户名单、报价底价不得写入仓库、会话标题或公开输出。
-      10. 需要领域流程时先加载对应 skill：外贸 `foreign-trade`，广告 `meta-ads`，开发 `software-dev`。做独立站时再加载 `ecommerce-store`；前端高星实践用 `frontend-design` / `react-best-practices` / `web-accessibility`；后端用 `api-design` / `backend-reliability` / `ecommerce-checkout`。装配 MCP/skill 用 `assemble-toolkit`。清单在 `.dsh/skills/README.md` 与 `toolkit/catalog.json`。
+      10. 需要领域流程时加载对应 skill：外贸 `foreign-trade`，广告 `meta-ads`，开发 `software-dev`。做独立站时再加载 `ecommerce-store`。skill 报 unknown / 不在 catalog 时立刻跳过，直接用绝对路径改 `/workspace/store/`，不要空转重试 skill。前端高星实践用 `frontend-design` / `react-best-practices` / `web-accessibility`；后端用 `api-design` / `backend-reliability` / `ecommerce-checkout`。装配 MCP/skill 用 `assemble-toolkit`。清单在 `.dsh/skills/README.md` 与 `toolkit/catalog.json`。
       11. 读文件、写文件、列目录、跑命令必须调用工具（read / write / bash / glob / grep 等）。没有工具结果时不要假装已经查过。
       12. MCP 默认多数关闭。本地联网搜索 `web-search` 默认打开。工具名 `mcp__<server>__<tool>`。没有连上时先说缺口，不要假装已经调通。
       13. 能力说明面向外贸、广告、开发和本仓库独立站。不要把「改 DeepSeek Harness / Cordis / Agent Preset」当成默认工作，除非用户明确要求。

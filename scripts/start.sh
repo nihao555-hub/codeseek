@@ -48,7 +48,26 @@ require_node() {
   fi
 }
 
+ensure_user_skills() {
+  # Harness 在会话 cwd 不是仓库根时读不到 <project>/.dsh/skills。
+  # user-dsh 根是 $DSH_HOME/skills，链到项目 skills 后错误工作区也能加载。
+  local dest="${DSH_HOME}/skills"
+  local src="$ROOT/.dsh/skills"
+  if [[ ! -d "$src" ]]; then
+    return 0
+  fi
+  if [[ -L "$dest" ]]; then
+    return 0
+  fi
+  if [[ -e "$dest" ]]; then
+    echo "跳过 skills 链接：${dest} 已存在且不是符号链接"
+    return 0
+  fi
+  ln -sfn "$src" "$dest"
+}
+
 ensure_toolkit() {
+  ensure_user_skills
   node "$ROOT/scripts/assemble-toolkit.mjs" sync >/dev/null
 }
 
@@ -192,6 +211,15 @@ PY
   echo
   echo "== 工具箱 =="
   node "$ROOT/scripts/assemble-toolkit.mjs" doctor
+  echo
+  echo "== Skills =="
+  if [[ -L "$DSH_HOME/skills" ]]; then
+    echo "dsh-home/skills -> $(readlink "$DSH_HOME/skills")"
+  elif [[ -d "$DSH_HOME/skills" ]]; then
+    echo "dsh-home/skills: 目录（未链接到 .dsh/skills）"
+  else
+    echo "dsh-home/skills: 不存在"
+  fi
   echo
   echo "== 联网搜索 =="
   if grep -q 'web-search' "$ROOT/toolkit/enabled.json" 2>/dev/null; then

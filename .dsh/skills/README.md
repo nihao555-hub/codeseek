@@ -1,6 +1,6 @@
 # 项目 Skills
 
-放在 `.dsh/skills/<name>/SKILL.md`。名字必须 kebab-case。模型用 `skill` 工具加载。
+放在 `.dsh/skills/<name>/SKILL.md`。名字必须 kebab-case。模型用 `skill` 工具加载。启动时会把本目录链到 `dsh-home/skills`，这样 Web 会话工作区不是仓库根时也能加载。skill 报 unknown 时跳过，不要空转。
 
 ## 业务
 

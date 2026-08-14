@@ -13,7 +13,7 @@ fi
 
 PUBLIC="$SRC/apps/web/public"
 DIST="$SRC/apps/web/dist"
-mkdir -p "$PUBLIC/brand" "$DIST/brand"
+mkdir -p "$PUBLIC/brand" "$PUBLIC/brand/models" "$DIST/brand"
 
 cp -f "$BRAND/svg/favicon.svg" "$PUBLIC/favicon.svg"
 cp -f "$BRAND/css/brand.css" "$PUBLIC/brand/brand.css"
@@ -22,6 +22,8 @@ cp -f "$BRAND/generated/codeseek-wordmark.png" "$PUBLIC/brand/wordmark.png"
 cp -f "$BRAND/generated/codeseek-hero-glow.png" "$PUBLIC/brand/hero-glow.png"
 cp -f "$BRAND/generated/codeseek-empty-state.png" "$PUBLIC/brand/empty-state.png"
 cp -f "$BRAND/generated/codeseek-sidebar-ornament.png" "$PUBLIC/brand/sidebar-ornament.png"
+cp -f "$BRAND/svg/model-gemini.svg" "$PUBLIC/brand/models/gemini.svg"
+cp -f "$BRAND/svg/model-openai.svg" "$PUBLIC/brand/models/openai.svg"
 cp -f "$BRAND/overrides/index.html" "$SRC/apps/web/index.html"
 cp -f "$BRAND/overrides/manifest.webmanifest" "$PUBLIC/manifest.webmanifest"
 cp -f "$BRAND/overrides/FishLogo.tsx" "$SRC/packages/client/ui-primitives/src/FishLogo.tsx"

@@ -20,14 +20,27 @@ test('settings catalog only lists GRS Gemini and GPT seats', () => {
 
 test('ModelSelect override paints Gemini/OpenAI marks and hides DeepSeek rows', () => {
   const tsx = readFileSync(join(root, 'branding/overrides/ModelSelect.tsx'), 'utf8')
-  assert.match(tsx, /function GeminiLogo/)
-  assert.match(tsx, /function OpenAILogo/)
+  assert.match(tsx, /\/brand\/models\/gemini\.svg/)
+  assert.match(tsx, /\/brand\/models\/openai\.svg/)
   assert.match(tsx, /id\.includes\('gemini'\)/)
   assert.match(tsx, /id\.includes\('gpt'\)/)
   assert.match(tsx, /hay\.includes\('deepseek'\)/)
   assert.match(tsx, /groupId === 'deepseek-official'/)
   assert.match(tsx, /<ModelLogo modelId=\{currentChoice\?\.model\.id/)
   assert.match(tsx, /<ModelLogo modelId=\{model\.id/)
+})
+
+test('apply-brand copies official model logos into the web public dir', () => {
+  const sh = readFileSync(join(root, 'scripts/apply-brand.sh'), 'utf8')
+  assert.match(sh, /svg\/model-gemini\.svg/)
+  assert.match(sh, /brand\/models\/gemini\.svg/)
+  assert.match(sh, /svg\/model-openai\.svg/)
+  assert.match(sh, /brand\/models\/openai\.svg/)
+  const gemini = readFileSync(join(root, 'branding/svg/model-gemini.svg'), 'utf8')
+  const openai = readFileSync(join(root, 'branding/svg/model-openai.svg'), 'utf8')
+  assert.match(gemini, /viewBox="0 0 65 65"/)
+  assert.match(gemini, /#3186FF|#FC413D|#00B95C/)
+  assert.match(openai, /M22\.2819 9\.8211/)
 })
 
 test('apply-brand copies the ModelSelect override into the vendor client', () => {

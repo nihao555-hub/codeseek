@@ -53,54 +53,15 @@ function isHiddenCatalogModel(groupId: string, modelId: string): boolean {
   return hay.includes('deepseek') || groupId === 'deepseek-official'
 }
 
-function GeminiLogo({ size = 16 }: { size?: number }) {
-  const rawId = useId().replace(/:/g, '')
-  const gid = `gemini-${rawId}`
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <defs>
-        <linearGradient id={gid} x1="3" y1="1" x2="21" y2="23" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#1C7DFF" />
-          <stop offset="0.5" stopColor="#22D3EE" />
-          <stop offset="1" stopColor="#A855F7" />
-        </linearGradient>
-      </defs>
-      <path
-        fill={`url(#${gid})`}
-        d="M12 1.15c.42 4.6 2.58 8.48 6.85 10.85C14.58 14.37 12.42 18.25 12 22.85c-.42-4.6-2.58-8.48-6.85-10.85C9.42 9.63 11.58 5.75 12 1.15z"
-      />
-    </svg>
-  )
-}
-
-function OpenAILogo({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zm-9.022 12.608a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.778-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.582a4.504 4.504 0 0 1-4.493 4.495zM3.641 18.304a4.47 4.47 0 0 1-.535-3.013l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.842-3.368v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.099-1.646zM2.49 8.248a4.482 4.482 0 0 1 2.353-1.973l.01.006 5.011 2.89a.8.8 0 0 1 .4.68v5.687L8.24 14.37a.071.071 0 0 1-.071-.006L3.41 11.59A4.5 4.5 0 0 1 2.49 8.248zm16.375 3.884-5.011-2.892 2.02-1.166a.075.075 0 0 1 .07 0l4.76 2.743a4.495 4.495 0 0 1 .654 7.246 4.494 4.494 0 0 1-2.493 1.208v-6.53a.8.8 0 0 0-.4-.68zm2.011-3.023-.142-.085-4.773-2.782a.776.776 0 0 0-.785 0L9.409 9.2V6.865a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66c.01.054.01.106.018.16zM8.51 12.63 6.49 11.463a.08.08 0 0 1-.038-.057V5.825a4.5 4.5 0 0 1 7.375-3.453l-.142.08-4.773 2.762a.795.795 0 0 0-.393.681zm1.097-2.365L12 8.88l2.577-1.488v2.976L12 11.856 9.423 10.37z"
-      />
-    </svg>
-  )
-}
-
 function ModelLogo({ modelId, size = 16 }: { modelId: string; size?: number }) {
   const kind = modelLogoKind(modelId)
-  if (kind === 'gemini') {
-    return (
-      <span className={css.logo}>
-        <GeminiLogo size={size} />
-      </span>
-    )
-  }
-  if (kind === 'openai') {
-    return (
-      <span className={css.logo}>
-        <OpenAILogo size={size} />
-      </span>
-    )
-  }
-  return null
+  if (kind === null) return null
+  const src = kind === 'gemini' ? '/brand/models/gemini.svg' : '/brand/models/openai.svg'
+  return (
+    <span className={css.logo}>
+      <img src={src} width={size} height={size} alt="" aria-hidden="true" />
+    </span>
+  )
 }
 
 /** One dynamic effort row; undefined means preserve the provider default. */

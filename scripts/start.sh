@@ -220,6 +220,14 @@ PY
   echo "== 工具箱 =="
   node "$ROOT/scripts/assemble-toolkit.mjs" doctor
   echo
+  echo "== 设置页入口 =="
+  if [[ -L "$DSH_HOME/profiles/web/node_modules/codeseek-toolkit-panel" ]]; then
+    echo "codeseek-toolkit-panel -> $(readlink "$DSH_HOME/profiles/web/node_modules/codeseek-toolkit-panel")"
+    echo "Web 设置 → 插件 → 工具与 MCP"
+  else
+    echo "尚未链接 codeseek-toolkit-panel（start.sh web 会写入 profile node_modules）"
+  fi
+  echo
   echo "== Skills =="
   if [[ -L "$DSH_HOME/skills" ]]; then
     echo "dsh-home/skills -> $(readlink "$DSH_HOME/skills")"

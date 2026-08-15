@@ -1,6 +1,7 @@
 {
   "mcp": [
     "buyer-dd",
+    "context7",
     "documents",
     "memory",
     "open-websearch",
@@ -8,5 +9,5 @@
     "time",
     "web-search"
   ],
-  "note": "把要强制打开的 MCP id 放进 mcp 数组，然后 npm run toolkit sync。也可在 Web 设置 → 插件 → 工具与 MCP 里开关。无密钥默认打开：搜索、背调、记忆、时区、附件阅读、拆步骤。有密钥的（GitHub/Meta/Stripe 等）有环境变量就会自动开。Playwright 要下载浏览器，请在设置页再开。"
+  "note": "把要强制打开的 MCP id 放进 mcp 数组，然后 npm run toolkit sync。也可在 Web 设置 → 插件 → 工具与 MCP 里开关。无密钥默认打开：搜索、背调、记忆、时区、附件阅读、拆步骤、Context7。有密钥的（GitHub/Meta/Stripe 等）有环境变量就会自动开。Playwright 要下载浏览器，请在设置页再开。"
 }

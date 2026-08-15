@@ -89,6 +89,16 @@ test('local memory/time/documents MCP use NDJSON node scripts', () => {
   assert.ok(catalog.communityPlugins.length >= 4)
 })
 
+test('default enabled.json turns on no-key MCP and leaves playwright off', () => {
+  const enabled = JSON.parse(readFileSync(new URL('../../toolkit/enabled.json', import.meta.url), 'utf8'))
+  for (const id of ['web-search', 'open-websearch', 'buyer-dd', 'memory', 'time', 'documents', 'sequential-thinking', 'context7']) {
+    assert.ok(enabled.mcp.includes(id), id)
+  }
+  assert.ok(!enabled.mcp.includes('playwright'))
+  assert.ok(!enabled.mcp.includes('puppeteer'))
+  assert.ok(!enabled.mcp.includes('filesystem'))
+})
+
 test('describeToolkit marks forced MCP as enabled and lists host tools', () => {
   const catalog = loadCatalog()
   const data = describeToolkit(catalog, { mcp: ['documents'] }, {})

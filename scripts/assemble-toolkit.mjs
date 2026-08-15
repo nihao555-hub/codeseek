@@ -10,7 +10,7 @@
  *   node scripts/assemble-toolkit.mjs refresh-mcp
  *   node scripts/assemble-toolkit.mjs doctor
  */
-import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync, statSync, lstatSync, readlinkSync, unlinkSync, symlinkSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
@@ -158,7 +158,50 @@ export function syncPatch(catalog = loadCatalog(), enabled = loadEnabled()) {
   mkdirSync(dirname(PATCH_PATH), { recursive: true })
   const yaml = renderMcpPatch(catalog, enabled)
   writeFileSync(PATCH_PATH, yaml)
+  ensureToolkitPanelInstall()
   return PATCH_PATH
+}
+
+export const TOOLKIT_PANEL_PACKAGE = 'codeseek-toolkit-panel'
+export const TOOLKIT_PANEL_DIR = join(ROOT, 'plugins/toolkit-panel')
+
+function ensureSymlink(link, target) {
+  mkdirSync(dirname(link), { recursive: true })
+  try {
+    const stat = lstatSync(link)
+    if (stat.isSymbolicLink()) {
+      if (readlinkSync(link) === target) return link
+      unlinkSync(link)
+    } else {
+      throw new Error(`${link} 已存在且不是符号链接`)
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
+  }
+  symlinkSync(target, link)
+  return link
+}
+
+/**
+ * Client 半边靠 package.json 的 dsh.client 扫描。overlay 必须用包名，
+ * 并且这个包要从 web profile 的 node_modules 解析到。
+ */
+export function ensureToolkitPanelInstall(home = process.env.DSH_HOME || join(ROOT, 'dsh-home')) {
+  const links = [
+    ensureSymlink(join(home, 'profiles/web/node_modules', TOOLKIT_PANEL_PACKAGE), TOOLKIT_PANEL_DIR),
+    ensureSymlink(join(home, 'profiles/node_modules', TOOLKIT_PANEL_PACKAGE), TOOLKIT_PANEL_DIR),
+  ]
+  const manifestPath = join(home, 'profiles/web/package.json')
+  if (existsSync(manifestPath)) {
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+    const spec = `file:${TOOLKIT_PANEL_DIR}`
+    manifest.dependencies = manifest.dependencies || {}
+    if (manifest.dependencies[TOOLKIT_PANEL_PACKAGE] !== spec) {
+      manifest.dependencies[TOOLKIT_PANEL_PACKAGE] = spec
+      writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
+    }
+  }
+  return links
 }
 
 function ensureWhenToUse(markdown, whenToUse) {

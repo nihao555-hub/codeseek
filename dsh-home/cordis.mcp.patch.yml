@@ -375,7 +375,7 @@
           maxAttempts: 10
     - id: mcp-context7
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js "!(process.env.MCP_CONTEXT7 === '1')"
+      disabled: !!js "!(true || process.env.MCP_CONTEXT7 === '1')"
       config:
         serverName: context7
         transport: stdio

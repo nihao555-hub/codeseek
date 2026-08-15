@@ -225,6 +225,22 @@ async function main() {
     record('mcp.trade-crm pipeline_summary', false, error.message)
   }
 
+  try {
+    const replies = await rpc(process.execPath, [join(root, 'scripts/trade-open-data-mcp.mjs')], handshakePlus({
+      name: 'kickoff',
+      arguments: { market: 'Nordics', product: 'tumbler', text: '帮我找北欧买家' },
+    }))
+    const names = replies.find((row) => row.id === 2)?.result?.tools?.map((row) => row.name) || []
+    const text = callText(replies)
+    record(
+      'mcp.trade-open-data kickoff',
+      names.includes('kickoff') && names.includes('comtrade_preview') && names.includes('list_fairs') && /营销专家/.test(text) && /广告专员/.test(text),
+      `tools=${names.join(',') || '?'} ${text}`,
+    )
+  } catch (error) {
+    record('mcp.trade-open-data kickoff', false, error.message)
+  }
+
   const failed = rows.filter((row) => !row.ok)
   console.log(`\n${rows.length - failed.length}/${rows.length} passed`)
   if (failed.length) process.exitCode = 1

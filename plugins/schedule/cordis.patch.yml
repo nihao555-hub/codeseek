@@ -1,0 +1,8 @@
+# 官方 Web 默认树不含定时工具。这是上游 examples/web-schedule 的同一组 overlay。
+# 只对加载之后新建的根会话生效：schedule_create / schedule_list / schedule_delete。
+# every_seconds 最短 300（5 分钟）。到点后在同一会话里叫醒管家，prompt 里写清要继续的获客任务。
+- insert:
+    - id: time-context
+      name: '@deepseek-ai/dsh-time-context'
+    - id: schedule
+      name: '@deepseek-ai/dsh-schedule'

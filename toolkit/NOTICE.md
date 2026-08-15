@@ -18,6 +18,8 @@
 - SearXNG 引擎：https://github.com/searxng/searxng （AGPL-3.0）
 - SearXNG MCP：https://github.com/ihor-sokoliuk/mcp-searxng （MIT）
 - 默认本地搜索：`scripts/web-search-mcp.mjs` 先查 SearXNG JSON API，失败则解析 DuckDuckGo HTML
+- UN Comtrade 官方 preview：https://comtradeapi.un.org/public/v1/preview/C/A/HS （国家×HS 年度汇总，不是提单）
+- 展会日历快照：`toolkit/data/trade-shows.json` 来自 [LensmorOfficial/trade-show-calendar](https://github.com/LensmorOfficial/trade-show-calendar)
 - Stripe / Linear / Notion 等远程 MCP 需要各自账户与密钥，密钥只放 `.env`。
 
 不要把 token 写进 `catalog.json`、patch 或 commit。

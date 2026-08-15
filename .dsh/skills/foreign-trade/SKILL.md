@@ -30,12 +30,12 @@ whenToUse: 挖客、开发信、询盘、报价、跟单、独立站获客，或
 
 `subagent.description` = 花名。出生信 = `templates/member-brief.md`。已有同花名孩子用 `send_message`。
 
-没 @ 的短问题（MOQ、有没有 FDA）自己查 catalog。专家活即使没 @ 也按上表派人。
+没 @ 的短问题（MOQ、有没有 FDA）自己查 catalog。一句话挖客/找买家即使没 @ 也立刻派营销专家；有数量/SKU 再加报价，明确背调再加背调。不要把广告/社媒/建站/合规全拉出来凑数。用户说每天/每周：`schedule_create`。
 
 ## 红线
 
 - 不发真实邮件、不登录社媒后台
-- 不编认证、不编邮箱、不编海关数据
+- 不编认证、不编邮箱、不把 Comtrade 汇总说成海关提单
 - 底价不进客户稿
 - 真实客户隐私写 `team/deals/local/`
 - 不做全能开发

@@ -2,7 +2,7 @@
 
 基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 **外贸团队**，对齐 [网易外贸通 AI 团队](https://waimao.163.com/knowledge/article/1462)：管家 + 获客专家 + 成交专家。只做两件事——**找到买家，跟到订单**。不是全能编程 Agent。
 
-闭环：挖客 → 开发信草稿（不代发）→ 询盘 → 报价 → 跟单。没有海关库、没有群发 IP。公开网页 + 本地 `mcp__trade-crm__*` 代替。
+闭环：挖客 → 开发信草稿（不代发）→ 询盘 → 报价 → 跟单。没有海关提单库、没有群发 IP。公开网页 + UN Comtrade 汇总 + 开源展会日历 + 本地 `mcp__trade-crm__*` 代替。
 
 - **获客**：营销 / 社媒 / 独立站货架 / 可选 Meta 广告
 - **成交**：询盘、报价、运营跟单、公开源背调、合规
@@ -41,12 +41,16 @@ npm start              # 或 bash scripts/start.sh web
 
 ## 外贸团队
 
-默认人设是港窑 **管家**。输入 `@营销专家 找北欧买家` 指派。花名册 `team/roster.md`，闭环 `team/playbooks/loop.md`。
+默认人设是港窑 **管家**。一句话即可开干，不必写 @：`帮我找北欧买家买保温杯`。花名册 `team/roster.md`，闭环 `team/playbooks/loop.md`。
 
 - 线索 `team/crm/leads.json`（镜像 `leads.md`）
 - 商机 `team/crm/deals.json`（镜像 `pipeline.md`）
 - 成交档案 `team/deals/`
-- 工具：`mcp__trade-crm__*`、`mcp__buyer-dd__*`、官方 `web_search`
+- 工具：`mcp__trade-crm__*`、`mcp__trade-open-data__*`、`mcp__buyer-dd__*`、官方 `web_search`、`schedule_*`
+
+定时提醒用官方 `@deepseek-ai/dsh-schedule`（`every_seconds` 最短 5 分钟）。**重启 Web 后必须新建会话**，旧会话没有这组工具。
+
+海关：**没有**提单/进口商名单的合法免费开源库。能用的是联合国 Comtrade 官方 preview（国家 × HS × 年的汇总统计）。展会用 GitHub [LensmorOfficial/trade-show-calendar](https://github.com/LensmorOfficial/trade-show-calendar)。
 
 插件清单参考 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin)。社区 Cordis 皮肤/宠物/渗透不装；办公/附件类优先复用本仓库 NDJSON MCP，设置 → 插件 → 工具与 MCP 可看可开。
 

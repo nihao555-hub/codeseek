@@ -8,7 +8,8 @@
     "sequential-thinking",
     "time",
     "trade-crm",
+    "trade-open-data",
     "web-search"
   ],
-  "note": "获客到成交默认打开：搜索、背调、CRM/报价、附件、记忆、时区、拆步骤、Context7。GitHub/Meta/Stripe 有密钥才开。Playwright 在设置页再开。"
+  "note": "获客到成交默认打开：搜索、背调、CRM/报价、Comtrade 汇总/展会日历、附件、记忆、时区、拆步骤、Context7。GitHub/Meta/Stripe 有密钥才开。Playwright 在设置页再开。"
 }

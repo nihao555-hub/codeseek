@@ -100,7 +100,7 @@ export const TOOL_SKIP_NUDGE = [
 ].join(' ')
 
 const CHAT_ONLY_RE = /^(你好|您好|嗨|哈喽|在吗|谢谢|thanks|thank you|ok|okay|嗯|好的|hi|hello|hey)[\s!！。.?？~]*$/i
-const AGENT_TASK_RE = /@|找客|挖客|背调|尽调|搜|搜索|报价|询盘|开发信|独立站|改代码|实现|修复|读取|打开|写入|派|web_search|SKU|MOQ|买家|进口商|海关|OFAC|工商|制裁|read |write |search |fix |build |implement |dispatch |subagent|catalog/i
+const AGENT_TASK_RE = /@|找客|挖客|背调|尽调|搜|搜索|报价|询盘|开发信|独立站|改代码|实现|修复|读取|打开|写入|派|web_search|SKU|MOQ|买家|进口商|海关|展会|定时|每天|每周|开干|OFAC|工商|制裁|read |write |search |fix |build |implement |dispatch |subagent|catalog/i
 const SKIPPED_TOOL_TALK_RE = /I('ll| will) (now )?(search|read|call|use|check|look)|let me (search|read|check|look|use)|我(先|来|将|这就)?(搜索|检索|读取|调用|用工具|查一下|打开)|使用\s*(web_search|bash|read|skill)|calling (the )?\w+ tool|接下来(我)?(会|将)(调用|使用)/i
 
 /**
@@ -568,6 +568,8 @@ export const TOOL_CONTINUE_HINT = [
   'Extra engines: mcp__open-websearch__search. Official web_fetch is disabled; fetch URLs with mcp__web-search__web_fetch.',
   'Buyer due diligence: mcp__buyer-dd__company_search and mcp__buyer-dd__sanctions_search; never invent customs B/L.',
   'CRM: mcp__trade-crm__search_queries, upsert_lead, draft_outreach, quote_catalog, upsert_deal. Outreach is draft-only.',
+  'Open data: mcp__trade-open-data__kickoff, comtrade_preview (country×HS totals, NOT bills of lading), list_fairs.',
+  'If the user says daily/weekly, schedule_create (every_seconds >= 300) on a session created after the schedule overlay loaded.',
   'Local extras: mcp__memory__search_nodes, mcp__time__get_current_time, mcp__documents__read_document for workspace attachments.',
   'Harbor Kiln is a trade team (acquire buyers, close orders), not a general coding agent. @member means list_agents then send_message or subagent. subagent description must be the roster 花名 (营销专家, not the task summary). Members report with 【花名】进行中|报错|完成.',
 ].join(' ')
@@ -648,6 +650,8 @@ export function buildToolProtocolPrompt(tools) {
     '- search the web with official web_search (DuckDuckGo, then Wikipedia). Put result titles and URLs in the reply. Extra engines: mcp__open-websearch__search. Official web_fetch is off; fetch URLs with mcp__web-search__web_fetch',
     '- buyer due diligence: OpenCorporates / OpenSanctions via mcp__buyer-dd__* plus web_search; never invent customs bills of lading',
     '- CRM: mcp__trade-crm__search_queries then web_search; upsert_lead with a public URL; draft_outreach is not sent; quote_catalog reads store/data/catalog.json',
+    '- open data: mcp__trade-open-data__kickoff then dispatch 营销专家 even without @; comtrade_preview is country×HS totals not B/L; list_fairs is an open calendar',
+    '- daily/weekly: schedule_create with every_seconds >= 300; only new root sessions after the schedule overlay',
     '- workspace attachments (pdf/docx/xlsx/md) via mcp__documents__read_document; local memory via mcp__memory__*; time zones via mcp__time__*',
     '- if the user @s a Harbor Kiln teammate, list_agents then send_message or subagent; do not do that person\'s job yourself',
     '- subagent description MUST be the roster 花名 (营销专家 / 建站专家 / …), never a task summary; that label is the sidebar and @ picker name',

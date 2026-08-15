@@ -240,6 +240,22 @@
           initialDelayMs: 1000
           maxDelayMs: 30000
           maxAttempts: 10
+    - id: mcp-trade-open-data
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js "!(true || process.env.MCP_TRADE_OPEN_DATA === '1')"
+      config:
+        serverName: trade-open-data
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: node
+        args:
+          - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-open-data-mcp.mjs'"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
     - id: mcp-git
       name: '@deepseek-ai/dsh-mcp-client'
       disabled: !!js "!(process.env.MCP_GIT === '1')"

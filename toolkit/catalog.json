@@ -21,7 +21,10 @@
     { "id": "ask_user_question", "description": "缺了不猜就会做错的关键信息时问用户" },
     { "id": "exit_plan_mode", "description": "计划模式交卷；Web 点 /plan 才进入" },
     { "id": "ralph", "description": "全新子代理多轮死磕一个 objective；适合难修 bug，不适合一次派齐工位" },
-    { "id": "workflow", "description": "跑部署侧写好的工作流脚本" }
+    { "id": "workflow", "description": "跑部署侧写好的工作流脚本" },
+    { "id": "schedule_create", "description": "会话内定时提醒。every_seconds 最短 300。只对加载 schedule overlay 之后新建的根会话生效。" },
+    { "id": "schedule_list", "description": "列出本会话未完成的定时提醒" },
+    { "id": "schedule_delete", "description": "删除本会话一条定时提醒" }
   ],
   "skills": [
     { "id": "assemble-toolkit", "kind": "local", "group": "platform", "description": "装配本仓库 skill / MCP / 主机工具" },
@@ -320,6 +323,17 @@
       "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-crm-mcp.mjs'" }],
       "enableWhen": { "flag": "MCP_TRADE_CRM" },
       "docs": "https://github.com/nihao555-hub/codeseek"
+    },
+    {
+      "id": "trade-open-data",
+      "title": "开源外贸数据（Comtrade + 展会）",
+      "description": "UN Comtrade 官方 preview：国家×HS 年度汇总，不是提单、没有进口商公司名。展会日历来自 GitHub LensmorOfficial/trade-show-calendar。一句话开干用 kickoff。工具名 mcp__trade-open-data__kickoff / comtrade_preview / list_fairs。",
+      "transport": "stdio",
+      "serverName": "trade-open-data",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-open-data-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_TRADE_OPEN_DATA" },
+      "docs": "https://comtradedeveloper.un.org/"
     },
     {
       "id": "git",

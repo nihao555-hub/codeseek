@@ -47,7 +47,7 @@ test('searxng env has public instance default and html fallback', () => {
 test('hostTools catalog lists DSH standard preset names', () => {
   const catalog = loadCatalog()
   const ids = new Set(catalog.hostTools.map((item) => item.id))
-  for (const id of ['web_search', 'subagent', 'report', 'ralph', 'exit_plan_mode']) {
+  for (const id of ['web_search', 'subagent', 'report', 'ralph', 'exit_plan_mode', 'schedule_create', 'schedule_list', 'schedule_delete']) {
     assert.ok(ids.has(id), id)
   }
 })
@@ -82,11 +82,13 @@ test('local memory/time/documents MCP use NDJSON node scripts', () => {
   assert.equal(ids.time.command, 'node')
   assert.equal(ids.documents.command, 'node')
   assert.equal(ids['trade-crm'].command, 'node')
-  const yaml = renderMcpPatch(catalog, { mcp: ['memory', 'time', 'documents', 'trade-crm'] })
+  assert.equal(ids['trade-open-data'].command, 'node')
+  const yaml = renderMcpPatch(catalog, { mcp: ['memory', 'time', 'documents', 'trade-crm', 'trade-open-data'] })
   assert.match(yaml, /scripts\/memory-mcp\.mjs/)
   assert.match(yaml, /scripts\/time-mcp\.mjs/)
   assert.match(yaml, /scripts\/documents-mcp\.mjs/)
   assert.match(yaml, /scripts\/trade-crm-mcp\.mjs/)
+  assert.match(yaml, /scripts\/trade-open-data-mcp\.mjs/)
   assert.ok(Array.isArray(catalog.communityPlugins))
   const pluginIds = catalog.communityPlugins.map((row) => row.id)
   for (const id of ['dsh-at-file', 'dsh-files', 'dsh-office-tools', 'dsh-cowork', 'dsh-tool-csv']) {
@@ -97,7 +99,7 @@ test('local memory/time/documents MCP use NDJSON node scripts', () => {
 
 test('default enabled.json turns on no-key MCP and leaves playwright off', () => {
   const enabled = JSON.parse(readFileSync(new URL('../../toolkit/enabled.json', import.meta.url), 'utf8'))
-  for (const id of ['web-search', 'open-websearch', 'buyer-dd', 'memory', 'time', 'documents', 'sequential-thinking', 'context7', 'trade-crm']) {
+  for (const id of ['web-search', 'open-websearch', 'buyer-dd', 'memory', 'time', 'documents', 'sequential-thinking', 'context7', 'trade-crm', 'trade-open-data']) {
     assert.ok(enabled.mcp.includes(id), id)
   }
   assert.ok(!enabled.mcp.includes('playwright'))

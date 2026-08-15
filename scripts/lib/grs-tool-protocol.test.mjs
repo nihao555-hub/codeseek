@@ -385,4 +385,6 @@ test('gpt-5 tool protocol lowers reasoning effort so visible tool_call survives'
   assert.match(out.messages[0].content, /mcp__buyer-dd__/)
   assert.match(out.messages[0].content, /mcp__documents__read_document/)
   assert.match(out.messages[0].content, /mcp__trade-crm__/)
+  assert.match(out.messages[0].content, /mcp__trade-open-data__/)
+  assert.match(out.messages[0].content, /schedule_create/)
 })

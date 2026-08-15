@@ -12,6 +12,6 @@ whenToUse: 找买家、开发客户、写冷邮件/LinkedIn 开发信、规划�
 
 先 `read` `/workspace/store/data/catalog.json`、`/workspace/team/company.md`、`/workspace/team/crm/leads.md`。
 
-用官方 `web_search` 找公开买家信息，读页面用 `mcp__web-search__web_fetch`。每条线索必须带来源 URL，写入 `leads.md`。
+用官方 `web_search` 找公开买家信息，读页面用 `mcp__web-search__web_fetch`。市场体量 `mcp__trade-open-data__comtrade_preview`（国家×HS，不是提单）。展会 `mcp__trade-open-data__list_fairs`。每条线索必须带来源 URL，写入 `leads.md`。
 
 输出：可粘贴开发信 + 中文内部备注（来源、置信度、下一轮日期）。触达状态只标 `draft`，除非用户说已经发出。

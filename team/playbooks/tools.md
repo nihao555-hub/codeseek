@@ -24,6 +24,8 @@ LSP `Content-Length` 会让 `dsh-mcp-client` 握手挂死，工具名永远不�
 | 制裁名单 | [opensanctions/opensanctions](https://github.com/opensanctions/opensanctions) | `mcp__buyer-dd__sanctions_search` |
 | 拆步骤 | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) sequential-thinking | `mcp__sequential-thinking__*` |
 | 完整 CRM 产品 | [twentyhq/twenty](https://github.com/twentyhq/twenty)（5 万星，要 Postgres） | **不在本机拉起**。团员落盘只用 `team/crm/*.json` |
+| 市场体量（不是提单） | 联合国 [Comtrade preview](https://comtradeapi.un.org/public/v1/preview/C/A/HS)；轮子 [uncomtrade/comtradeapicall](https://github.com/uncomtrade/comtradeapicall) | `mcp__trade-open-data__comtrade_preview`。国家×HS×年汇总，**没有进口商公司名** |
+| 展会档期 | [LensmorOfficial/trade-show-calendar](https://github.com/LensmorOfficial/trade-show-calendar) 开源 JSON | `mcp__trade-open-data__list_fairs`；失败用 `toolkit/data/trade-shows.json`。仍要打开官网确认 |
 | 办公附件 UI | awesome-dsh：`dsh-files` / `dsh-office-tools` / `dsh-cowork` | 审源码再 overlay；读内容走 `mcp__documents__read_document` |
 
 ## DSH 自带、standard 预设已经给模型看的主机工具
@@ -43,8 +45,9 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 | `exit_plan_mode` | plan-mode | Web 点 `/plan` 才进计划模式 | 预设已装 |
 | `ralph` | tool-ralph | 全新子代理多轮死磕一个 bug；**不要**用来一次拉齐工位 | 预设已装 |
 | `workflow` | tool-workflow | 跑部署侧脚本 | 预设已装 |
+| `schedule_create` / `schedule_list` / `schedule_delete` | `@deepseek-ai/dsh-schedule` + time-context overlay | 用户说每天/每周挖客时建提醒。`every_seconds` 最短 300。只对加载 overlay **之后新建的根会话**生效 | 开（`plugins/schedule/cordis.patch.yml`） |
 
-可选、本仓库默认不挂的 DSH 插件：`lsp`（要语言服务器）、`schedule_*`（定时唤醒）、`terminal_*`（PTY）、`cordis_*`（动态插件，危险）、Exa / Perplexity / DeepSeek 官方搜索（要各自密钥；我们用本地 SearXNG）。
+可选、本仓库默认不挂的 DSH 插件：`lsp`（要语言服务器）、`terminal_*`（PTY）、`cordis_*`（动态插件，危险）、Exa / Perplexity / DeepSeek 官方搜索（要各自密钥；我们用本地 SearXNG）。定时提醒已用官方 `dsh-schedule` overlay 打开。
 
 ## 已在本机、外贸天天用
 
@@ -59,6 +62,7 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 | time | 本仓库 `scripts/time-mcp.mjs` | 时区转换 | 开 |
 | documents | 本仓库 `scripts/documents-mcp.mjs` | 读工作区 md/docx/xlsx/pdf | 开 |
 | trade-crm | 本仓库 `scripts/trade-crm-mcp.mjs` | 线索 / 商机 / 目录报价 / 开发信草稿（不代发） | 开 |
+| trade-open-data | 本仓库 `scripts/trade-open-data-mcp.mjs` | 一句话开干 `kickoff`；UN Comtrade preview；GitHub 展会日历 | 开 |
 | context7 | `@upstash/context7-mcp` | 按库名拉最新官方文档 | 开 |
 | trade-desk / foreign-trade / trade-marketing / trade-dd / … | 本仓库 `.dsh/skills` | 工位派工、港窑人设、公开源背调 | 开 |
 | doc-coauthoring / pdf / pptx / xlsx | `github.com/anthropics/skills` | 报价表、画册、介绍信 | 按许可证；docx/pdf/pptx/xlsx **默认不拉**，要办公套件再 `fetch-skills --include-restricted` |
@@ -68,11 +72,11 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 
 ## 建议打开（无密钥）
 
-`sequential-thinking`、`buyer-dd`、`memory`、`time`、`documents`、`context7`、`trade-crm` 已写入 `toolkit/enabled.json`。
+`sequential-thinking`、`buyer-dd`、`memory`、`time`、`documents`、`context7`、`trade-crm`、`trade-open-data` 已写入 `toolkit/enabled.json`。
 
 Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页没有这个入口，本仓库 overlay 补上）。改完重启 Web。
 
-给管家拆「先查买家再写开发信」的步骤；背调用工商库 + 制裁名单，**仍然没有海关提单**。本地记忆不要写客户隐私。询盘 PDF/DOCX 用 `mcp__documents__read_document`。
+给管家拆「先查买家再写开发信」的步骤；背调用工商库 + 制裁名单。市场体量用 Comtrade **汇总统计**，**仍然没有海关提单**。本地记忆不要写客户隐私。询盘 PDF/DOCX 用 `mcp__documents__read_document`。
 
 无密钥但不要默认开：`filesystem`（和 read/write 重复）、Playwright（要下载浏览器，在设置页再开）。Context7 已默认打开（建站专家查库文档用，不是给全能开发准备的）。
 
@@ -90,13 +94,13 @@ Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页�
 | 工具 | 原因 |
 |---|---|
 | Playwright MCP (`MCP_PLAYWRIGHT=1`) | 首次 `npx` 会下整套浏览器，拖慢 Harness 启动。要「打开买家公开页截图」时再开。仓库：`github.com/microsoft/playwright-mcp` |
-| 非官方 LinkedIn / 海关库 / 群发 SMTP | 本产品不做爬虫、不代发邮件、没有海关数据。 |
+| 非官方 LinkedIn / 海关提单库 / 群发 SMTP | 本产品不做爬虫、不代发邮件。Comtrade preview 只给国家×HS 汇总，不是提单。 |
 | 地图抓取 / Google Maps scraper | 不做。获客走公开网页搜索 + 工商库，不另写一套地图爬虫。 |
 | 社区「marketing-skills」杂包 | 许可证和来源不明，不进 `toolkit/catalog.json`。 |
 
 ## 团员怎么用（不要发明工具名）
 
-- 营销：`mcp__trade-crm__search_queries` → `web_search` → `mcp__web-search__web_fetch` → `upsert_lead`；开发信 `draft_outreach`（不代发）。
+- 营销：`kickoff` 后 `mcp__trade-crm__search_queries` → `web_search` → `mcp__web-search__web_fetch` → `upsert_lead`；开发信 `draft_outreach`（不代发）。市场体量 `mcp__trade-open-data__comtrade_preview`。展会 `list_fairs`。
 - 询盘 / 报价：`mcp__trade-crm__quote_catalog` → `upsert_deal`。数字只来自 `store/data/catalog.json`。
 - 运营：`list_leads` / `list_deals` 分层跟进；触达只允许 draft / user-sent / replied。
 - 背调：`mcp__buyer-dd__company_search` → `mcp__buyer-dd__sanctions_search` → 官网 `web_fetch`。模板 `team/templates/due-diligence.md`。

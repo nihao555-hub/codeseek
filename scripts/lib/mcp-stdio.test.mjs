@@ -88,6 +88,7 @@ test('shipped MCP servers no longer speak LSP Content-Length', () => {
     'scripts/time-mcp.mjs',
     'scripts/documents-mcp.mjs',
     'scripts/trade-crm-mcp.mjs',
+    'scripts/trade-open-data-mcp.mjs',
   ]) {
     const body = readFileSync(join(root, file), 'utf8')
     assert.equal(body.includes('Content-Length:'), false, file)
@@ -135,4 +136,11 @@ test('trade-crm MCP speaks NDJSON and lists CRM tools', async () => {
   for (const id of ['list_leads', 'upsert_lead', 'quote_catalog', 'draft_outreach', 'search_queries']) {
     assert.ok(names.includes(id), id)
   }
+})
+
+test('trade-open-data MCP speaks NDJSON and lists kickoff/comtrade/fairs', async () => {
+  const replies = await rpcServer('scripts/trade-open-data-mcp.mjs', handshake)
+  assert.equal(replies[0].result.serverInfo.name, 'trade-open-data')
+  const names = replies[1].result.tools.map((row) => row.name).sort()
+  assert.deepEqual(names, ['comtrade_preview', 'kickoff', 'list_fairs'])
 })

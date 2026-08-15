@@ -244,11 +244,12 @@ PY
   echo
   echo "== 联网搜索 =="
   if grep -q 'web-search' "$ROOT/toolkit/enabled.json" 2>/dev/null; then
-    echo "web-search MCP: enabled.json 已打开（SearXNG → DuckDuckGo → Wikipedia；429 冷却不露给 UI）"
+    echo "web-search MCP: enabled.json 已打开（DuckDuckGo → Wikipedia；公开 SearXNG 默认跳过）"
+    echo "open-websearch MCP: $(grep -q 'open-websearch' "$ROOT/toolkit/enabled.json" && echo 'enabled.json 已打开' || echo '未强制打开')"
   else
     echo "web-search MCP: 未在 enabled.json（可用 MCP_WEB_SEARCH=1 打开）"
   fi
-  echo "SEARXNG_URL: ${SEARXNG_URL:-（未设置，将用公开实例列表）}"
+  echo "SEARXNG_URL: ${SEARXNG_URL:-（未设置；默认跳过公开实例以免 429）}"
   echo
   echo "== GRS 工具代理 =="
   if curl -sf "http://127.0.0.1:${GRS_TOOL_PROXY_PORT:-18765}/health" >/dev/null 2>&1; then

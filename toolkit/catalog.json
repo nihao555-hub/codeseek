@@ -12,7 +12,7 @@
     { "id": "todo_write", "description": "任务清单" },
     { "id": "get_goal", "description": "当前会话目标" },
     { "id": "job_*", "description": "后台作业控制" },
-    { "id": "web_search", "description": "官方模型可见搜索。本仓库后端为 SearXNG，失败则 DuckDuckGo。" },
+    { "id": "web_search", "description": "官方模型可见搜索。本仓库后端为 DuckDuckGo，失败则 Wikipedia。点 Search 卡片展开看结果。" },
     { "id": "subagent", "description": "拉团员；description 必须是花名。standard 预设默认后台 continuable" },
     { "id": "list_agents", "description": "列出已派出的孩子会话" },
     { "id": "send_message", "description": "给已有孩子补一句" },
@@ -170,20 +170,34 @@
     },
     {
       "id": "web-search",
-      "title": "联网搜索（SearXNG + DuckDuckGo）",
-      "description": "本地 MCP：先查 GitHub 高星开源元搜索 SearXNG，公开实例失败再解析 DuckDuckGo HTML。工具名 mcp__web-search__web_search / mcp__web-search__web_fetch。",
+      "title": "联网搜索（DuckDuckGo + Wikipedia）",
+      "description": "本地 MCP：先 DuckDuckGo，失败再 Wikipedia。公开 SearXNG 默认不打（会 429）。工具名 mcp__web-search__web_search / mcp__web-search__web_fetch。",
       "transport": "stdio",
       "serverName": "web-search",
       "command": "node",
       "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/web-search-mcp.mjs'" }],
       "env": {
-        "SEARXNG_URL": {
-          "from": ["SEARXNG_URL"],
-          "default": "https://searx.tiekoetter.com;https://priv.au;https://search.ononoki.org;https://opnxng.com;https://paulgo.io"
-        }
+        "SEARXNG_URL": { "from": ["SEARXNG_URL"], "default": "" },
+        "SEARXNG_PUBLIC": { "from": ["SEARXNG_PUBLIC"], "default": "" }
       },
       "enableWhen": { "flag": "MCP_WEB_SEARCH" },
       "docs": "https://github.com/searxng/searxng"
+    },
+    {
+      "id": "open-websearch",
+      "title": "Open-WebSearch",
+      "description": "GitHub 高星无密钥多引擎搜索（Aas-ee/open-webSearch）。本地 NDJSON 包装 CLI，默认 DuckDuckGo，不走 Playwright。工具名 mcp__open-websearch__search。",
+      "transport": "stdio",
+      "serverName": "open-websearch",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/open-websearch-mcp.mjs'" }],
+      "env": {
+        "DEFAULT_SEARCH_ENGINE": { "from": ["OPEN_WEBSEARCH_ENGINE"], "default": "duckduckgo" },
+        "ALLOWED_SEARCH_ENGINES": { "from": [], "default": "duckduckgo,startpage,bing" },
+        "SEARCH_MODE": { "from": [], "default": "request" }
+      },
+      "enableWhen": { "flag": "MCP_OPEN_WEBSEARCH" },
+      "docs": "https://github.com/Aas-ee/open-webSearch"
     },
     {
       "id": "buyer-dd",

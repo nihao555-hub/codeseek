@@ -172,6 +172,23 @@ async function main() {
     record('mcp.sequential-thinking', false, error.message)
   }
 
+  try {
+    const replies = await rpc(process.execPath, [join(root, 'scripts/open-websearch-mcp.mjs')], handshakePlus({
+      name: 'search',
+      arguments: { query: 'Harbor Kiln stainless tumbler', limit: 5, engine: 'duckduckgo' },
+    }), { timeoutMs: 120000 })
+    const names = replies.find((row) => row.id === 2)?.result?.tools?.map((row) => row.name) || []
+    const text = callText(replies)
+    const leaked = /\b429\b|too many requests/i.test(text)
+    record(
+      'mcp.open-websearch handshake+search',
+      names.includes('search') && /http/i.test(text) && !leaked,
+      leaked ? `leaked 429: ${clip(text, 180)}` : `tools=${names.join(',') || '?'} ${text}`,
+    )
+  } catch (error) {
+    record('mcp.open-websearch handshake+search', false, error.message)
+  }
+
   const failed = rows.filter((row) => !row.ok)
   console.log(`\n${rows.length - failed.length}/${rows.length} passed`)
   if (failed.length) process.exitCode = 1

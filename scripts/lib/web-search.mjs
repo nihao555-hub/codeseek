@@ -1,6 +1,7 @@
 /**
- * 开源联网搜索：优先 SearXNG JSON API，失败则 DuckDuckGo / Wikipedia。
- * 公开实例常 429；状态码只进冷却与日志，不写给模型或 UI。
+ * 开源联网搜索：默认 DuckDuckGo HTML → Instant → Wikipedia。
+ * 公开 SearXNG 经常 429，只有 SEARXNG_URL 或 SEARXNG_PUBLIC=1 才打。
+ * 状态码只进冷却与日志，不写给模型或 UI。
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
@@ -14,13 +15,17 @@ export const DEFAULT_SEARXNG_URLS = [
   'https://paulgo.io',
 ]
 
-const UA = 'Mozilla/5.0 (compatible; codeseek-web-search/1.0)'
+const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
 const RATE_LIMIT_STATUSES = new Set([429, 403, 418])
 export const DEFAULT_COOLDOWN_MS = 10 * 60 * 1000
 export const DEFAULT_COOLDOWN_FILE = process.env.SEARX_COOLDOWN_FILE || '/tmp/codeseek-searx-cooldown.json'
 const MAX_SEARX_ATTEMPTS = 3
 
-const UA_HEADERS = { 'user-agent': UA }
+const UA_HEADERS = {
+  'user-agent': UA,
+  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8',
+}
 
 export function splitSearxUrls(raw) {
   const text = String(raw || '').trim()
@@ -60,25 +65,46 @@ export function parseSearxJson(payload) {
   })).filter((row) => row.url)
 }
 
+function decodeHref(raw) {
+  let href = String(raw || '').replace(/&amp;/g, '&')
+  const uddg = /[?&]uddg=([^&]+)/.exec(href)
+  if (uddg) {
+    try {
+      href = decodeURIComponent(uddg[1])
+    } catch {
+      href = uddg[1]
+    }
+  } else if (href.startsWith('//')) {
+    href = `https:${href}`
+  }
+  return href
+}
+
+function stripTags(html) {
+  return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 export function parseDdgHtml(html) {
   const source = String(html || '')
   const rows = []
-  const re = /class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi
+  const re = /<a\b[^>]*class="[^"]*\bresult__a\b[^"]*"[^>]*>/gi
   for (const match of source.matchAll(re)) {
-    let href = match[1].replace(/&amp;/g, '&')
-    const uddg = /[?&]uddg=([^&]+)/.exec(href)
-    if (uddg) {
-      try {
-        href = decodeURIComponent(uddg[1])
-      } catch {
-        href = uddg[1]
-      }
-    } else if (href.startsWith('//')) {
-      href = `https:${href}`
-    }
-    const title = match[2].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+    const tag = match[0]
+    const hrefHit = /href="([^"]+)"/i.exec(tag)
+    if (!hrefHit) continue
+    const href = decodeHref(hrefHit[1])
+    const afterTag = source.slice(match.index + tag.length)
+    const close = afterTag.search(/<\/a>/i)
+    const titleHtml = close >= 0 ? afterTag.slice(0, close) : ''
+    const title = stripTags(titleHtml)
+    const restStart = match.index + tag.length + Math.max(close, 0) + 4
+    const rest = source.slice(restStart, restStart + 1500)
+    const nextResult = rest.search(/class="[^"]*\bresult__a\b/i)
+    const tail = nextResult >= 0 ? rest.slice(0, nextResult) : rest
+    const snippetHit = /class="[^"]*\bresult__snippet\b[^"]*"[^>]*>([\s\S]*?)<\/(?:a|div|span)>/i.exec(tail)
+    const snippet = stripTags(snippetHit?.[1] || '')
     if (!href.startsWith('http') || rows.some((row) => row.url === href)) continue
-    rows.push({ title: title || href, url: href, snippet: '', engine: 'duckduckgo' })
+    rows.push({ title: title || href, url: href, snippet, engine: 'duckduckgo' })
     if (rows.length >= 8) break
   }
   return rows
@@ -295,7 +321,22 @@ export async function searchWeb(query, {
   const brave = await tryBrave(q, { fetchImpl, apiKey: braveKey, maxResults }).catch(() => null)
   if (brave) return brave
 
-  const urls = shuffle(splitSearxUrls(searxUrls ?? process.env.SEARXNG_URL), random)
+  const ddgHtml = await tryDuckDuckGoHtml(q, { fetchImpl, maxResults }).catch(() => null)
+  if (ddgHtml) return ddgHtml
+
+  const ddgInstant = await tryDuckDuckGoInstant(q, { fetchImpl, maxResults }).catch(() => null)
+  if (ddgInstant) return ddgInstant
+
+  const wiki = await tryWikipedia(q, { fetchImpl, maxResults }).catch(() => null)
+  if (wiki) return wiki
+
+  // Public SearXNG often 429s; only hit it when SEARXNG_URL or SEARXNG_PUBLIC=1 is set.
+  const explicitSearx = String(searxUrls ?? process.env.SEARXNG_URL ?? '').trim()
+  const urls = explicitSearx
+    ? shuffle(splitSearxUrls(explicitSearx), random)
+    : process.env.SEARXNG_PUBLIC === '1'
+      ? shuffle([...DEFAULT_SEARXNG_URLS], random)
+      : []
   let searxAttempts = 0
   for (const base of urls) {
     if (cooldown?.isCool?.(base)) continue
@@ -306,7 +347,6 @@ export async function searchWeb(query, {
       const got = await fetchText(target, { fetchImpl, timeoutMs: 5000, headers: { accept: 'application/json' } })
       if (!got.ok) {
         cooldown?.mark?.(base, got.status)
-        if (isRateLimitedStatus(got.status)) continue
         continue
       }
       const results = parseSearxJson(got.body)
@@ -315,15 +355,6 @@ export async function searchWeb(query, {
       continue
     }
   }
-
-  const ddgHtml = await tryDuckDuckGoHtml(q, { fetchImpl, maxResults }).catch(() => null)
-  if (ddgHtml) return ddgHtml
-
-  const ddgInstant = await tryDuckDuckGoInstant(q, { fetchImpl, maxResults }).catch(() => null)
-  if (ddgInstant) return ddgInstant
-
-  const wiki = await tryWikipedia(q, { fetchImpl, maxResults }).catch(() => null)
-  if (wiki) return wiki
 
   return {
     source: 'none',

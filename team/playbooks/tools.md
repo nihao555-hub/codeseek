@@ -22,7 +22,7 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 | `bash` / `read` / `write` / `edit` / `glob` / `grep` | tool-bash, tool-fs, tool-fs-search | 改本仓库、读 catalog | 开 |
 | `skill` | tool-skill | 加载 `.dsh/skills/<name>` | 开 |
 | `todo_write` / `get_goal` / `job_*` | tool-todo, tool-goal, tool-jobs | 清单、目标、后台作业 | 开 |
-| `web_search` | tool-web + 本仓库 `web-search-provider.mjs` | 官方工具名；后端 SearXNG→DuckDuckGo→Wikipedia。公开实例 429 会冷却并静默回退，不把 HTTP 状态写进工具结果 | 开；官方 `web_fetch` **关**（SSRF） |
+| `web_search` | tool-web + 本仓库 `web-search-provider.mjs` | 官方工具名。后端 **DuckDuckGo → Wikipedia**，公开 SearXNG 默认不打（429）。点 Search 卡片展开看标题/链接/摘要 | 开；官方 `web_fetch` **关**（SSRF） |
 | `subagent` / `list_agents` / `send_message` / `interrupt_agent` | tool-subagent* | `@花名` 派工 | 开 |
 | `report` | tool-subagent-report | 只在 continuable 孩子里；`【花名】已接到\|…` | 开 |
 | `ask_user_question` | tool-ask-user | 缺关键信息再问 | 开 |
@@ -36,7 +36,8 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 
 | 工具 | 来源 | 作用 | 默认 |
 |---|---|---|---|
-| web-search | 本仓库 `scripts/web-search-mcp.mjs`；SearXNG → DuckDuckGo → Wikipedia | 买家、展会、竞品公开检索；限流时回退，不把 429 显示给会话 | 开 |
+| web-search | 本仓库 `scripts/web-search-mcp.mjs`；DuckDuckGo → Wikipedia | 买家、展会、竞品公开检索；默认不打公开 SearXNG | 开 |
+| open-websearch | `github.com/Aas-ee/open-webSearch`；本仓库 NDJSON 包装 CLI | 无密钥多引擎（默认 DuckDuckGo，可 Startpage/Bing）。不装 Playwright | 开 |
 | web_fetch | `mcp__web-search__web_fetch`（官方 web_fetch 关） | 打开买家官网、目录页 | 开 |
 | buyer-dd | OpenCorporates API + OpenSanctions API；401 时回退 GLEIF LEI 与 OpenSanctions 公开 HTML | 工商 / LEI / 制裁名单 | 开 |
 | sequential-thinking | `github.com/modelcontextprotocol/servers` | 管家拆步骤；首次 `npx` 会下载 | 开 |

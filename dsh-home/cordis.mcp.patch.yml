@@ -31,7 +31,28 @@
         args:
           - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/web-search-mcp.mjs'"
         env:
-          SEARXNG_URL: !!js "process.env.SEARXNG_URL || 'https://searx.tiekoetter.com;https://priv.au;https://search.ononoki.org;https://opnxng.com;https://paulgo.io'"
+          SEARXNG_URL: !!js "process.env.SEARXNG_URL || ''"
+          SEARXNG_PUBLIC: !!js "process.env.SEARXNG_PUBLIC || ''"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-open-websearch
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js "!(true || process.env.MCP_OPEN_WEBSEARCH === '1')"
+      config:
+        serverName: open-websearch
+        transport: stdio
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+        command: node
+        args:
+          - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/open-websearch-mcp.mjs'"
+        env:
+          DEFAULT_SEARCH_ENGINE: !!js "process.env.OPEN_WEBSEARCH_ENGINE || 'duckduckgo'"
+          ALLOWED_SEARCH_ENGINES: !!js "'duckduckgo,startpage,bing'"
+          SEARCH_MODE: !!js "'request'"
         reconnect:
           enabled: true
           initialDelayMs: 1000

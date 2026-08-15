@@ -30,6 +30,26 @@ export function rewriteProxyHeaders(headers, targetAuthority) {
   return out
 }
 
-export function isProxyHealthPath(urlPath) {
-  return urlPath === '/__proxy_health'
+export function isProxyHealthPath(pathname) {
+  return pathname === '/__proxy_health'
+}
+
+export function isEventStreamPath(urlPath) {
+  const path = String(urlPath || '').split('?')[0]
+  return /\/plugins\/events(?:\/|$)/.test(path) || /\/api\/.*events/.test(path)
+}
+
+export function sseResponseHeaders(headers) {
+  const out = {}
+  for (const [key, value] of Object.entries(headers || {})) {
+    if (value === undefined) continue
+    const lower = key.toLowerCase()
+    if (lower === 'content-length') continue
+    out[lower] = value
+  }
+  out['cache-control'] = 'no-cache'
+  out['x-accel-buffering'] = 'no'
+  out.connection = 'keep-alive'
+  if (!out['content-type']) out['content-type'] = 'text/event-stream'
+  return out
 }

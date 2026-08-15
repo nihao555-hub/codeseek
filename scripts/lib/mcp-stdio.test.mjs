@@ -80,7 +80,7 @@ const handshake = [
 ]
 
 test('shipped MCP servers no longer speak LSP Content-Length', () => {
-  for (const file of ['scripts/web-search-mcp.mjs', 'scripts/buyer-dd-mcp.mjs']) {
+  for (const file of ['scripts/web-search-mcp.mjs', 'scripts/buyer-dd-mcp.mjs', 'scripts/open-websearch-mcp.mjs']) {
     const body = readFileSync(join(root, file), 'utf8')
     assert.equal(body.includes('Content-Length:'), false, file)
     assert.match(body, /startStdioMcpServer/)
@@ -99,4 +99,11 @@ test('buyer-dd MCP speaks NDJSON that DSH can handshake', async () => {
   assert.equal(replies[0].result.serverInfo.name, 'buyer-dd')
   const names = replies[1].result.tools.map((row) => row.name).sort()
   assert.deepEqual(names, ['company_search', 'sanctions_search'])
+})
+
+test('open-websearch MCP speaks NDJSON that DSH can handshake', async () => {
+  const replies = await rpcServer('scripts/open-websearch-mcp.mjs', handshake)
+  assert.equal(replies[0].result.serverInfo.name, 'open-websearch')
+  const names = replies[1].result.tools.map((row) => row.name).sort()
+  assert.deepEqual(names, ['fetch_web', 'search'])
 })

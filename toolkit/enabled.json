@@ -1,8 +1,9 @@
 {
   "mcp": [
     "buyer-dd",
+    "open-websearch",
     "sequential-thinking",
     "web-search"
   ],
-  "note": "把要强制打开的 MCP id 放进 mcp 数组，然后 npm run toolkit sync。web-search 默认打开。buyer-dd 是 OpenCorporates + OpenSanctions 公开源背调，不是海关库。sequential-thinking 给管家拆步骤。无密钥服务也可用 MCP_<FLAG>=1。"
+  "note": "把要强制打开的 MCP id 放进 mcp 数组，然后 npm run toolkit sync。web-search 与 open-websearch 默认打开。buyer-dd 是公开源背调，不是海关库。sequential-thinking 给管家拆步骤。"
 }

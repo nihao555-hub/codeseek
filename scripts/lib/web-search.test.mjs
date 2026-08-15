@@ -26,13 +26,19 @@ test('parses SearXNG json results', () => {
 
 test('parses DuckDuckGo html redirect links', () => {
   const html = `
-    <a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fgithub.com%2Fsearxng%2Fsearxng&amp;rut=abc">GitHub - searxng/searxng</a>
-    <a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fdocs.searxng.org%2F">Docs</a>
+    <div class="result__body">
+      <a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fgithub.com%2Fsearxng%2Fsearxng&amp;rut=abc">GitHub - searxng/searxng</a>
+      <a class="result__snippet" href="#">Privacy-respecting metasearch</a>
+    </div>
+    <div class="result__body">
+      <a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fdocs.searxng.org%2F">Docs</a>
+    </div>
   `
   const rows = parseDdgHtml(html)
   assert.equal(rows.length, 2)
   assert.equal(rows[0].url, 'https://github.com/searxng/searxng')
   assert.equal(rows[0].engine, 'duckduckgo')
+  assert.match(rows[0].snippet, /metasearch/)
 })
 
 test('splitSearxUrls falls back to defaults', () => {
@@ -40,16 +46,23 @@ test('splitSearxUrls falls back to defaults', () => {
   assert.deepEqual(splitSearxUrls('https://a.example;https://b.example/'), ['https://a.example', 'https://b.example'])
 })
 
-test('searchWeb uses SearXNG json when it works', async () => {
+test('searchWeb uses SearXNG json after DuckDuckGo is empty', async () => {
   const fetchImpl = async (url) => {
-    assert.match(String(url), /format=json/)
+    if (String(url).includes('format=json')) {
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'application/json' },
+        text: async () => JSON.stringify({
+          results: [{ title: 'Harbor Kiln', url: 'https://example.com/store', content: 'independent store' }],
+        }),
+      }
+    }
     return {
       ok: true,
       status: 200,
-      headers: { get: () => 'application/json' },
-      text: async () => JSON.stringify({
-        results: [{ title: 'Harbor Kiln', url: 'https://example.com/store', content: 'independent store' }],
-      }),
+      headers: { get: () => 'text/html' },
+      text: async () => '<html></html>',
     }
   }
   const out = await searchWeb('ecommerce storefront', {
@@ -64,17 +77,19 @@ test('searchWeb uses SearXNG json when it works', async () => {
   assert.doesNotMatch(out.text, /\b429\b/)
 })
 
-test('searchWeb falls back to DuckDuckGo when SearXNG fails', async () => {
+test('searchWeb uses DuckDuckGo before public SearXNG', async () => {
+  const seen = []
   const fetchImpl = async (url) => {
-    if (String(url).includes('searx')) {
-      return { ok: false, status: 429, headers: { get: () => 'text/plain' }, text: async () => 'Too Many Requests' }
+    seen.push(String(url))
+    if (String(url).includes('duckduckgo.com/html')) {
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'text/html' },
+        text: async () => '<a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com%2Fpage">Example</a><a class="result__snippet"> Housewares importer</a>',
+      }
     }
-    return {
-      ok: true,
-      status: 200,
-      headers: { get: () => 'text/html' },
-      text: async () => '<a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com%2Fpage">Example</a>',
-    }
+    return { ok: false, status: 429, headers: { get: () => 'text/plain' }, text: async () => 'Too Many Requests' }
   }
   const out = await searchWeb('example', {
     searxUrls: 'https://searx.example',
@@ -84,9 +99,74 @@ test('searchWeb falls back to DuckDuckGo when SearXNG fails', async () => {
   })
   assert.equal(out.source, 'duckduckgo')
   assert.equal(out.results[0].url, 'https://example.com/page')
-  assert.match(out.text, /Source: duckduckgo/)
+  assert.match(out.results[0].snippet, /Housewares/)
+  assert.ok(seen.some((url) => url.includes('duckduckgo')))
+  assert.ok(seen.every((url) => !url.includes('searx.example')))
   assert.doesNotMatch(out.text, /\b429\b/)
-  assert.doesNotMatch(out.text, /searxng failed/i)
+})
+
+test('searchWeb skips SearXNG when no URL is configured', async () => {
+  const prevPublic = process.env.SEARXNG_PUBLIC
+  delete process.env.SEARXNG_PUBLIC
+  const seen = []
+  const fetchImpl = async (url) => {
+    seen.push(String(url))
+    if (String(url).includes('duckduckgo.com/html')) {
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'text/html' },
+        text: async () => '<a class="result__a" href="https://example.com/a">A</a>',
+      }
+    }
+    throw new Error(`unexpected ${url}`)
+  }
+  try {
+    const out = await searchWeb('example', {
+      searxUrls: '',
+      fetchImpl,
+      braveKey: '',
+      cooldown: createMemoryCooldown(),
+    })
+    assert.equal(out.source, 'duckduckgo')
+    assert.ok(seen.every((url) => !/searx|tiekoetter|priv\.au/.test(url)))
+  } finally {
+    if (prevPublic !== undefined) process.env.SEARXNG_PUBLIC = prevPublic
+  }
+})
+
+test('searchWeb does not hit public SearXNG unless opted in', async () => {
+  const prevPublic = process.env.SEARXNG_PUBLIC
+  const prevUrl = process.env.SEARXNG_URL
+  delete process.env.SEARXNG_PUBLIC
+  delete process.env.SEARXNG_URL
+  const seen = []
+  const fetchImpl = async (url) => {
+    seen.push(String(url))
+    if (String(url).includes('wikipedia')) {
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'application/json' },
+        text: async () => JSON.stringify(['q', ['Alpha'], ['note'], ['https://en.wikipedia.org/wiki/Alpha']]),
+      }
+    }
+    return { ok: true, status: 200, headers: { get: () => 'text/html' }, text: async () => '<html></html>' }
+  }
+  try {
+    const out = await searchWeb('example', {
+      fetchImpl,
+      braveKey: '',
+      cooldown: createMemoryCooldown(),
+    })
+    assert.equal(out.source, 'wikipedia')
+    assert.ok(seen.every((url) => !/searx|tiekoetter|priv\.au|ononoki|opnxng|paulgo/.test(url)))
+  } finally {
+    if (prevPublic !== undefined) process.env.SEARXNG_PUBLIC = prevPublic
+    else delete process.env.SEARXNG_PUBLIC
+    if (prevUrl !== undefined) process.env.SEARXNG_URL = prevUrl
+    else delete process.env.SEARXNG_URL
+  }
 })
 
 test('sanitizeSearchNoise strips status codes from leaked errors', () => {

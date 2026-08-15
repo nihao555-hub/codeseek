@@ -28,8 +28,11 @@ export function createCodeseekSearchProvider({ search = searchWeb } = {}) {
         ...row.title ? { title: row.title } : {},
         ...row.snippet ? { snippet: row.snippet } : {},
       }))
+      const content = rows.length
+        ? `Found ${rows.length} results via ${out.source || 'web'} for “${query}”.`
+        : (out.text || 'No results found.')
       return {
-        content: out.text,
+        content,
         sources,
         truncated: Boolean(cap && (out.results || []).length > cap),
       }

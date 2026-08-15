@@ -64,6 +64,17 @@ test('web-search local mcp is default-on via enabled patch', () => {
   assert.match(yaml, /scripts\/web-search-provider\.mjs/)
 })
 
+test('open-websearch is default-on stdio MCP without Playwright', () => {
+  const catalog = loadCatalog()
+  assert.ok(catalog.mcp.some((item) => item.id === 'open-websearch'))
+  const yaml = renderMcpPatch(catalog, { mcp: ['open-websearch'] })
+  assert.match(yaml, /id: mcp-open-websearch/)
+  assert.match(yaml, /serverName: open-websearch/)
+  assert.match(yaml, /open-websearch-mcp\.mjs/)
+  assert.match(yaml, /SEARCH_MODE: !!js "'request'"/)
+  assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_OPEN_WEBSEARCH === '1'\)"/)
+})
+
 test('fetchRemoteSkills writes SKILL.md with whenToUse', async () => {
   const catalog = {
     skills: [{

@@ -7,7 +7,7 @@
 import http from 'node:http'
 import net from 'node:net'
 import { fileURLToPath } from 'node:url'
-import { isProxyHealthPath, loopbackAuthority, rewriteProxyHeaders } from './lib/public-proxy.mjs'
+import { isEventStreamPath, isProxyHealthPath, loopbackAuthority, rewriteProxyHeaders, sseResponseHeaders } from './lib/public-proxy.mjs'
 
 const listenHost = process.env.DSH_PUBLIC_HOST || '0.0.0.0'
 const listenPort = Number(process.env.DSH_PUBLIC_PORT || 3081)
@@ -54,7 +54,17 @@ export function createPublicProxyServer() {
       method: req.method,
       headers: forwardHeaders(req.headers),
     }, (upstream) => {
-      res.writeHead(upstream.statusCode || 502, upstream.headers)
+      const streaming = isEventStreamPath(urlPath)
+        || /event-stream/i.test(String(upstream.headers['content-type'] || ''))
+      if (streaming) {
+        req.socket.setTimeout(0)
+        req.socket.setNoDelay(true)
+        p.setTimeout(0)
+        res.writeHead(upstream.statusCode || 502, sseResponseHeaders(upstream.headers))
+        res.flushHeaders()
+      } else {
+        res.writeHead(upstream.statusCode || 502, upstream.headers)
+      }
       upstream.pipe(res)
     })
     p.on('error', () => {
@@ -92,6 +102,9 @@ export function createPublicProxyServer() {
 
 function main() {
   const server = createPublicProxyServer()
+  server.timeout = 0
+  server.headersTimeout = 0
+  server.requestTimeout = 0
   server.listen(listenPort, listenHost, () => {
     console.log(`public proxy ${listenHost}:${listenPort} -> ${targetAuthority}`)
   })

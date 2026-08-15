@@ -8,6 +8,7 @@ const root = join(import.meta.dirname, '../..')
 test('trade team workspace has playbooks, templates and a sample deal', () => {
   const files = [
     'team/README.md',
+    'team/roster.md',
     'team/company.md',
     'team/crm/leads.md',
     'team/pipeline.md',
@@ -18,14 +19,17 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
     'team/playbooks/marketing.md',
     'team/playbooks/social.md',
     'team/playbooks/site.md',
+    'team/playbooks/wecom.md',
     'team/templates/inquiry-reply.en.md',
     'team/templates/quotation.md',
     'team/templates/deal.md',
     'team/templates/outreach.en.md',
     'team/templates/social-post.md',
+    'team/templates/member-brief.md',
     'team/deals/HK-2026-001-nordic.md',
     '.dsh/skills/trade-marketing/SKILL.md',
     '.dsh/skills/trade-social/SKILL.md',
+    '.dsh/skills/trade-desk/SKILL.md',
   ]
   for (const rel of files) {
     assert.equal(existsSync(join(root, rel)), true, rel)
@@ -36,6 +40,10 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
   assert.match(readme, /trade-social/)
   assert.match(readme, /catalog\.json/)
   assert.match(readme, /网易外贸通/)
+  assert.match(readme, /@营销专家/)
+  const roster = readFileSync(join(root, 'team/roster.md'), 'utf8')
+  assert.match(roster, /营销专家/)
+  assert.match(roster, /subagent/)
   const pipeline = readFileSync(join(root, 'team/pipeline.md'), 'utf8')
   assert.match(pipeline, /HK-2026-001/)
 })

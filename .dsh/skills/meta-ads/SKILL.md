@@ -6,6 +6,8 @@ whenToUse: 查看广告账户、活动、广告组、素材、受众、花费与
 
 # Meta 广告运营
 
+工位花名「广告专员」。按 `/workspace/team/playbooks/wecom.md` 用 `report` 向群汇报：`【广告专员】已接到|进行中|报错|完成：…`。新广告默认 PAUSED。
+
 通过 DeepSeek Harness 的 MCP 客户端连接官方 Ads MCP：`https://mcp.facebook.com/ads`。
 模型可见工具名形如 `mcp__meta-ads__*`。需要环境变量 `META_ACCESS_TOKEN`（Graph API 用户令牌，权限至少 `ads_read`；写入还要 `ads_management`）。
 

@@ -17,6 +17,7 @@
   "skills": [
     { "id": "assemble-toolkit", "kind": "local", "group": "platform", "description": "装配本仓库 skill / MCP / 主机工具" },
     { "id": "foreign-trade", "kind": "local", "group": "business" },
+    { "id": "trade-desk", "kind": "local", "group": "business" },
     { "id": "trade-marketing", "kind": "local", "group": "business" },
     { "id": "trade-inquiry", "kind": "local", "group": "business" },
     { "id": "trade-quote", "kind": "local", "group": "business" },

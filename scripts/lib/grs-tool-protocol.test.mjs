@@ -17,6 +17,7 @@ import {
   encodeAssistantContent,
   nudgeEmptyRetry,
   bumpReasoningBudget,
+  canonicalRosterLabel,
 } from './grs-tool-protocol.mjs'
 
 test('parses hermes <tool_call> json', () => {
@@ -220,6 +221,42 @@ test('parses tool_call blocks that use argument aliases', () => {
   assert.equal(parsed.calls[1].arguments.command, 'ls /workspace/store')
   assert.match(parsed.calls[1].arguments.description, /ls \/workspace\/store/)
   assert.equal(parsed.calls[2].arguments.pattern, '**/*')
+})
+
+test('canonicalRosterLabel maps @handles to sidebar 花名', () => {
+  assert.equal(canonicalRosterLabel('@营销'), '营销专家')
+  assert.equal(canonicalRosterLabel('marketing'), '营销专家')
+  assert.equal(canonicalRosterLabel('建站专家'), '建站专家')
+  assert.equal(canonicalRosterLabel('random'), '')
+})
+
+test('subagent aliases force roster 花名 into description', () => {
+  const parsed = parseAssistantToolPayload(
+    '<tool_call>{"name":"subagent","arguments":{"name":"营销专家","description":"找买家","prompt":"去挖客"}}</tool_call>',
+  )
+  assert.equal(parsed.calls[0].arguments.description, '营销专家')
+  assert.match(parsed.calls[0].arguments.prompt, /找买家/)
+  assert.match(parsed.calls[0].arguments.prompt, /去挖客/)
+})
+
+test('send_message and report argument aliases', () => {
+  const parsed = parseAssistantToolPayload([
+    '<tool_call>{"name":"send_message","arguments":{"id":"abc","text":"继续"}}</tool_call>',
+    '<tool_call>{"name":"report","arguments":{"content":"【营销专家】完成：ok"}}</tool_call>',
+  ].join('\n'))
+  assert.equal(parsed.calls[0].arguments.subagent_id, 'abc')
+  assert.equal(parsed.calls[0].arguments.message, '继续')
+  assert.equal(parsed.calls[1].arguments.output, '【营销专家】完成：ok')
+})
+
+test('protocol tells the model to dispatch @ teammates', () => {
+  const out = toUpstreamChatBody({
+    model: 'gemini-3.5-flash',
+    tools: [{ type: 'function', function: { name: 'subagent', description: 'delegate', parameters: { type: 'object' } } }],
+    messages: [{ role: 'user', content: '@营销专家 找客' }],
+  })
+  assert.match(out.messages[0].content, /花名/)
+  assert.match(out.messages[0].content, /list_agents/)
 })
 
 test('collectCompletion reads sse text', () => {

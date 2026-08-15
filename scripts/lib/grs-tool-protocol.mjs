@@ -188,6 +188,50 @@ function assignCanonical(out, canonical, aliases) {
  * Gemini 常把 file_path 写成 path、漏掉 bash 必填的 description。
  * 在交给 Harness 之前把常见别名收成 schema 字段。
  */
+export const TEAM_ROSTER_LABELS = [
+  '管家', '营销专家', '运营专家', '建站专家', '社媒专家',
+  '询盘专员', '报价专员', '合规专员', '广告专员', '开发',
+]
+
+const TEAM_ROSTER_ALIASES = {
+  营销: '营销专家',
+  marketing: '营销专家',
+  运营: '运营专家',
+  ops: '运营专家',
+  建站: '建站专家',
+  site: '建站专家',
+  社媒: '社媒专家',
+  social: '社媒专家',
+  询盘: '询盘专员',
+  inquiry: '询盘专员',
+  报价: '报价专员',
+  quote: '报价专员',
+  合规: '合规专员',
+  compliance: '合规专员',
+  广告: '广告专员',
+  ads: '广告专员',
+  开发: '开发',
+  dev: '开发',
+  lead: '管家',
+  管家: '管家',
+}
+
+/** 把 @营销 / 营销专家 / marketing 收成侧栏花名。认不出则返回空。 */
+export function canonicalRosterLabel(value) {
+  const raw = String(value || '').trim().replace(/^@/, '')
+  if (!raw) return ''
+  if (TEAM_ROSTER_LABELS.includes(raw)) return raw
+  return TEAM_ROSTER_ALIASES[raw] || TEAM_ROSTER_ALIASES[raw.toLowerCase()] || ''
+}
+
+function pickRosterLabel(obj) {
+  for (const key of ['label', 'name', 'role', 'title', 'description']) {
+    const hit = canonicalRosterLabel(obj[key])
+    if (hit) return hit
+  }
+  return ''
+}
+
 export function normalizeToolArguments(name, args) {
   const out = { ...(args && typeof args === 'object' && !Array.isArray(args) ? args : {}) }
   const tool = String(name || '')
@@ -223,6 +267,44 @@ export function normalizeToolArguments(name, args) {
 
   if (tool === 'web_fetch' || tool === 'mcp__web-search__web_fetch') {
     assignCanonical(out, 'url', ['uri', 'link', 'href'])
+  }
+
+  if (tool === 'subagent' || tool === 'subagent_fork') {
+    const label = pickRosterLabel(out)
+    const rawDescription = typeof out.description === 'string' ? out.description.trim() : ''
+    assignCanonical(out, 'prompt', ['message', 'instruction', 'task', 'content', 'input'])
+    if (label) {
+      if (rawDescription && !canonicalRosterLabel(rawDescription) && typeof out.prompt === 'string') {
+        out.prompt = `任务摘要：${rawDescription}\n\n${out.prompt}`
+      }
+      out.description = label
+    } else {
+      assignCanonical(out, 'description', ['label', 'title', 'name', 'role'])
+    }
+    delete out.label
+    delete out.name
+    delete out.role
+    delete out.title
+    if (out.background === true || out.async === true) out.run_in_background = true
+    delete out.background
+    delete out.async
+  }
+
+  if (tool === 'send_message') {
+    assignCanonical(out, 'subagent_id', ['id', 'agent_id', 'target', 'to'])
+    assignCanonical(out, 'message', ['content', 'text', 'prompt', 'body'])
+  }
+
+  if (tool === 'interrupt_agent') {
+    assignCanonical(out, 'agent_id', ['id', 'subagent_id', 'target'])
+  }
+
+  if (tool === 'report') {
+    assignCanonical(out, 'output', ['content', 'text', 'message', 'report', 'body'])
+  }
+
+  if (tool === 'list_agents') {
+    assignCanonical(out, 'scope', ['level', 'range'])
   }
 
   return out
@@ -262,7 +344,7 @@ function recoverToolCallObject(text) {
   const name = /"(?:name|tool)"\s*:\s*"([A-Za-z0-9_.-]+)"/.exec(source)?.[1]
   if (!name) return null
   const args = {}
-  const keys = ['output', 'content', 'new_string', 'old_string', 'command', 'cmd', 'query', 'pattern', 'file_path', 'path', 'description']
+  const keys = ['output', 'content', 'new_string', 'old_string', 'command', 'cmd', 'query', 'pattern', 'file_path', 'path', 'description', 'prompt', 'message', 'subagent_id']
   for (const key of keys) {
     const token = `"${key}"`
     const at = source.indexOf(token)
@@ -393,6 +475,7 @@ export const TOOL_CONTINUE_HINT = [
   'If skill is unknown, skip it and keep implementing under /workspace/store/.',
   'Prefer official web_search for live lookup (SearXNG, then DuckDuckGo).',
   'Official web_fetch is disabled; fetch URLs with mcp__web-search__web_fetch.',
+  'Harbor Kiln team: @member means list_agents then send_message or subagent. subagent description must be the roster 花名 (营销专家, not the task summary). Members report with 【花名】进行中|报错|完成.',
 ].join(' ')
 
 const EDIT_NEEDS_READ_RE = /edit requires reading "([^"]+)" first/g
@@ -467,6 +550,9 @@ export function buildToolProtocolPrompt(tools) {
     '- bash requires command and description (5-10 words; description is shown in the UI)',
     '- glob requires pattern; skill requires name',
     '- search the web with official web_search (SearXNG, then DuckDuckGo). Official web_fetch is off; fetch URLs with mcp__web-search__web_fetch',
+    '- if the user @s a Harbor Kiln teammate, list_agents then send_message or subagent; do not do that person\'s job yourself',
+    '- subagent description MUST be the roster 花名 (营销专家 / 建站专家 / …), never a task summary; that label is the sidebar and @ picker name',
+    '- teammates report with report output like 【营销专家】进行中：… including errors',
     '- if skill says unknown, skip it and keep editing /workspace/store/ with absolute paths',
     '- escape newlines inside JSON strings as \\n; keep the object valid JSON',
     '- multiple tools: multiple <tool_call> blocks',

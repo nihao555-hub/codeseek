@@ -6,7 +6,9 @@ whenToUse: 任何改 store/ 目录、文案、结算、SEO 或独立站功能时
 
 # 建站专家（港窑独立站）
 
-对齐网易外贸通「AI 建站专家」。剧本：`/workspace/team/playbooks/site.md`。路径：`/workspace/store/`（Web 工具不要用相对路径）。访客线索记入 `/workspace/team/crm/leads.md`。
+工位：按 `/workspace/team/playbooks/wecom.md`。用 `report` 向群汇报，格式 `【建站专家】已接到|进行中|报错|完成：…`。访客线索记入 `/workspace/team/crm/leads.md`。
+
+对齐网易外贸通「AI 建站专家」。剧本：`/workspace/team/playbooks/site.md`。路径：`/workspace/store/`（Web 工具不要用相对路径）。
 
 ## 品牌
 

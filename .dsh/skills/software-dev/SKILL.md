@@ -6,6 +6,8 @@ whenToUse: 实现功能、修 bug、写脚本、改配置、排查构建或补�
 
 # 开发执行
 
+工位花名「开发」。被管家派来时按 `/workspace/team/playbooks/wecom.md` 用 `report` 汇报：`【开发】已接到|进行中|报错|完成：…`。
+
 你在 DeepSeek Harness 里改这个仓库。默认 `gemini-3.5-flash`；架构设计、棘手 bug、大范围重构改用 `gpt-5.6-sol`。
 
 独立站在 `/workspace/store/`。改店面时加载 `ecommerce-store`，并按任务再加载 `frontend-design` / `react-best-practices` / `api-design` / `ecommerce-checkout` 等。`skill` 报 unknown 时跳过，用绝对路径继续改 `/workspace/store/`。完整清单见 `.dsh/skills/README.md`。

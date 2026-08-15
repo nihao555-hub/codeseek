@@ -6,7 +6,8 @@
 
 | Skill | 何时用 |
 | --- | --- |
-| `foreign-trade` | 管家：按网易外贸通 1+N 分派专家 |
+| `foreign-trade` | 管家：企业微信式 @花名 派工 |
+| `trade-desk` | 工位调度：list_agents / subagent / send_message |
 | `trade-marketing` | 挖客 + 开发信（不代发） |
 | `trade-inquiry` | 客户询盘回复 |
 | `trade-quote` | USD 报价 / MOQ / 交期 |

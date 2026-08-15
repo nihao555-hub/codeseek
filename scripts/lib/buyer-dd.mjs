@@ -1,5 +1,6 @@
 /**
  * 公开源买家背调：OpenCorporates 公司库 + OpenSanctions 制裁名单。
+ * API 要密钥时回退 GLEIF（LEI）和 OpenSanctions 公开 HTML。
  * 不是海关提单。没有的字段标 TBD，禁止编造货值/采购量。
  */
 const UA = 'codeseek-buyer-dd/1.0 (+https://github.com/nihao555-hub/codeseek)'
@@ -8,15 +9,15 @@ export function normalizeCompanyName(value) {
   return String(value || '').replace(/\s+/g, ' ').trim()
 }
 
-export function formatCompanyHits(query, companies) {
+export function formatCompanyHits(query, companies, source = 'opencorporates') {
   const q = normalizeCompanyName(query)
   if (!companies.length) {
     return [
-      `OpenCorporates: no company hit for "${q}".`,
+      `${source}: no company hit for "${q}".`,
       'This is not a customs database. Continue with official web_search + registry sites for that country.',
     ].join('\n')
   }
-  const lines = [`OpenCorporates search: ${q}`, `Hits: ${companies.length}`, '']
+  const lines = [`${source} search: ${q}`, `Hits: ${companies.length}`, '']
   for (const [i, row] of companies.entries()) {
     lines.push(`${i + 1}. ${row.name}`)
     if (row.companyNumber) lines.push(`   number: ${row.companyNumber}`)
@@ -45,6 +46,25 @@ export function parseOpenCorporates(payload) {
   }).filter((row) => row.name)
 }
 
+export function parseGleif(payload) {
+  const data = typeof payload === 'string' ? JSON.parse(payload) : payload
+  const rows = Array.isArray(data?.data) ? data.data : []
+  return rows.slice(0, 8).map((row) => {
+    const entity = row.attributes?.entity || {}
+    const legal = entity.legalAddress || {}
+    const address = [...(legal.addressLines || []), legal.city, legal.country].filter(Boolean).join(', ')
+    const lei = String(row.attributes?.lei || row.id || '').trim()
+    return {
+      name: String(entity.legalName?.name || '').trim(),
+      companyNumber: lei,
+      jurisdiction: String(entity.jurisdiction || legal.country || '').trim(),
+      status: String(row.attributes?.registration?.status || entity.status || '').trim(),
+      address,
+      url: lei ? `https://search.gleif.org/#/record/${lei}` : '',
+    }
+  }).filter((row) => row.name)
+}
+
 export function parseOpenSanctions(payload) {
   const data = typeof payload === 'string' ? JSON.parse(payload) : payload
   const rows = Array.isArray(data?.results) ? data.results : []
@@ -56,6 +76,31 @@ export function parseOpenSanctions(payload) {
     score: row.score,
     url: row.id ? `https://www.opensanctions.org/entities/${row.id}/` : '',
   })).filter((row) => row.caption)
+}
+
+export function parseOpenSanctionsHtml(html) {
+  const source = String(html || '').replace(/\\"/g, '"')
+  const hits = []
+  const seen = new Set()
+  const re = /\/entities\/([a-z0-9-]+)\//g
+  let match
+  while ((match = re.exec(source))) {
+    const id = match[1]
+    if (seen.has(id)) continue
+    seen.add(id)
+    const window = source.slice(Math.max(0, match.index - 80), Math.min(source.length, match.index + 220))
+    const named = /"children":"([^"]{2,120})"/.exec(window)
+    const caption = named?.[1] || id
+    hits.push({
+      id,
+      caption,
+      schema: 'entity',
+      datasets: [],
+      url: `https://www.opensanctions.org/entities/${id}/`,
+    })
+    if (hits.length >= 8) break
+  }
+  return hits
 }
 
 export function formatSanctionsHits(query, hits) {
@@ -79,32 +124,83 @@ export function formatSanctionsHits(query, hits) {
   return lines.join('\n')
 }
 
-async function fetchJson(url, { fetchImpl = fetch, timeoutMs = 15000 } = {}) {
+function headers(extra = {}) {
+  return { 'user-agent': UA, ...extra }
+}
+
+async function fetchText(url, { fetchImpl = fetch, timeoutMs = 15000, extraHeaders = {} } = {}) {
   const res = await fetchImpl(url, {
-    headers: { 'user-agent': UA, accept: 'application/json' },
+    headers: headers(extraHeaders),
     redirect: 'follow',
     signal: AbortSignal.timeout(timeoutMs),
   })
   const body = await res.text()
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} ${url}`)
-  }
-  return JSON.parse(body)
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`)
+  return body
+}
+
+async function fetchJson(url, opts = {}) {
+  return JSON.parse(await fetchText(url, {
+    ...opts,
+    extraHeaders: { accept: 'application/json', ...(opts.extraHeaders || {}) },
+  }))
+}
+
+function gleifQueries(query) {
+  const q = normalizeCompanyName(query)
+  const out = [q]
+  const stripped = q
+    .replace(/\b(of|the|ab|asa|oy|oyj|as|aps|gmbh|ltd|llc|inc|co|company|group|holdings)\b/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (stripped && stripped !== q) out.push(stripped)
+  return [...new Set(out)]
+}
+
+function ocSearchUrl(query) {
+  const url = new URL('https://api.opencorporates.com/v0.4/companies/search')
+  url.searchParams.set('q', query)
+  url.searchParams.set('per_page', '8')
+  const token = process.env.OPENCORPORATES_API_TOKEN
+  if (token) url.searchParams.set('api_token', token)
+  return url.toString()
 }
 
 export async function searchCompanies(query, { fetchImpl = fetch } = {}) {
   const q = normalizeCompanyName(query)
   if (!q) return { source: 'opencorporates', results: [], text: 'Missing company name.' }
-  const url = `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(q)}&per_page=8`
+
   try {
-    const data = await fetchJson(url, { fetchImpl })
+    const extraHeaders = {}
+    if (process.env.OPENCORPORATES_API_TOKEN) {
+      extraHeaders.authorization = `Bearer ${process.env.OPENCORPORATES_API_TOKEN}`
+    }
+    const data = await fetchJson(ocSearchUrl(q), { fetchImpl, extraHeaders })
     const results = parseOpenCorporates(data)
-    return { source: 'opencorporates', results, text: formatCompanyHits(q, results) }
-  } catch (err) {
-    return {
-      source: 'opencorporates',
-      results: [],
-      text: `OpenCorporates failed (${err instanceof Error ? err.message : err}). Fall back to web_search for the national company register.`,
+    return { source: 'opencorporates', results, text: formatCompanyHits(q, results, 'opencorporates') }
+  } catch (ocErr) {
+    try {
+      let results = []
+      let used = ''
+      for (const attempt of gleifQueries(q)) {
+        const gleifUrl = `https://api.gleif.org/api/v1/lei-records?page[size]=8&filter[fulltext]=${encodeURIComponent(attempt)}`
+        const data = await fetchJson(gleifUrl, { fetchImpl })
+        results = parseGleif(data)
+        used = attempt
+        if (results.length) break
+      }
+      const note = `OpenCorporates unavailable (${ocErr instanceof Error ? ocErr.message : ocErr}). Showing GLEIF LEI records instead${used && used !== q ? ` (query: ${used})` : ''}.`
+      return {
+        source: 'gleif',
+        results,
+        text: `${note}\n${formatCompanyHits(q, results, 'gleif')}`,
+      }
+    } catch (gleifErr) {
+      return {
+        source: 'opencorporates',
+        results: [],
+        text: `OpenCorporates failed (${ocErr instanceof Error ? ocErr.message : ocErr}). GLEIF failed (${gleifErr instanceof Error ? gleifErr.message : gleifErr}). Fall back to web_search for the national company register.`,
+      }
     }
   }
 }
@@ -112,16 +208,34 @@ export async function searchCompanies(query, { fetchImpl = fetch } = {}) {
 export async function searchSanctions(query, { fetchImpl = fetch } = {}) {
   const q = normalizeCompanyName(query)
   if (!q) return { source: 'opensanctions', results: [], text: 'Missing name.' }
-  const url = `https://api.opensanctions.org/search/default?q=${encodeURIComponent(q)}`
+  const apiUrl = `https://api.opensanctions.org/search/default?q=${encodeURIComponent(q)}`
   try {
-    const data = await fetchJson(url, { fetchImpl })
+    const extraHeaders = {}
+    if (process.env.OPENSANCTIONS_API_KEY) {
+      extraHeaders.authorization = `Bearer ${process.env.OPENSANCTIONS_API_KEY}`
+    }
+    const data = await fetchJson(apiUrl, { fetchImpl, extraHeaders })
     const results = parseOpenSanctions(data)
     return { source: 'opensanctions', results, text: formatSanctionsHits(q, results) }
-  } catch (err) {
-    return {
-      source: 'opensanctions',
-      results: [],
-      text: `OpenSanctions failed (${err instanceof Error ? err.message : err}). Fall back to web_search site:sanctionssearch.ofac.treas.gov.`,
+  } catch (apiErr) {
+    try {
+      const html = await fetchText(`https://www.opensanctions.org/search/?q=${encodeURIComponent(q)}`, {
+        fetchImpl,
+        extraHeaders: { accept: 'text/html' },
+      })
+      const results = parseOpenSanctionsHtml(html)
+      const note = `OpenSanctions API unavailable (${apiErr instanceof Error ? apiErr.message : apiErr}). Parsed public HTML search.`
+      return {
+        source: 'opensanctions-html',
+        results,
+        text: `${note}\n${formatSanctionsHits(q, results)}`,
+      }
+    } catch (htmlErr) {
+      return {
+        source: 'opensanctions',
+        results: [],
+        text: `OpenSanctions failed (${apiErr instanceof Error ? apiErr.message : apiErr}). HTML fallback failed (${htmlErr instanceof Error ? htmlErr.message : htmlErr}). Fall back to web_search site:sanctionssearch.ofac.treas.gov.`,
+      }
     }
   }
 }

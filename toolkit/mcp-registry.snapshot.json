@@ -1,6 +1,6 @@
 {
-  "fetchedAt": "2026-08-14T10:42:06.114Z",
-  "count": 56,
+  "fetchedAt": "2026-08-15T07:05:38.402Z",
+  "count": 60,
   "servers": [
     {
       "query": "github",
@@ -870,7 +870,7 @@
         {
           "registryType": "npm",
           "identifier": "@n24q02m/better-notion-mcp",
-          "version": "2.38.0",
+          "version": "2.39.0",
           "runtimeHint": "npx",
           "transport": {
             "type": "stdio"
@@ -1366,6 +1366,183 @@
           "transport": {
             "type": "stdio"
           }
+        }
+      ]
+    },
+    {
+      "query": "searxng",
+      "name": "io.github.aicrafted/searxng-mcp",
+      "description": "MCP server for SearXNG aggregator — web search across multiple engines via Model Context Protocol",
+      "packages": [
+        {
+          "registryType": "oci",
+          "identifier": "ghcr.io/aicrafted/searxng-mcp:latest",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "URL of your SearXNG instance",
+              "isRequired": true,
+              "format": "string",
+              "name": "SEARXNG_URL"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "searxng",
+      "name": "io.github.burakaydinofficial/searxng-deepdive",
+      "description": "MCP server for SearXNG with engine targeting, multi-page fanout, and HTML→Markdown URL reading.",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "searxng-deepdive",
+          "version": "0.4.1",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Base URL of the SearXNG instance (e.g. http://127.0.0.1:7979/). Defaults to http://127.0.0.1:8080 if unset; set this to the address of your running SearXNG.",
+              "format": "string",
+              "name": "SEARXNG_URL"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "searxng",
+      "name": "io.github.ihor-sokoliuk/mcp-searxng",
+      "description": "MCP server for SearXNG — privacy-respecting web search with pagination, URL reading",
+      "packages": [
+        {
+          "registryType": "npm",
+          "identifier": "mcp-searxng",
+          "version": "1.15.0",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "URL of your SearXNG instance",
+              "isRequired": true,
+              "format": "string",
+              "isSecret": true,
+              "name": "SEARXNG_URL"
+            },
+            {
+              "description": "Legacy global SearXNG Basic Auth username",
+              "format": "string",
+              "isSecret": true,
+              "name": "AUTH_USERNAME"
+            },
+            {
+              "description": "Legacy global SearXNG Basic Auth password",
+              "format": "string",
+              "isSecret": true,
+              "name": "AUTH_PASSWORD"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "searxng",
+      "name": "io.github.whw23/searxng-http-mcp",
+      "description": "Self-contained SearXNG metasearch MCP server. One Docker image, 200+ engines, privacy-first.",
+      "packages": [
+        {
+          "registryType": "oci",
+          "identifier": "ghcr.io/whw23/searxng-http-mcp",
+          "runtimeHint": "docker",
+          "transport": {
+            "type": "stdio"
+          },
+          "runtimeArguments": [
+            {
+              "value": "run",
+              "type": "positional"
+            },
+            {
+              "type": "named",
+              "name": "--rm"
+            },
+            {
+              "type": "named",
+              "name": "-i"
+            },
+            {
+              "value": "512m",
+              "type": "named",
+              "name": "--memory"
+            },
+            {
+              "value": "1",
+              "type": "named",
+              "name": "--cpus"
+            }
+          ],
+          "packageArguments": [
+            {
+              "value": "--stdio",
+              "type": "positional"
+            }
+          ]
+        },
+        {
+          "registryType": "oci",
+          "identifier": "ghcr.io/whw23/searxng-http-mcp",
+          "runtimeHint": "docker",
+          "transport": {
+            "type": "streamable-http",
+            "url": "http://127.0.0.1:8888/mcp/"
+          },
+          "runtimeArguments": [
+            {
+              "value": "run",
+              "type": "positional"
+            },
+            {
+              "type": "named",
+              "name": "-d"
+            },
+            {
+              "value": "searxng-mcp",
+              "type": "named",
+              "name": "--name"
+            },
+            {
+              "value": "unless-stopped",
+              "type": "named",
+              "name": "--restart"
+            },
+            {
+              "value": "8888:8888",
+              "type": "named",
+              "name": "-p"
+            },
+            {
+              "value": "512m",
+              "type": "named",
+              "name": "--memory"
+            },
+            {
+              "value": "1",
+              "type": "named",
+              "name": "--cpus"
+            }
+          ],
+          "environmentVariables": [
+            {
+              "description": "API key for authentication. Leave empty for no auth.",
+              "format": "string",
+              "isSecret": true,
+              "name": "API_KEY"
+            }
+          ]
         }
       ]
     }

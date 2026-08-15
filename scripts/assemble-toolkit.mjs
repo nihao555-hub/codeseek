@@ -257,6 +257,8 @@ function printDoctor(catalog, enabled) {
   }
   console.log(`\nMCP patch: ${existsSync(PATCH_PATH) ? PATCH_PATH : '尚未 sync'}`)
   console.log(`已安装 skill: ${localSkillNames().length}`)
+  console.log('stdio MCP 协议: 换行 JSON-RPC（不是 LSP Content-Length）')
+  console.log('活体探测: node scripts/probe-tools.mjs')
 }
 
 async function main(argv = process.argv.slice(2)) {

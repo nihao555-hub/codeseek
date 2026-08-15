@@ -12,7 +12,16 @@
     { "id": "todo_write", "description": "任务清单" },
     { "id": "get_goal", "description": "当前会话目标" },
     { "id": "job_*", "description": "后台作业控制" },
-    { "id": "web_search", "description": "官方模型可见搜索。本仓库后端为 SearXNG，失败则 DuckDuckGo。" }
+    { "id": "web_search", "description": "官方模型可见搜索。本仓库后端为 SearXNG，失败则 DuckDuckGo。" },
+    { "id": "subagent", "description": "拉团员；description 必须是花名。standard 预设默认后台 continuable" },
+    { "id": "list_agents", "description": "列出已派出的孩子会话" },
+    { "id": "send_message", "description": "给已有孩子补一句" },
+    { "id": "interrupt_agent", "description": "打断孩子" },
+    { "id": "report", "description": "只在 continuable 孩子里出现；团员往群里汇报" },
+    { "id": "ask_user_question", "description": "缺了不猜就会做错的关键信息时问用户" },
+    { "id": "exit_plan_mode", "description": "计划模式交卷；Web 点 /plan 才进入" },
+    { "id": "ralph", "description": "全新子代理多轮死磕一个 objective；适合难修 bug，不适合一次派齐工位" },
+    { "id": "workflow", "description": "跑部署侧写好的工作流脚本" }
   ],
   "skills": [
     { "id": "assemble-toolkit", "kind": "local", "group": "platform", "description": "装配本仓库 skill / MCP / 主机工具" },
@@ -179,7 +188,7 @@
     {
       "id": "buyer-dd",
       "title": "公开源买家背调",
-      "description": "OpenCorporates 公司检索 + OpenSanctions 制裁名单。不是海关提单。工具名 mcp__buyer-dd__company_search / mcp__buyer-dd__sanctions_search。",
+      "description": "OpenCorporates 公司检索 + OpenSanctions 制裁名单。API 要密钥时回退 GLEIF 与公开 HTML。不是海关提单。工具名 mcp__buyer-dd__company_search / mcp__buyer-dd__sanctions_search。",
       "transport": "stdio",
       "serverName": "buyer-dd",
       "command": "node",

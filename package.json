@@ -14,6 +14,7 @@
     "toolkit": "node scripts/assemble-toolkit.mjs",
     "toolkit:sync": "node scripts/assemble-toolkit.mjs sync",
     "toolkit:fetch": "node scripts/assemble-toolkit.mjs fetch-skills",
+    "probe": "node scripts/probe-tools.mjs",
     "store": "npm --prefix store run dev",
     "store:test": "npm --prefix store test",
     "store:build": "npm --prefix store run build",

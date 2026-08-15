@@ -3,14 +3,43 @@
 本机装配走 `npm run toolkit -- <cmd>`。目录源是 `toolkit/catalog.json`，
 远程 skill 从 GitHub 拉 SKILL.md，MCP 从 npm / GitHub 仓库按需启用。
 
+当前 DeepSeek Harness 子模块钉在上游 `master` **0.1.0-rc.5**
+（`47f943859bef60e4160492346772ded9b24f765a`，2026-08-13 npm 公开发布）。
+`git fetch origin master` 落后 0 commit，没有可同步的新提交。
+vendor 工作树里的品牌覆盖是 `scripts/apply-brand.sh` 的预期脏文件，不要当业务改动提交。
+
+本地 MCP 必须说 **换行 JSON-RPC**（`@modelcontextprotocol/sdk` 的 NDJSON）。
+LSP `Content-Length` 会让 `dsh-mcp-client` 握手挂死，工具名永远不会出现。
+探测：`node scripts/probe-tools.mjs`。
+
+## DSH 自带、standard 预设已经给模型看的主机工具
+
+这些不是 MCP，来自 `vendor/deepseek-harness` 的 `standard` agent preset。
+Web 把工具挂在会话预设上，不是进程全局那一份。
+
+| 工具 | 插件 | 港窑怎么用 | 默认 |
+|---|---|---|---|
+| `bash` / `read` / `write` / `edit` / `glob` / `grep` | tool-bash, tool-fs, tool-fs-search | 改本仓库、读 catalog | 开 |
+| `skill` | tool-skill | 加载 `.dsh/skills/<name>` | 开 |
+| `todo_write` / `get_goal` / `job_*` | tool-todo, tool-goal, tool-jobs | 清单、目标、后台作业 | 开 |
+| `web_search` | tool-web + 本仓库 `web-search-provider.mjs` | 官方工具名；后端 SearXNG→DuckDuckGo | 开；官方 `web_fetch` **关**（SSRF） |
+| `subagent` / `list_agents` / `send_message` / `interrupt_agent` | tool-subagent* | `@花名` 派工 | 开 |
+| `report` | tool-subagent-report | 只在 continuable 孩子里；`【花名】已接到\|…` | 开 |
+| `ask_user_question` | tool-ask-user | 缺关键信息再问 | 开 |
+| `exit_plan_mode` | plan-mode | Web 点 `/plan` 才进计划模式 | 预设已装 |
+| `ralph` | tool-ralph | 全新子代理多轮死磕一个 bug；**不要**用来一次拉齐工位 | 预设已装 |
+| `workflow` | tool-workflow | 跑部署侧脚本 | 预设已装 |
+
+可选、本仓库默认不挂的 DSH 插件：`lsp`（要语言服务器）、`schedule_*`（定时唤醒）、`terminal_*`（PTY）、`cordis_*`（动态插件，危险）、Exa / Perplexity / DeepSeek 官方搜索（要各自密钥；我们用本地 SearXNG）。
+
 ## 已在本机、外贸天天用
 
 | 工具 | 来源 | 作用 | 默认 |
 |---|---|---|---|
 | web-search | 本仓库 `scripts/web-search-mcp.mjs`；SearXNG → DuckDuckGo | 买家、展会、竞品公开检索 | 开 |
 | web_fetch | `mcp__web-search__web_fetch`（官方 web_fetch 关） | 打开买家官网、目录页 | 开 |
-| buyer-dd | OpenCorporates API + OpenSanctions API（GitHub 公开项目） | 工商检索、制裁名单 | 开 |
-| sequential-thinking | `github.com/modelcontextprotocol/servers` | 管家拆步骤 | 开 |
+| buyer-dd | OpenCorporates API + OpenSanctions API；401 时回退 GLEIF LEI 与 OpenSanctions 公开 HTML | 工商 / LEI / 制裁名单 | 开 |
+| sequential-thinking | `github.com/modelcontextprotocol/servers` | 管家拆步骤；首次 `npx` 会下载 | 开 |
 | trade-desk / foreign-trade / trade-marketing / trade-dd / … | 本仓库 `.dsh/skills` | 工位派工、港窑人设、公开源背调 | 开 |
 | doc-coauthoring / pdf / pptx / xlsx | `github.com/anthropics/skills` | 报价表、画册、介绍信 | 按许可证；docx/pdf/pptx/xlsx **默认不拉**，要办公套件再 `fetch-skills --include-restricted` |
 | webapp-testing | `github.com/anthropics/skills` | 独立站走查 | 已拉 |
@@ -22,6 +51,8 @@
 `sequential-thinking` 与 `buyer-dd` 已写入 `toolkit/enabled.json`。
 
 给管家拆「先查买家再写开发信」的步骤；背调用工商库 + 制裁名单，**仍然没有海关提单**。
+
+无密钥但不要默认开：`memory`（知识图谱，污染工具列表）、`context7`（拉库文档，偏开发）、`MCP_TIME=1`（要 `uvx`）。
 
 ## 有密钥再开
 
@@ -47,10 +78,11 @@
 - 建站：读 catalog + `webapp-testing` skill；改独立站走本仓库 `store/`。
 - 社媒：`trade-social` + 公开检索；不编互动数据。
 - 广告：仅在 Meta MCP 就绪时用官方工具；否则只出文案草稿。
-- 开发：本仓库代码；GitHub MCP 只读公开资料。
+- 开发：本仓库代码；GitHub MCP 只读公开资料。难修 bug 可用 `ralph`，不要拿它派外贸工位。
 
 刷新 MCP 注册表（GitHub 上的官方服务器列表缓存）：
 
 ```bash
 npm run toolkit -- refresh-mcp
+node scripts/probe-tools.mjs
 ```

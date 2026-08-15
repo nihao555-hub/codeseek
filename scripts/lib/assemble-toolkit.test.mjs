@@ -44,6 +44,14 @@ test('searxng env has public instance default and html fallback', () => {
   assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_SEARXNG === '1'\)"/)
 })
 
+test('hostTools catalog lists DSH standard preset names', () => {
+  const catalog = loadCatalog()
+  const ids = new Set(catalog.hostTools.map((item) => item.id))
+  for (const id of ['web_search', 'subagent', 'report', 'ralph', 'exit_plan_mode']) {
+    assert.ok(ids.has(id), id)
+  }
+})
+
 test('web-search local mcp is default-on via enabled patch', () => {
   const catalog = loadCatalog()
   assert.ok(catalog.mcp.some((item) => item.id === 'web-search'))

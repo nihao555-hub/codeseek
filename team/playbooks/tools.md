@@ -8,9 +8,23 @@
 `git fetch origin master` 落后 0 commit，没有可同步的新提交。
 vendor 工作树里的品牌覆盖是 `scripts/apply-brand.sh` 的预期脏文件，不要当业务改动提交。
 
+**不要重复造轮子。** 搜索、工商、制裁、办公套件用 GitHub 上已经有的高星项目；本仓库只做 DSH 需要的 NDJSON 包装，以及把线索写进 `team/crm/`。不要自研搜索引擎、不要自研 Salesforce、不要自研地图/海关爬虫。
+
 本地 MCP 必须说 **换行 JSON-RPC**（`@modelcontextprotocol/sdk` 的 NDJSON）。
 LSP `Content-Length` 会让 `dsh-mcp-client` 握手挂死，工具名永远不会出现。
 探测：`node scripts/probe-tools.mjs`。
+
+## 获客成交用的上游轮子（GitHub）
+
+| 干什么 | 用哪个仓库 / API | 本仓库怎么接 |
+|---|---|---|
+| 公开网页搜索 | [Aas-ee/open-webSearch](https://github.com/Aas-ee/open-webSearch)、DuckDuckGo HTML | `mcp__open-websearch__search`、官方 `web_search` |
+| 读买家官网 | 本机 `web_fetch`；更深用 [mendableai/firecrawl](https://github.com/mendableai/firecrawl)（要密钥） | `mcp__web-search__web_fetch`；`MCP_FIRECRAWL=1` |
+| 工商登记 | [opencorporates](https://github.com/openc) 公开 API，401 则 [GLEIF/LEI](https://www.gleif.org/) | `mcp__buyer-dd__company_search` |
+| 制裁名单 | [opensanctions/opensanctions](https://github.com/opensanctions/opensanctions) | `mcp__buyer-dd__sanctions_search` |
+| 拆步骤 | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) sequential-thinking | `mcp__sequential-thinking__*` |
+| 完整 CRM 产品 | [twentyhq/twenty](https://github.com/twentyhq/twenty)（5 万星，要 Postgres） | **不在本机拉起**。团员落盘只用 `team/crm/*.json` |
+| 办公附件 UI | awesome-dsh：`dsh-files` / `dsh-office-tools` / `dsh-cowork` | 审源码再 overlay；读内容走 `mcp__documents__read_document` |
 
 ## DSH 自带、standard 预设已经给模型看的主机工具
 
@@ -77,6 +91,7 @@ Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页�
 |---|---|
 | Playwright MCP (`MCP_PLAYWRIGHT=1`) | 首次 `npx` 会下整套浏览器，拖慢 Harness 启动。要「打开买家公开页截图」时再开。仓库：`github.com/microsoft/playwright-mcp` |
 | 非官方 LinkedIn / 海关库 / 群发 SMTP | 本产品不做爬虫、不代发邮件、没有海关数据。 |
+| 地图抓取 / Google Maps scraper | 不做。获客走公开网页搜索 + 工商库，不另写一套地图爬虫。 |
 | 社区「marketing-skills」杂包 | 许可证和来源不明，不进 `toolkit/catalog.json`。 |
 
 ## 团员怎么用（不要发明工具名）

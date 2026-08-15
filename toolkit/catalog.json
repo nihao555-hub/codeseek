@@ -313,7 +313,7 @@
     {
       "id": "trade-crm",
       "title": "外贸 CRM（线索到订单）",
-      "description": "本仓库 NDJSON：线索池、商机看板、目录报价、开发信草稿。对齐网易外贸通闭环，不代发、没有海关库。工具名 mcp__trade-crm__list_leads / upsert_lead / quote_catalog / draft_outreach。",
+      "description": "把线索/商机写进 team/crm JSON（给团员落盘）。不是 Twenty/HubSpot。挖客用 open-webSearch + OpenCorporates + OpenSanctions。工具名 mcp__trade-crm__list_leads / upsert_lead / quote_catalog / draft_outreach。",
       "transport": "stdio",
       "serverName": "trade-crm",
       "command": "node",
@@ -402,7 +402,7 @@
     {
       "id": "google-maps",
       "title": "Google Maps",
-      "description": "地理编码与地点。",
+      "description": "官方 Places API（要 GOOGLE_MAPS_API_KEY）。获客默认不走地图；有密钥再开。",
       "transport": "stdio",
       "serverName": "google-maps",
       "command": "npx",

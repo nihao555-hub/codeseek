@@ -5,8 +5,8 @@
 ## 找客
 
 1. 先 `read` `/workspace/store/data/catalog.json` 和 `team/company.md`，锁定品类、条款、目标市场。
-2. `mcp__trade-crm__search_queries` 拿查询词，再 `web_search` 查：进口商 / 批发商 / 零售连锁 / 酒店用品采购 / 展会名录。查询写清品类 + 国家 + buyer/importer/wholesaler。
-3. 有候选 URL 再用 `mcp__web-search__web_fetch` 读页面。把**公司名、国家、页面角色、公开联系方式、来源 URL** 用 `mcp__trade-crm__upsert_lead` 写入（会镜像 `team/crm/leads.md`）。
+2. `mcp__trade-crm__search_queries` 拿查询词，再走 GitHub 轮子：官方 `web_search`（DuckDuckGo）和 `mcp__open-websearch__search`（[Aas-ee/open-webSearch](https://github.com/Aas-ee/open-webSearch)）。查进口商 / 批发商 / 零售连锁 / 酒店用品采购 / 展会名录。查询写清品类 + 国家 + buyer/importer/wholesaler。不要自写爬虫。
+3. 有候选 URL 再用 `mcp__web-search__web_fetch` 读页面。把**公司名、国家、页面角色、公开联系方式、来源 URL** 用 `mcp__trade-crm__upsert_lead` 写入（会镜像 `team/crm/leads.md`）。线索文件只是落盘，不是 Twenty/HubSpot。
 4. 对 hot 线索 `mcp__trade-crm__draft_outreach`。触达保持 `draft`。来源不够就标明置信度低，不要用“海关 2023 提单”这类无法核验的句子撑场面。
 
 ## 开发信

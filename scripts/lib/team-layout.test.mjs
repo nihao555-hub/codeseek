@@ -9,22 +9,33 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
   const files = [
     'team/README.md',
     'team/company.md',
+    'team/crm/leads.md',
     'team/pipeline.md',
     'team/playbooks/inquiry.md',
     'team/playbooks/quote.md',
     'team/playbooks/ops.md',
     'team/playbooks/compliance.md',
+    'team/playbooks/marketing.md',
+    'team/playbooks/social.md',
+    'team/playbooks/site.md',
     'team/templates/inquiry-reply.en.md',
     'team/templates/quotation.md',
     'team/templates/deal.md',
+    'team/templates/outreach.en.md',
+    'team/templates/social-post.md',
     'team/deals/HK-2026-001-nordic.md',
+    '.dsh/skills/trade-marketing/SKILL.md',
+    '.dsh/skills/trade-social/SKILL.md',
   ]
   for (const rel of files) {
     assert.equal(existsSync(join(root, rel)), true, rel)
   }
   const readme = readFileSync(join(root, 'team/README.md'), 'utf8')
   assert.match(readme, /trade-inquiry/)
+  assert.match(readme, /trade-marketing/)
+  assert.match(readme, /trade-social/)
   assert.match(readme, /catalog\.json/)
+  assert.match(readme, /网易外贸通/)
   const pipeline = readFileSync(join(root, 'team/pipeline.md'), 'utf8')
   assert.match(pipeline, /HK-2026-001/)
 })

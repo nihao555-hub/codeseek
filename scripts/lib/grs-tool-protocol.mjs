@@ -23,6 +23,81 @@ function asText(content) {
   return String(content)
 }
 
+function collectTextish(value) {
+  if (value == null) return ''
+  if (typeof value === 'string') return value
+  if (Array.isArray(value)) return value.map(collectTextish).join('')
+  if (typeof value === 'object') {
+    return collectTextish(value.text ?? value.content ?? value.reasoning_content ?? value.reasoning)
+  }
+  return ''
+}
+
+function pickHiddenReasoning(obj) {
+  if (!obj || typeof obj !== 'object') return ''
+  return [obj.reasoning_content, obj.reasoning, obj.thinking, obj.thought]
+    .map(collectTextish)
+    .join('')
+}
+
+/** GPT-5 / o-series 走推理 token，max_tokens 常被忽略或直接导致空正文。 */
+const REASONING_MODEL_RE = /^(gpt-5|o1|o3|o4)|gpt-5\./i
+
+export function isReasoningModel(model) {
+  return REASONING_MODEL_RE.test(String(model || ''))
+}
+
+/**
+ * 把 GPT-5 类模型的 max_tokens 改成 max_completion_tokens，避免空 completion。
+ * @param {Record<string, unknown>} body
+ */
+export function applyReasoningModelCompat(body) {
+  if (!body || typeof body !== 'object') return body
+  if (!isReasoningModel(body.model)) return body
+  const next = { ...body }
+  if (next.max_tokens != null && next.max_completion_tokens == null) {
+    next.max_completion_tokens = next.max_tokens
+    delete next.max_tokens
+  }
+  return next
+}
+
+/**
+ * 空回复重试时抬高推理模型的完成额度，避免思考把 max tokens 吃光。
+ * @param {Record<string, unknown>} body
+ * @param {number} [floor]
+ */
+export function bumpReasoningBudget(body, floor = 8192) {
+  const next = { ...body }
+  const current = Number(next.max_completion_tokens ?? next.max_tokens ?? 0)
+  if (!Number.isFinite(current) || current < floor) {
+    next.max_completion_tokens = floor
+    delete next.max_tokens
+  }
+  return next
+}
+
+export const EMPTY_COMPLETION_NUDGE = [
+  '[runtime] Your previous completion finished with empty visible content.',
+  'Hidden reasoning is not shown to the user or the agent loop.',
+  'Reply now with visible assistant text and/or a <tool_call> JSON block.',
+  'Do not wait for the human to say 继续.',
+].join(' ')
+
+export const EMPTY_COMPLETION_FALLBACK = [
+  '上一轮模型完成了但没有可见正文（常见于 gpt-5.6-sol 把字写进思考栏）。',
+  '请再发一次同样的任务，或改用 gemini-3.5-flash。',
+].join('')
+
+/**
+ * @param {Record<string, unknown>} body
+ */
+export function nudgeEmptyRetry(body) {
+  const next = { ...body, messages: [...(Array.isArray(body.messages) ? body.messages : [])] }
+  next.messages.push({ role: 'user', content: EMPTY_COMPLETION_NUDGE })
+  return next
+}
+
 function repairJsonControlChars(text) {
   let out = ''
   let inString = false
@@ -604,7 +679,44 @@ export function sseEncode(chunks) {
 }
 
 /**
- * 收集 OpenAI SSE / JSON 完成内容。
+ * 把助手正文写成 Harness 能看见的 OpenAI SSE / JSON。
+ * GPT-5 常把字写进 reasoning_content，原样转发会触发 EMPTY_RESPONSE。
+ */
+export function encodeAssistantContent({ stream, upstream = {}, content, finishReason = 'stop' }) {
+  const created = Number(upstream.created) || Math.floor(Date.now() / 1000)
+  const base = {
+    id: typeof upstream.id === 'string' ? upstream.id : `chatcmpl-proxy-${created}`,
+    created,
+    model: upstream.model || 'unknown',
+    usage: upstream.usage,
+  }
+  const text = String(content ?? '')
+  if (!stream) {
+    return JSON.stringify({
+      id: base.id,
+      object: 'chat.completion',
+      created: base.created,
+      model: base.model,
+      choices: [{
+        index: 0,
+        message: { role: 'assistant', content: text },
+        finish_reason: finishReason || 'stop',
+      }],
+      usage: base.usage,
+    })
+  }
+  const chunks = [
+    chunkTemplate(base, { role: 'assistant', content: '' }),
+    chunkTemplate(base, { content: text }),
+    chunkTemplate(base, {}, finishReason || 'stop'),
+  ]
+  if (base.usage) chunks[chunks.length - 1].usage = base.usage
+  return sseEncode(chunks)
+}
+
+/**
+ * 收集 OpenAI SSE / JSON 完成内容。同时记下 reasoning_content，
+ * 因为 gpt-5.6-sol 经常 stop 且 content 为空。
  * @param {string} raw
  * @param {boolean} stream
  */
@@ -613,15 +725,22 @@ export function collectCompletion(raw, stream) {
     const data = JSON.parse(raw)
     const choice = (data.choices || [])[0] || {}
     const message = choice.message || {}
+    const content = asText(message.content)
+    const reasoning = pickHiddenReasoning(message) || pickHiddenReasoning(choice)
+    const refusal = asText(message.refusal)
     return {
       data,
-      content: asText(message.content),
+      content,
+      reasoning,
+      refusal,
       nativeToolCalls: Array.isArray(message.tool_calls) && message.tool_calls.length > 0,
       finishReason: choice.finish_reason,
     }
   }
 
   let content = ''
+  let reasoning = ''
+  let refusal = ''
   let nativeToolCalls = false
   let finishReason
   const acc = { id: undefined, created: undefined, model: undefined, usage: undefined, choices: [{ delta: {} }] }
@@ -644,8 +763,29 @@ export function collectCompletion(raw, stream) {
     const delta = choice.delta || {}
     if (typeof delta.content === 'string') content += delta.content
     if (typeof choice.message?.content === 'string') content += choice.message.content
+    reasoning += pickHiddenReasoning(delta) + pickHiddenReasoning(choice.message)
+    refusal += asText(delta.refusal) + asText(choice.message?.refusal)
     if (Array.isArray(delta.tool_calls) && delta.tool_calls.length > 0) nativeToolCalls = true
+    if (Array.isArray(choice.message?.tool_calls) && choice.message.tool_calls.length > 0) nativeToolCalls = true
     if (choice.finish_reason) finishReason = choice.finish_reason
   }
-  return { data: acc, content, nativeToolCalls, finishReason }
+  return { data: acc, content, reasoning, refusal, nativeToolCalls, finishReason }
+}
+
+/**
+ * content 为空时，把 reasoning / refusal 抬成可见正文，否则 Harness 会报 EMPTY_RESPONSE。
+ * @param {ReturnType<typeof collectCompletion>} collected
+ */
+export function withLiftedReasoning(collected) {
+  const content = String(collected?.content || '').trim()
+  if (content) return { ...collected, lifted: false }
+  const fallback = String(collected?.reasoning || '').trim() || String(collected?.refusal || '').trim()
+  if (!fallback) return { ...collected, lifted: false }
+  return { ...collected, content: fallback, lifted: true }
+}
+
+export function isEmptyAssistant(collected) {
+  if (!collected) return true
+  if (collected.nativeToolCalls) return false
+  return !String(collected.content || '').trim()
 }

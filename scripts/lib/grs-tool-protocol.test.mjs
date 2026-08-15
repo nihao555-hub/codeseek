@@ -11,6 +11,12 @@ import {
   buildObservationHint,
   unreadEditPathsFromText,
   normalizeToolArguments,
+  withLiftedReasoning,
+  isEmptyAssistant,
+  applyReasoningModelCompat,
+  encodeAssistantContent,
+  nudgeEmptyRetry,
+  bumpReasoningBudget,
 } from './grs-tool-protocol.mjs'
 
 test('parses hermes <tool_call> json', () => {
@@ -225,4 +231,73 @@ test('collectCompletion reads sse text', () => {
   const got = collectCompletion(raw, true)
   assert.equal(got.content, 'Hello')
   assert.equal(got.nativeToolCalls, false)
+})
+
+test('collectCompletion lifts reasoning_content when content is empty', () => {
+  const raw = [
+    'data: {"choices":[{"delta":{"role":"assistant","reasoning_content":"I should search"}}]}',
+    'data: {"choices":[{"delta":{"reasoning_content":" for tumblers"},"finish_reason":"stop"}]}',
+    'data: [DONE]',
+  ].join('\n\n')
+  const got = withLiftedReasoning(collectCompletion(raw, true))
+  assert.equal(got.content, 'I should search for tumblers')
+  assert.equal(got.lifted, true)
+  assert.equal(isEmptyAssistant(got), false)
+})
+
+test('collectCompletion json reasoning_content can carry a tool_call', () => {
+  const raw = JSON.stringify({
+    id: 'cmpl-test',
+    created: 1,
+    model: 'gpt-5.6-sol',
+    choices: [{
+      message: {
+        role: 'assistant',
+        content: '',
+        reasoning_content: '<tool_call>{"name":"web_search","arguments":{"query":"EU tumbler importer"}}</tool_call>',
+      },
+      finish_reason: 'stop',
+    }],
+  })
+  const got = withLiftedReasoning(collectCompletion(raw, false))
+  const parsed = parseAssistantToolPayload(got.content)
+  assert.equal(parsed.calls[0].name, 'web_search')
+  assert.match(parsed.calls[0].arguments.query, /tumbler/)
+})
+
+test('applyReasoningModelCompat remaps max_tokens for gpt-5', () => {
+  const out = applyReasoningModelCompat({
+    model: 'gpt-5.6-sol',
+    max_tokens: 2048,
+    messages: [],
+  })
+  assert.equal(out.max_completion_tokens, 2048)
+  assert.equal(out.max_tokens, undefined)
+  const gemini = applyReasoningModelCompat({ model: 'gemini-3.5-flash', max_tokens: 2048 })
+  assert.equal(gemini.max_tokens, 2048)
+  assert.equal(gemini.max_completion_tokens, undefined)
+})
+
+test('encodeAssistantContent writes visible SSE content', () => {
+  const sse = encodeAssistantContent({
+    stream: true,
+    upstream: { id: 'cmpl-x', created: 1, model: 'gpt-5.6-sol' },
+    content: 'visible',
+  })
+  assert.match(sse, /"content":"visible"/)
+  assert.match(sse, /data: \[DONE\]/)
+  const json = JSON.parse(encodeAssistantContent({
+    stream: false,
+    upstream: { id: 'cmpl-x', created: 1, model: 'gpt-5.6-sol' },
+    content: 'visible',
+  }))
+  assert.equal(json.choices[0].message.content, 'visible')
+})
+
+test('nudgeEmptyRetry appends a user hint and bumpReasoningBudget raises the floor', () => {
+  const nudged = nudgeEmptyRetry({ model: 'gpt-5.6-sol', messages: [{ role: 'user', content: 'hi' }] })
+  assert.equal(nudged.messages.at(-1).role, 'user')
+  assert.match(nudged.messages.at(-1).content, /empty visible content/)
+  const bumped = bumpReasoningBudget({ model: 'gpt-5.6-sol', max_tokens: 512 })
+  assert.equal(bumped.max_completion_tokens, 8192)
 })

@@ -6,13 +6,15 @@
 
 | Skill | 何时用 |
 | --- | --- |
-| `foreign-trade` | 团队调度：分派询盘/报价/跟单/合规 |
+| `foreign-trade` | 管家：按网易外贸通 1+N 分派专家 |
+| `trade-marketing` | 挖客 + 开发信（不代发） |
 | `trade-inquiry` | 客户询盘回复 |
 | `trade-quote` | USD 报价 / MOQ / 交期 |
-| `trade-ops` | 样品到出货跟单 |
+| `trade-ops` | 线索运营 + 样品到出货 |
+| `trade-social` | 社媒帖 / 私信稿 |
 | `trade-compliance` | 认证与出口规则 |
 | `meta-ads` | Facebook / Instagram 广告 |
-| `ecommerce-store` | 本仓库港窑独立站约定 |
+| `ecommerce-store` | 建站专家：港窑独立站 |
 
 ## 前端（高星实践浓缩）
 

@@ -1,12 +1,12 @@
 ---
 name: ecommerce-store
-description: 港窑 Harbor Kiln 独立站的本仓库约定：目录、品牌、API、演示边界。
-whenToUse: 任何改 store/ 目录、文案、结算或独立站功能时使用。
+description: 港窑建站专家：独立站目录、品牌、SEO 引流与询盘表单，对应网易外贸通建站专家。
+whenToUse: 任何改 store/ 目录、文案、结算、SEO 或独立站功能时使用。
 ---
 
-# 港窑独立站
+# 建站专家（港窑独立站）
 
-路径：`/workspace/store/`（Web 工具不要用相对路径）。
+对齐网易外贸通「AI 建站专家」。剧本：`/workspace/team/playbooks/site.md`。路径：`/workspace/store/`（Web 工具不要用相对路径）。访客线索记入 `/workspace/team/crm/leads.md`。
 
 ## 品牌
 

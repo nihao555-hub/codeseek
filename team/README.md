@@ -1,38 +1,60 @@
 # 港窑外贸团队
 
-这是 Web 会话里的**团队工作台**。调度（主会话）读这里，再按角色出稿或派 subagent。
+对齐 [网易外贸通 AI 团队](https://waimao.163.com/knowledge/article/1462) 的 **1 个管家 + 四大专家**，再补上港窑自己的询盘 / 报价 / 合规履约。
 
-公司档案：`company.md`  
-看板：`pipeline.md`  
-产品真相源：`/workspace/store/data/catalog.json`（不要手填价格/认证）
+调度（主会话）是管家。先读本文件、`company.md`、`crm/leads.md`、`pipeline.md`，产品只信 `/workspace/store/data/catalog.json`。
+
+## 闭环（抄他们的流程，不抄他们没有的数据）
+
+网易外贸通：找客 → 触达 → 管理 → 建站引流 → 转化。
+
+本仓库同样跑这条链，但**没有** 60 亿海关库、高信誉发信 IP、自动邮件 / WhatsApp。替代方式：
+
+| 网易能力 | 我们怎么做 |
+| --- | --- |
+| 海关 / 社媒 / Google 挖客 | `web_search` + `mcp__web-search__web_fetch`，来源写进线索表 |
+| 开发信多轮触达 | 只出可粘贴稿，**不代发** |
+| 高潜分组 / 沉睡激活 | `team/crm/leads.md` |
+| 独立站 + SEO + 访客线索 | `store/` + `ecommerce-store` |
+| 多平台内容 / 私信 | 只出帖子和私信稿，不登录对方后台 |
+
+禁止编造邮箱、海关提单、认证和“已发送”状态。
 
 ## 角色
 
-| 角色 | skill | 剧本 |
-| --- | --- | --- |
-| 调度 Trade Lead | `foreign-trade` | 本文件 |
-| 询盘 | `trade-inquiry` | `playbooks/inquiry.md` |
-| 报价 | `trade-quote` | `playbooks/quote.md` |
-| 跟单 | `trade-ops` | `playbooks/ops.md` |
-| 合规 | `trade-compliance` | `playbooks/compliance.md` |
-| 独立站 | `ecommerce-store` | `/workspace/store/` |
-| 广告 | `meta-ads` | `.dsh/skills/meta-ads/SKILL.md` |
+| 网易角色 | 本仓库 | skill | 台账 / 剧本 |
+| --- | --- | --- | --- |
+| 管家 | Trade Lead | `foreign-trade` | 本文件 |
+| AI 营销专家 | 挖客 + 开发信 | `trade-marketing` | `crm/leads.md`、`playbooks/marketing.md` |
+| AI 运营专家 | CRM + 跟单 | `trade-ops` | `crm/leads.md`、`pipeline.md`、`playbooks/ops.md` |
+| AI 建站专家 | 港窑独立站 | `ecommerce-store` | `store/`、`playbooks/site.md` |
+| AI 社媒专家 | 内容 / 私信稿 | `trade-social` | `playbooks/social.md` |
+| （港窑加项）询盘 |  inbound 回复 | `trade-inquiry` | `playbooks/inquiry.md` |
+| （港窑加项）报价 | FOB / MOQ | `trade-quote` | `playbooks/quote.md` |
+| （港窑加项）合规 | 认证 / 出口 | `trade-compliance` | `playbooks/compliance.md` |
+| 广告 | Meta | `meta-ads` | 广告 skill |
 
-## 接到一条客户消息时
+管家拆任务、点名专家。一条短任务在本会话做完。只有明显可并行的独立活才 `subagent`（例如同时写开发信和改首页）。子代理提示词写清角色、SKU、绝对路径。
 
-1. `read` 本文件、`pipeline.md`、`store/data/catalog.json`。
-2. 能对上现有成交就打开 `deals/` 里那份；对不上就按 `templates/deal.md` **新建** `deals/HK-YYYY-NNN-slug.md` 并在看板加一行。
-3. 只做当前需要的角色。一封询盘回复不要再派四个 subagent。
-4. 给用户两块输出：**可粘贴给客户的稿** + **中文内部备注**（风险、要工厂确认的点、下一步）。
-5. 更新看板状态。不要发真实邮件、不要编 catalog 里没有的认证。
+## 接到一条用户消息时
+
+1. `read` 本文件、`crm/leads.md`、`pipeline.md`、`store/data/catalog.json`。
+2. **找客 / 开发信 / 激活** → 营销或运营专家；线索写入 `crm/leads.md`。
+3. **已有询盘** → 询盘专家；对得上成交就打开 `deals/`，对不上按 `templates/deal.md` 新建并在看板加一行。
+4. **报价 / 认证** → 报价或合规；价格只出 catalog 里有的。
+5. **独立站 / SEO** → 建站专家，改 `/workspace/store/`。
+6. **LinkedIn / Instagram / 内容日历** → 社媒专家。
+7. 给用户两块输出：**可粘贴的外稿** + **中文内部备注**（来源、风险、下一步）。
+8. 更新线索表或看板。不要发真实邮件，不要编 catalog 里没有的认证。
 
 ## 目录
 
 ```
 team/
   company.md
-  pipeline.md
+  crm/leads.md     # 线索池（营销 + 运营）
+  pipeline.md      # 已进入询盘/报价的商机
   playbooks/
   templates/
-  deals/           # 单笔成交；真实客户隐私放 deals/local/（已 gitignore）
+  deals/           # 单笔成交；真实客户隐私放 deals/local/
 ```

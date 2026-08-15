@@ -1,15 +1,15 @@
 # codeseek · 超级员工
 
-基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 Agent，默认是 **港窑外贸团队**（询盘、报价、跟单、合规），顺带做广告和改独立站：
+基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 Agent，默认是 **港窑外贸团队**（对齐网易外贸通：管家 + 营销 / 运营 / 建站 / 社媒，并保留询盘报价合规），顺带做广告和改独立站：
 
-- **跨境外贸**：询盘、报价、跟单、合规
+- **跨境外贸**：挖客、开发信、询盘、报价、跟单、合规（不代发邮件、没有海关库）
 - **Meta 广告**：官方 Ads MCP（`https://mcp.facebook.com/ads`）
 - **开发任务**：改这个仓库里的代码与配置
 - **港窑独立站**：`store/` 里的跨境家居演示站（Vite + React + Node HTTP）
 
 模型走 GRS 的 OpenAI 兼容中转，默认 `gemini-3.5-flash`，复杂任务可切 `gpt-5.6-sol`。
 
-GRS 目前**不会**返回 OpenAI 原生 `tool_calls`。`scripts/start.sh` 会在本机拉起 `scripts/grs-tool-proxy.mjs`（默认 `http://127.0.0.1:18765/v1`），把工具编进提示词，再把模型输出的 `<tool_call>` 还原成 Harness 能执行的函数调用。上游瞬时失败（例如 `model load is too high`）默认最多再试 3 次。
+GRS 目前**不会**返回 OpenAI 原生 `tool_calls`。`scripts/start.sh` 会在本机拉起 `scripts/grs-tool-proxy.mjs`（默认 `http://127.0.0.1:18765/v1`），把工具编进提示词，再把模型输出的 `<tool_call>` 还原成 Harness 能执行的函数调用。上游瞬时失败（例如 `model load is too high`）默认最多再试 3 次。`gpt-5.6-sol` 若把正文写进 `reasoning_content` 或返回空 completion，代理会抬成可见正文并重试，避免 Harness 报 `EMPTY_RESPONSE`。
 
 ## 需要的环境
 
@@ -62,14 +62,16 @@ npm run store          # http://127.0.0.1:5173  （API 在 :8788）
 
 ## 外贸团队
 
-默认人设是港窑 **Trade Lead**。台账在 `team/`：
+默认人设是港窑 **管家（Trade Lead）**，结构抄网易外贸通的 1+N，台账在 `team/`：
 
-- 看板 `team/pipeline.md`
+- 线索池 `team/crm/leads.md`
+- 商机看板 `team/pipeline.md`
 - 单笔成交 `team/deals/`
 - 真实客户隐私 `team/deals/local/`（不提交）
-- 角色 skill：`trade-inquiry` / `trade-quote` / `trade-ops` / `trade-compliance`
+- 四大专家：`trade-marketing` / `trade-ops` / `ecommerce-store` / `trade-social`
+- 履约加项：`trade-inquiry` / `trade-quote` / `trade-compliance`
 
-产品价格、MOQ、认证只以 `store/data/catalog.json` 为准。Agent 只出可粘贴的客户稿，不发真实邮件。
+产品价格、MOQ、认证只以 `store/data/catalog.json` 为准。Agent 只出可粘贴的客户稿，不发真实邮件，不编造海关数据和邮箱。
 
 ## 装配自己的工具
 

@@ -326,13 +326,27 @@ window.__ModuleLoader__.load({
 		}
 
 		var crmTimer = 0;
+		function mergeLive(crm) {
+			var live = crm && crm.live;
+			var cur = getSnapshot().session;
+			if (!live) return { crm: crm, error: null };
+			var hostCalls = (live.calls && live.calls.length) ? live.calls : (live.recent || []);
+			var next = Object.assign({}, cur);
+			if (!cur.calls.length && hostCalls.length) next.calls = hostCalls;
+			if (!cur.members.length && live.members && live.members.length) next.members = live.members;
+			if (live.running) {
+				next.running = true;
+				next.blank = false;
+			}
+			return { crm: crm, error: null, session: next };
+		}
 		function loadCrm() {
 			fetch("/__codeseek/activity", { cache: "no-store" })
 				.then(function (res) {
 					if (!res.ok) throw new Error("HTTP " + res.status);
 					return res.json();
 				})
-				.then(function (crm) { emit({ crm: crm, error: null }); })
+				.then(function (crm) { emit(mergeLive(crm)); })
 				.catch(function (error) { emit({ error: String(error.message || error) }); });
 		}
 		function ensureVanillaMount() {

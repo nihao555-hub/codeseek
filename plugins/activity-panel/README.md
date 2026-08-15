@@ -16,6 +16,6 @@ GitHub 上已经有右侧栏轮子，对照后没有原样安装：
 
 ## 数据从哪来
 
-- **正在做什么**：浏览器会话快照 `running` / `runningCalls` / 子代理列表（零 RPC）
-- **线索 / 商机**：`GET /__codeseek/activity` 读 `team/crm/*.json`
+- **正在做什么**：宿主听 `session/event` 的 `tool/call`，经 `GET /__codeseek/activity` 的 `live` 字段；浏览器槽位若能读到 `runningCalls` 会覆盖
+- **线索 / 商机**：同一接口读 `team/crm/*.json`
 - **报价金额**：`store/data/catalog.json`，不是买家询盘

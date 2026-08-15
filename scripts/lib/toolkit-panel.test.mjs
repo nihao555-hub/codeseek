@@ -43,8 +43,11 @@ test('activity panel ships a DSH client overlay for the right rail', () => {
   assert.match(client, /codeseek-activity-root/)
   assert.match(client, /document\.body/)
   assert.match(client, /__codeseek\/activity/)
+  assert.match(client, /crm\.live/)
   assert.match(client, /港窑实时/)
   assert.match(host, /trade-activity\.mjs/)
+  assert.match(host, /session\/event/)
+  assert.match(host, /ingestLiveEvent/)
   assert.equal(manifest.name, ACTIVITY_PANEL_PACKAGE)
   assert.equal(manifest.dsh.client.platform, 'web')
   assert.match(patch, /^\s+name: codeseek-activity-panel\s*$/m)
@@ -60,6 +63,21 @@ test('activity panel host serves CRM snapshot', async () => {
   const data = mod.activitySnapshot()
   assert.equal(data.quoteSource, 'store/data/catalog.json')
   assert.ok(data.catalog.some((row) => row.sku === 'HK-TB-500-SS'))
+})
+
+test('activity panel host folds in-flight tool/call into live snapshot', async () => {
+  const mod = await import(pathToFileURL(join(root, 'plugins/activity-panel/src/index.mjs')).href)
+  mod.resetLiveActivity()
+  mod.ingestLiveEvent({ id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+  mod.ingestLiveEvent({ id: 's1' }, { type: 'tool/call', data: { callId: 'c1', name: 'mcp__trade-crm__quote_catalog', arguments: '{"sku":"HK-TB-500-SS"}' } })
+  const live = mod.liveActivity()
+  assert.equal(live.running, true)
+  assert.equal(live.calls[0].name, 'mcp__trade-crm__quote_catalog')
+  mod.ingestLiveEvent({ id: 's1' }, { type: 'tool/result', data: { message: { content: [{ toolCallId: 'c1' }] } } })
+  const after = mod.liveActivity()
+  assert.equal(after.calls.length, 0)
+  assert.equal(after.recent[0].name, 'mcp__trade-crm__quote_catalog')
+  mod.resetLiveActivity()
 })
 
 test('toolkit panel host module loads assemble-toolkit', async () => {

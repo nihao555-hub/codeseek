@@ -74,24 +74,21 @@ npm run toolkit -- enable github sequential-thinking
 
 ## 联网搜索
 
-Web UI 组合默认关掉 Harness 原生 `tool-web`。本仓库默认打开本地 MCP `web-search`：
+官方 `standard` preset 给模型的工具名是 `web_search`（`web_fetch` 默认关闭）。本仓库把该工具的后端从 DeepSeek 官方检索换成本地开源搜索：
 
 1. 先查 GitHub 高星开源元搜索 [SearXNG](https://github.com/searxng/searxng)
 2. 公开实例失败（限流、关闭 JSON）再解析 DuckDuckGo HTML
 
-工具名：
+读页面仍用 MCP：`mcp__web-search__web_fetch`。备用 MCP 搜索名是 `mcp__web-search__web_search`。
 
-- `mcp__web-search__web_search`
-- `mcp__web-search__web_fetch`
-
-自建 SearXNG 写入 `.env` 的 `SEARXNG_URL`（多个实例用分号分隔）。需要完整 SearXNG MCP（分页、读 URL）时：`npm run toolkit -- enable searxng`，对应 [mcp-searxng](https://github.com/ihor-sokoliuk/mcp-searxng)。关掉默认搜索：`npm run toolkit -- disable web-search`。Brave / Firecrawl 仍是可选付费备选。
+自建 SearXNG 写入 `.env` 的 `SEARXNG_URL`（多个实例用分号分隔）。需要完整 SearXNG MCP（分页、读 URL）时：`npm run toolkit -- enable searxng`，对应 [mcp-searxng](https://github.com/ihor-sokoliuk/mcp-searxng)。关掉默认 MCP 搜索：`npm run toolkit -- disable web-search`。Brave / Firecrawl 仍是可选付费备选。
 
 ## 配置在哪
 
 | 路径 | 作用 |
 | --- | --- |
 | `dsh-home/settings.yaml` | GRS 提供方与默认模型 |
-| `dsh-home/cordis.patch.yml` | 人设、默认模型、沙箱；暂时禁用 `llm-deepseek` |
+| `dsh-home/cordis.patch.yml` | 人设、默认模型、沙箱；禁用 `llm-deepseek`；`web_search` 后端为 SearXNG |
 | `scripts/grs-tool-proxy.mjs` | GRS 文本工具协议 ↔ OpenAI tool_calls |
 | `.dsh/skills/` | 外贸 / 广告 / 开发 / 前端 / 后端技能（见该目录 README） |
 | `toolkit/catalog.json` | 可装配 skill 与 MCP 目录 |

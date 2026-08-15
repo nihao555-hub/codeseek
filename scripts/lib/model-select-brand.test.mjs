@@ -10,6 +10,7 @@ test('home patch disables the DeepSeek official adapter', () => {
   const yaml = readFileSync(join(root, 'dsh-home/cordis.patch.yml'), 'utf8')
   assert.match(yaml, /- id: llm-deepseek\n  disabled: true/)
   assert.match(yaml, /- id: web-search-deepseek\n  disabled: true/)
+  assert.match(yaml, /searchProvider: codeseek-searxng/)
 })
 
 test('settings catalog only lists GRS Gemini and GPT seats', () => {

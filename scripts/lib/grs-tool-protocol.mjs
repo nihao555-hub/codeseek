@@ -142,6 +142,14 @@ export function normalizeToolArguments(name, args) {
     assignCanonical(out, 'name', ['skill', 'skill_name', 'id'])
   }
 
+  if (tool === 'web_search' || tool === 'mcp__web-search__web_search') {
+    assignCanonical(out, 'query', ['q', 'search', 'text', 'keyword'])
+  }
+
+  if (tool === 'web_fetch' || tool === 'mcp__web-search__web_fetch') {
+    assignCanonical(out, 'url', ['uri', 'link', 'href'])
+  }
+
   return out
 }
 
@@ -174,6 +182,30 @@ function parseXmlParameters(body) {
   return Object.keys(args).length ? args : null
 }
 
+function recoverToolCallObject(text) {
+  const source = String(text || '')
+  const name = /"(?:name|tool)"\s*:\s*"([A-Za-z0-9_.-]+)"/.exec(source)?.[1]
+  if (!name) return null
+  const args = {}
+  const keys = ['output', 'content', 'new_string', 'old_string', 'command', 'cmd', 'query', 'pattern', 'file_path', 'path', 'description']
+  for (const key of keys) {
+    const token = `"${key}"`
+    const at = source.indexOf(token)
+    if (at < 0) continue
+    const colon = source.indexOf(':', at + token.length)
+    if (colon < 0) continue
+    let i = colon + 1
+    while (i < source.length && /\s/.test(source[i])) i += 1
+    if (source[i] !== '"') continue
+    i += 1
+    const tail = source.slice(i)
+    const close = tail.match(/"\s*(?:,\s*"[A-Za-z0-9_]+"\s*:|\}[\s}]*)$/)
+    const raw = close ? tail.slice(0, close.index) : tail.replace(/"\s*\}[\s}]*$/, '')
+    args[key] = raw.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\"/g, '"')
+  }
+  return { name, arguments: args }
+}
+
 function parseCallBody(body, openTag) {
   const nameFromTag = /name\s*=\s*["']([^"']+)["']/i.exec(openTag || '')?.[1]
   const trimmed = String(body ?? '').trim()
@@ -182,6 +214,8 @@ function parseCallBody(body, openTag) {
     if (asJson.name || asJson.tool) return normalizeCall(asJson, nameFromTag)
     if (nameFromTag) return normalizeCall({ name: nameFromTag, arguments: asJson })
   }
+  const recovered = recoverToolCallObject(trimmed)
+  if (recovered) return normalizeCall(recovered, nameFromTag)
   const xmlArgs = parseXmlParameters(trimmed)
   if (xmlArgs && nameFromTag) return normalizeCall({ name: nameFromTag, arguments: xmlArgs })
   const lines = trimmed.split('\n')
@@ -282,7 +316,8 @@ export const TOOL_CONTINUE_HINT = [
   'edit on an existing file requires a successful `read` tool call on that path first (bash/cat/grep do not count).',
   'If cwd is empty or not the repo, use absolute paths under /workspace. The storefront lives at /workspace/store/.',
   'If skill is unknown, skip it and keep implementing under /workspace/store/.',
-  'Do not call web_search; use mcp__web-search__web_search.',
+  'Prefer official web_search for live lookup (SearXNG, then DuckDuckGo).',
+  'Official web_fetch is disabled; fetch URLs with mcp__web-search__web_fetch.',
 ].join(' ')
 
 const EDIT_NEEDS_READ_RE = /edit requires reading "([^"]+)" first/g
@@ -356,7 +391,7 @@ export function buildToolProtocolPrompt(tools) {
     '- read/write/edit require file_path (not path/file)',
     '- bash requires command and description (5-10 words; description is shown in the UI)',
     '- glob requires pattern; skill requires name',
-    '- do not call web_search / web_fetch (they need DEEPSEEK_API_KEY). Search with mcp__web-search__web_search; fetch URLs with mcp__web-search__web_fetch',
+    '- search the web with official web_search (SearXNG, then DuckDuckGo). Official web_fetch is off; fetch URLs with mcp__web-search__web_fetch',
     '- if skill says unknown, skip it and keep editing /workspace/store/ with absolute paths',
     '- escape newlines inside JSON strings as \\n; keep the object valid JSON',
     '- multiple tools: multiple <tool_call> blocks',

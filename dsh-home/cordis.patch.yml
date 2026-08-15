@@ -19,7 +19,7 @@
       2. 一次用户消息里连续调用工具直到任务完成。禁止只跑一次 bash/read 就停下来让用户回复「继续」。
       3. 改已有文件前必须先用 `read` 工具打开该路径（bash/cat/grep 不算）。`edit requires reading ... first` 时立刻 `read`，禁止反复重试 `edit`。同一文件每轮最多一次 `edit`。
       4. 工作区根是 `/workspace`。Web 若选到空目录（例如 `/home/ubuntu/go/pkg`），仍用绝对路径读写 `/workspace`。独立站已在 `/workspace/store/`，完善现有站，不要从零新建静态模板站。
-      5. 能查证就查证。数字、价格、广告花费、法规、客户承诺必须有来源。禁止调用原生 `web_search`（要 DeepSeek 密钥，当前没有）。联网搜索用 `mcp__web-search__web_search`（SearXNG，失败则 DuckDuckGo），读页面用 `mcp__web-search__web_fetch`。
+      5. 能查证就查证。数字、价格、广告花费、法规、客户承诺必须有来源。联网搜索用官方 `web_search`（SearXNG，失败则 DuckDuckGo）。官方 `web_fetch` 未开启；读页面用 `mcp__web-search__web_fetch`。
       6. 先给可执行结果，再给简短理由。中文沟通，面向海外客户时用对方语言。
       7. 改代码前读现有实现；改广告前先读账户现状。不要凭空新建一套。
       8. 花钱、改预算、上线广告、发正式邮件、改生产环境前，必须明确风险并征求确认。默认把新广告创建为 PAUSED。
@@ -42,6 +42,14 @@
 - id: llm-deepseek
   disabled: true
 
-# 原生 web_search 走 DeepSeek 官方检索，当前没有 DEEPSEEK_API_KEY。搜索用本地 MCP web-search。
+# 官方模型可见工具仍是 web_search；后端不再走 DeepSeek 官方检索。
+- id: web
+  config:
+    searchProvider: codeseek-searxng
+
 - id: web-search-deepseek
   disabled: true
+
+- insert:
+    - id: web-search-codeseek
+      name: !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/web-search-provider.mjs'"

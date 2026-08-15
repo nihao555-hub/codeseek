@@ -167,6 +167,8 @@ test('normalizes common Gemini argument aliases', () => {
     '**/*.jsx',
   )
   assert.equal(normalizeToolArguments('skill', { skill: 'ecommerce-store' }).name, 'ecommerce-store')
+  assert.equal(normalizeToolArguments('web_search', { q: 'searxng' }).query, 'searxng')
+  assert.equal(normalizeToolArguments('mcp__web-search__web_fetch', { href: 'https://example.com' }).url, 'https://example.com')
 })
 
 test('parses invoke XML parameters and bare JSON tool calls', () => {
@@ -180,14 +182,25 @@ test('parses invoke XML parameters and bare JSON tool calls', () => {
   assert.equal(bare.calls[0].arguments.file_path, '/workspace/AGENTS.md')
 })
 
-test('protocol forbids native web_search without DeepSeek key', () => {
+test('recovers report tool_call JSON with raw newlines and quotes', () => {
+  const text = `<tool_call> {"name":"report","arguments":{"output":"# 港窑审计
+里面有 "缺陷" 和换行
+"}}`
+  const parsed = parseAssistantToolPayload(text)
+  assert.equal(parsed.calls[0].name, 'report')
+  assert.match(parsed.calls[0].arguments.output, /港窑审计/)
+  assert.match(parsed.calls[0].arguments.output, /缺陷/)
+})
+
+test('protocol tells the model to use official web_search', () => {
   const out = toUpstreamChatBody({
     model: 'gemini-3.5-flash',
-    tools: [{ type: 'function', function: { name: 'write', description: 'write file', parameters: { type: 'object' } } }],
+    tools: [{ type: 'function', function: { name: 'web_search', description: 'search', parameters: { type: 'object' } } }],
     messages: [{ role: 'user', content: 'search something' }],
   })
-  assert.match(out.messages[0].content, /do not call web_search/)
-  assert.match(out.messages[0].content, /mcp__web-search__web_search/)
+  assert.match(out.messages[0].content, /official web_search/)
+  assert.match(out.messages[0].content, /mcp__web-search__web_fetch/)
+  assert.doesNotMatch(out.messages[0].content, /do not call web_search/)
 })
 
 test('parses tool_call blocks that use argument aliases', () => {

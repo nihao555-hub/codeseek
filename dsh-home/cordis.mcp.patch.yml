@@ -90,7 +90,7 @@
           maxAttempts: 10
     - id: mcp-sequential-thinking
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js "!(process.env.MCP_SEQUENTIAL === '1')"
+      disabled: !!js "!(true || process.env.MCP_SEQUENTIAL === '1')"
       config:
         serverName: sequential-thinking
         transport: stdio

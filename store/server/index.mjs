@@ -4,6 +4,7 @@ import { createReadStream, existsSync, statSync } from 'node:fs'
 import { extname, join, dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { allProducts, collections, getBySlug, quoteItems, searchProducts } from './catalog.mjs'
+import { createTeamDesk } from './team.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const dist = join(root, 'client/dist')
@@ -46,7 +47,7 @@ function readJson(req) {
   })
 }
 
-function api(req, res, url, orders, rfqs) {
+function api(req, res, url, orders, rfqs, desk) {
   if (req.method === 'OPTIONS') {
     send(res, 204, '')
     return true
@@ -144,6 +145,18 @@ function api(req, res, url, orders, rfqs) {
       send(res, 201, { id, status: 'queued' })
     }).catch(() => send(res, 400, { error: 'invalid_json' }))
   }
+  if (url.pathname === '/api/team' && req.method === 'GET') {
+    const thread = url.searchParams.get('thread') || 'group'
+    send(res, 200, desk.markRead(thread))
+    return true
+  }
+  if (url.pathname === '/api/team/messages' && req.method === 'POST') {
+    return readJson(req).then((body) => {
+      const out = desk.post({ threadId: body.threadId || 'group', text: body.text })
+      if (out.error) send(res, out.status || 400, out)
+      else send(res, 201, out)
+    }).catch(() => send(res, 400, { error: 'invalid_json' }))
+  }
   return false
 }
 
@@ -163,10 +176,11 @@ function serveStatic(req, res, url) {
 export function createHarborServer() {
   const orders = new Map()
   const rfqs = []
+  const desk = createTeamDesk()
   return http.createServer(async (req, res) => {
     try {
       const url = new URL(req.url || '/', `http://127.0.0.1:${port}`)
-      const handled = api(req, res, url, orders, rfqs)
+      const handled = api(req, res, url, orders, rfqs, desk)
       if (handled === true) return
       if (handled && typeof handled.then === 'function') {
         await handled

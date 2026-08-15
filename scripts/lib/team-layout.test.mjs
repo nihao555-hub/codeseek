@@ -20,6 +20,7 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
     'team/playbooks/social.md',
     'team/playbooks/site.md',
     'team/playbooks/wecom.md',
+    'team/playbooks/tools.md',
     'team/templates/inquiry-reply.en.md',
     'team/templates/quotation.md',
     'team/templates/deal.md',

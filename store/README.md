@@ -26,3 +26,4 @@ NODE_ENV=production npm start   # http://127.0.0.1:8788
 - 结算是演示：内存订单，进程重启即丢失；不接真实支付。
 - 认证只展示 catalog 里已有的 CE / FDA / LFGB，禁止编造。
 - 品牌色：navy `#16324f`、ember `#c45c26`、gold `#b8862b`，不要换成紫渐变 + Inter。
+- 外贸工位页：`/#/team`。左侧总群与队员头像，右侧聊天。`@花名` 派工走 `GET/POST /api/team*`，草稿对照 catalog，不调真实模型、不发邮件。

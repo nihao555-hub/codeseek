@@ -2,7 +2,9 @@
 
 对齐 [网易外贸通 AI 团队](https://waimao.163.com/knowledge/article/1462) 的 **1 个管家 + 四大专家**，交互对齐企业微信：在群里 `@花名` 指派，团员后台执行，用 `report` 往群里汇报进度和报错。
 
-主会话是群，管家坐镇。花名册：`roster.md`。工位剧本：`playbooks/wecom.md`。先读这两份，再读 `company.md`、`crm/leads.md`、`pipeline.md`。产品只信 `/workspace/store/data/catalog.json`。
+主会话是群，管家坐镇。花名册：`roster.md`。工位剧本：`playbooks/wecom.md`。工具箱：`playbooks/tools.md`。先读这三份，再读 `company.md`、`crm/leads.md`、`pipeline.md`。产品只信 `/workspace/store/data/catalog.json`。
+
+可点击的工位 UI 在独立站 `/#/team`（catalog 演示调度）。Harness Web 才是真模型 + `subagent`。
 
 ## 闭环（抄他们的流程，不抄他们没有的数据）
 
@@ -56,7 +58,7 @@ team/
   company.md
   crm/leads.md     # 线索池（营销 + 运营）
   pipeline.md      # 已进入询盘/报价的商机
-  playbooks/       # 含 wecom.md 工位
+  playbooks/       # 含 wecom.md 工位、tools.md 工具箱
   templates/       # 含 member-brief.md 出生信
   deals/           # 单笔成交；真实客户隐私放 deals/local/
 ```

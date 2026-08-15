@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import TeamDesk from './TeamDesk.jsx'
 import { api } from './api.js'
 import { loc, t } from './i18n.js'
 
@@ -94,6 +95,10 @@ export default function App() {
     let cancelled = false
     setLoading(true)
     setError('')
+    if (route === '/team') {
+      setLoading(false)
+      return () => { cancelled = true }
+    }
     if (route.startsWith('/p/')) {
       api.product(route.slice(3))
         .then((d) => { if (!cancelled) setProduct(d.product) })
@@ -180,6 +185,7 @@ export default function App() {
         <nav className="nav">
           <a href="#/shop" onClick={(e) => { e.preventDefault(); go('/shop') }}>{t(lang, 'navShop')}</a>
           <a href="#/wholesale" onClick={(e) => { e.preventDefault(); go('/wholesale') }}>{t(lang, 'navWholesale')}</a>
+          <a href="#/team" onClick={(e) => { e.preventDefault(); go('/team') }}>{t(lang, 'navTeam')}</a>
           <a href="#/track" onClick={(e) => { e.preventDefault(); go('/track') }}>{t(lang, 'navTrack')}</a>
           <a href="#/about" onClick={(e) => { e.preventDefault(); go('/about') }}>{t(lang, 'navAbout')}</a>
           <button className="lang" type="button" onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}>{lang === 'en' ? '中文' : 'EN'}</button>
@@ -187,10 +193,12 @@ export default function App() {
         </nav>
       </header>
 
-      <main className="wrap" id="main">
+      <main className={route === '/team' ? 'desk-page' : 'wrap'} id="main">
         {notice && <p className="ok" role="status">{notice}</p>}
         {error && <p className="warn" role="alert">{error}</p>}
-        {loading && <p className="meta" role="status">{t(lang, 'loading')}</p>}
+        {loading && route !== '/team' && <p className="meta" role="status">{t(lang, 'loading')}</p>}
+
+        {route === '/team' && <TeamDesk lang={lang} />}
 
         {route === '/' && (
           <>
@@ -377,7 +385,7 @@ export default function App() {
         </aside>
       )}
 
-      <footer className="wrap foot">{t(lang, 'footer')}</footer>
+      {route !== '/team' && <footer className="wrap foot">{t(lang, 'footer')}</footer>}
     </>
   )
 }

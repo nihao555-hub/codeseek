@@ -17,4 +17,6 @@
 | @广告 @广告专员 @ads | 广告专员 | `meta-ads` | Meta 广告 |
 | @开发 @dev | 开发 | `software-dev` | 改本仓库代码 |
 
-剧本：`playbooks/wecom.md`。出生提示词：`templates/member-brief.md`。
+剧本：`playbooks/wecom.md`。工具箱：`playbooks/tools.md`（优先 GitHub 官方仓库，不要拉不明许可证的营销包）。出生提示词：`templates/member-brief.md`。
+
+独立站演示工位：`store/` 的 `/#/team`（catalog 调度，不调真实模型）。Harness Web 才是真 `subagent` 派工。

@@ -51,7 +51,7 @@ npm start              # 或 bash scripts/start.sh web
 
 ## 港窑独立站
 
-跨境家居演示站：6 个 SKU、中英切换、MOQ 报价、满 $500 免出口操作费、T/T 订金下单、批发询盘。
+跨境家居演示站：6 个 SKU、中英切换、MOQ 报价、满 $500 免出口操作费、T/T 订金下单、批发询盘。导航「外贸团队」打开 `/#/team`：左侧队员头像 + 外贸开发总群，右侧聊天；`@营销专家` 会按 catalog 出开发信草稿（演示调度，不调真实模型）。
 
 ```bash
 cd store && npm install
@@ -62,7 +62,7 @@ npm run store          # http://127.0.0.1:5173  （API 在 :8788）
 
 ## 外贸团队
 
-默认人设是港窑 **管家**。主会话是企业微信群：输入 `@营销专家 找北欧买家` 指派，团员在后台工位执行，用 `report` 往群里发 `【营销专家】进行中|报错|完成`。花名册 `team/roster.md`，工位剧本 `team/playbooks/wecom.md`。
+默认人设是港窑 **管家**。主会话是企业微信群：输入 `@营销专家 找北欧买家` 指派，团员在后台工位执行，用 `report` 往群里发 `【营销专家】进行中|报错|完成`。花名册 `team/roster.md`，工位剧本 `team/playbooks/wecom.md`，工具箱 `team/playbooks/tools.md`（优先 GitHub 官方仓库）。独立站演示工位：`npm run store` 后打开 http://127.0.0.1:5173/#/team 。
 
 - 线索池 `team/crm/leads.md`
 - 商机看板 `team/pipeline.md`

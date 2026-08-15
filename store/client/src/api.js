@@ -27,4 +27,6 @@ export const api = {
   checkout: (payload) => req('/api/checkout', { method: 'POST', body: JSON.stringify(payload) }),
   order: (id) => req(`/api/orders/${id}`),
   rfq: (payload) => req('/api/rfq', { method: 'POST', body: JSON.stringify(payload) }),
+  team: (thread = 'group') => req(`/api/team?thread=${encodeURIComponent(thread)}`),
+  teamSend: (payload) => req('/api/team/messages', { method: 'POST', body: JSON.stringify(payload) }),
 }

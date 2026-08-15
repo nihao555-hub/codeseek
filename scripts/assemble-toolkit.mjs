@@ -33,7 +33,11 @@ export function loadEnabled() {
 }
 
 export function saveEnabled(enabled) {
-  const next = { mcp: [...new Set(enabled.mcp)].sort(), note: loadEnabled().note }
+  const prev = loadEnabled()
+  const next = {
+    mcp: [...new Set(enabled.mcp)].sort(),
+    note: enabled.note || prev.note || '把要强制打开的 MCP id 放进 mcp 数组，然后 npm run toolkit sync。',
+  }
   writeFileSync(ENABLED_PATH, `${JSON.stringify(next, null, 2)}\n`)
   return next
 }

@@ -1,4 +1,7 @@
 {
-  "mcp": ["web-search"],
-  "note": "把要强制打开的 MCP id 放进 mcp 数组，然后 npm run toolkit sync。web-search 默认打开（SearXNG 开源元搜索，失败则 DuckDuckGo）。无密钥服务也可用 MCP_<FLAG>=1。有密钥的服务在对应 env 有值时会自动打开。"
+  "mcp": [
+    "sequential-thinking",
+    "web-search"
+  ],
+  "note": "把要强制打开的 MCP id 放进 mcp 数组，然后 npm run toolkit sync。web-search 默认打开（SearXNG 开源元搜索，失败则 DuckDuckGo）。sequential-thinking 给管家拆外贸步骤，无密钥。无密钥服务也可用 MCP_<FLAG>=1。有密钥的服务在对应 env 有值时会自动打开。"
 }

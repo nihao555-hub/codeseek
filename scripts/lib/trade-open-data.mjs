@@ -219,11 +219,15 @@ export async function searchFairs(query = {}, opts) {
 export function kickoffPlan({ market, product, text } = {}) {
   const source = `${market || ''} ${product || ''} ${text || ''}`
   const seats = [{ name: '营销专家', skill: 'trade-marketing', why: '公开检索挖客 + 开发信草稿' }]
-  if (/报价|询盘|成交|PI|MOQ/i.test(source)) {
-    seats.push({ name: '报价专员', skill: 'trade-quote', why: '有数量/SKU 再出目录报价' })
+  const namedBuyer = /Kitchenlab|公司\s+\S+|buyer\s+\S+/i.test(source)
+  if (/报价|询盘|成交|PI|MOQ|\d+\s*pcs/i.test(source)) {
+    seats.push({ name: '报价专员', skill: 'trade-quote', why: '只用 catalog SKU 按用户数量报价并写 team/deals/' })
+  }
+  if (/已发出|回了|对方回/.test(source) || namedBuyer) {
+    seats.push({ name: '运营专家', skill: 'trade-ops', why: 'record_reply：点名买家触达改 user-sent/replied' })
   }
   if (/背调|尽调|制裁/i.test(source)) {
-    seats.push({ name: '背调专员', skill: 'trade-dd', why: '公开工商+制裁' })
+    seats.push({ name: '背调专员', skill: 'trade-dd', why: '公开工商+制裁；对象是用户点名的公司' })
   }
   return {
     seats,
@@ -231,10 +235,13 @@ export function kickoffPlan({ market, product, text } = {}) {
     how: [
       '管家立刻 list_agents，没有营销专家就 subagent（description=营销专家），不要等人 @。',
       '一句话回群：已派营销开干。',
-      '营销：search_queries → web_search / open-websearch → web_fetch → upsert_lead。',
+      '营销：search_queries → web_search / open-websearch → web_fetch → upsert_lead（必须 sourceUrl）。',
+      'quote_catalog 只认 store/data/catalog.json。口头「保温杯」应对到 HK-TB-500-SS，禁止 unknown SKU 后改报别的公司。',
+      '用户点名公司+数量：mcp__trade-crm__record_reply，不要给别的线索出 50pcs 试单顶替。',
+      'upsert_deal status=quoted 必须写出 team/deals/<id>.md。',
       '市场体量用 mcp__trade-open-data__comtrade_preview（国家×HS，不是提单）。',
       '展会用 mcp__trade-open-data__list_fairs，再打开官网确认档期。',
-      '用户说每天/每周：schedule_create（every_seconds 至少 300）。必须是加载定时 overlay 之后新建的会话。',
+      '用户说每天/每周：schedule_create（every_seconds 至少 300）。必须是加载港窑外贸插件之后新建的短会话，不要跟在已经很长的工具回合后面。',
     ],
   }
 }

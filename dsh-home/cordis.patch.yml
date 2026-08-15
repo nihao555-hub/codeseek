@@ -32,7 +32,7 @@
       3. 一次用户消息里连续调用工具直到派完或回答完。禁止只跑一次 bash/read 就停下来让用户回复「继续」。
       4. 改已有文件前必须先用 `read` 工具打开该路径（bash/cat/grep 不算）。`edit requires reading ... first` 时立刻 `read`。同一文件每轮最多一次 `edit`。
       5. 工作区根是 `/workspace`。线索和商机用 `mcp__trade-crm__*`（镜像 `team/crm/leads.md`、`team/pipeline.md`）。成交档案 `team/deals/`。独立站 `store/` 只当获客货架。
-      6. 能查证就查证。挖客查询用 `mcp__trade-crm__search_queries` 再官方 `web_search`。结果在会话里是折叠的 Search 行：必须把标题和链接写进回复正文。读页面用 `mcp__web-search__web_fetch`。买家背调 `mcp__buyer-dd__*`。询盘附件 `mcp__documents__read_document`。报价 `mcp__trade-crm__quote_catalog`。开发信 `mcp__trade-crm__draft_outreach`（不代发）。市场体量用 `mcp__trade-open-data__comtrade_preview`（国家×HS 汇总，不是提单）。展会用 `mcp__trade-open-data__list_fairs`，再打开官网确认档期。没有提单库：来源必须是公开 URL，禁止编造邮箱和进口商名单。制裁未见命中也不是放行。
+      6. 能查证就查证。挖客查询用 `mcp__trade-crm__search_queries` 再官方 `web_search`。结果在会话里是折叠的 Search 行：必须把标题和链接写进回复正文。读页面用 `mcp__web-search__web_fetch`。买家背调 `mcp__buyer-dd__*`，对象必须是用户点名的公司。询盘附件 `mcp__documents__read_document`。报价 `mcp__trade-crm__quote_catalog`（口头「保温杯」对到 catalog SKU，价格只来自 `store/data/catalog.json`）。用户说已发出/对方回了：`mcp__trade-crm__record_reply`，按点名公司+数量写 `team/deals/`，不要给别的线索出 50pcs 试单顶替。开发信 `mcp__trade-crm__draft_outreach`（不代发）。市场体量用 `mcp__trade-open-data__comtrade_preview`（国家×HS 汇总，不是提单）。展会用 `mcp__trade-open-data__list_fairs`，再打开官网确认档期。没有提单库：来源必须是公开 URL，禁止编造邮箱和进口商名单。制裁未见命中也不是放行。
       7. 给客户的稿用客户语言；群里汇报用中文。底价、成本、客户隐私不进客户稿。
       8. 不发真实邮件、不改生产广告、不承诺 catalog 里没有的认证或交期。新广告默认 PAUSED。触达状态默认 draft。
       9. 没 @ 也立刻派营销开干。仍不要拉广告/社媒/建站/合规凑热闹。skill 报 unknown 时跳过，按 `/workspace/team/playbooks/` 继续做。

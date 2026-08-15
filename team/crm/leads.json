@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-15T09:34:58.297Z",
+  "updatedAt": "2026-08-15T10:47:59.494Z",
   "leads": [
     {
       "id": "L-2026-001",
@@ -42,6 +42,111 @@
       "sku": "HK-TB-500-SS",
       "email": "",
       "notes": ""
+    },
+    {
+      "id": "L-2026-004",
+      "company": "Prendo AB",
+      "market": "SE",
+      "group": "warm",
+      "source": "Prendo official product/company page",
+      "sourceUrl": "https://www.prendo.se/med-tryck/profilprodukter/termosmuggar/191465064-668126/transcup-500-ml-termosmugg",
+      "touch": "draft",
+      "next": "Pitch HK-TB-500-SS as replacement for discontinued 500ml TransCup; ask about private-label sourcing needs",
+      "due": "2026-08-19",
+      "email": "",
+      "notes": "High relevance. Swedish promotional products and corporate gifts channel. Official page shows a 500ml double-insulated stainless/plastic thermo mug, individually boxed, but marked discontinued. This creates a concrete replacement-product angle. Confidence: high. No contact details invented.",
+      "sku": "HK-TB-500-SS",
+      "updatedAt": "2026-08-15T10:16:41.671Z"
+    },
+    {
+      "id": "L-2026-005",
+      "company": "The Outdoor Agency",
+      "market": "NO",
+      "group": "warm",
+      "source": "The Outdoor Agency official website",
+      "sourceUrl": "https://theoutdooragency.no/",
+      "touch": "draft",
+      "next": "Ask whether they are open to adding private-label insulated drinkware for Nordic outdoor retailers",
+      "due": "2026-08-19",
+      "email": "",
+      "notes": "Norway-based specialist outdoor sales agency established in 2004. Official site explicitly lists Scandinavian/Nordic distribution, importation, logistics, brand representation, and outdoor retail expertise. Strong channel fit, but current portfolio focuses on watersports/outdoor equipment and does not visibly list drinkware. Confidence: medium-high.",
+      "sku": "HK-TB-500-SS",
+      "updatedAt": "2026-08-15T10:16:41.680Z"
+    },
+    {
+      "id": "L-2026-006",
+      "company": "Trade & Distribution Norway",
+      "market": "NO",
+      "group": "nurture",
+      "source": "Trade & Distribution Norway official website",
+      "sourceUrl": "https://tradeanddistribution.no/",
+      "touch": "draft",
+      "next": "Qualify interest in non-food drinkware and foodservice channel before sending product proposal",
+      "due": "2026-08-22",
+      "email": "",
+      "notes": "Official site identifies the company as a Norwegian importer and distributor handling import, logistics, distribution, sales, grocery and foodservice channels, with a non-food category. Excellent importer infrastructure, but visible portfolio is mainly food brands and no insulated cup was confirmed. Confidence: medium.",
+      "sku": "HK-TB-500-SS",
+      "updatedAt": "2026-08-15T10:16:41.688Z"
+    },
+    {
+      "id": "L-2026-007",
+      "company": "The Branding Company",
+      "market": "DK",
+      "group": "warm",
+      "source": "The Branding Company official drinkware page",
+      "sourceUrl": "https://www.thebrandingcompany.dk/en/drinkware",
+      "touch": "draft",
+      "next": "Offer HK-TB-500-SS for custom-logo and corporate-gift programs; position MOQ 50 and laser logo from 200 pcs",
+      "due": "2026-08-19",
+      "email": "",
+      "notes": "High relevance Danish B2B promotional merchandise channel. Official page has 1,429 drinkware items, corporate gifts, tumblers, thermo/travel mugs, and a 500ml double-wall vacuum stainless product. Direct category and buyer-channel match. Confidence: high.",
+      "sku": "HK-TB-500-SS",
+      "updatedAt": "2026-08-15T10:16:41.697Z"
+    },
+    {
+      "id": "L-2026-008",
+      "company": "TTF-International Oy Ltd (Merkkitukku)",
+      "market": "FI",
+      "group": "hot",
+      "source": "Merkkitukku official company page",
+      "sourceUrl": "https://www.merkkitukku.fi/eng/",
+      "touch": "draft",
+      "next": "Send importer/wholesaler-focused introduction and ask for current 500ml vacuum tumbler sourcing brief",
+      "due": "2026-08-19",
+      "email": "",
+      "notes": "Best structural fit. Official site explicitly states it is a Finnish business-gift and promotional-products importer and wholesaler serving registered retailers and leading business-gift companies across Europe, and references factory-volume purchasing. Strong prospect for OEM/private-label supply. Confidence: high.",
+      "sku": "HK-TB-500-SS",
+      "updatedAt": "2026-08-15T10:16:41.707Z"
+    },
+    {
+      "id": "L-2026-009",
+      "company": "HEF Group",
+      "market": "FI",
+      "group": "warm",
+      "source": "HEF official drinkware page",
+      "sourceUrl": "https://www.hef.fi/en/drinkware",
+      "touch": "draft",
+      "next": "Pitch custom-logo 500ml tumbler and ask whether they onboard direct OEM drinkware suppliers",
+      "due": "2026-08-19",
+      "email": "",
+      "notes": "Finnish promotional products and corporate gifts channel. Official drinkware page explicitly offers customized logo mugs, tumblers, water bottles, thermo/travel mugs and outdoor products; catalog shows factory/Asia production context. Exact 500ml tumbler not confirmed on fetched section, but category match is strong. Confidence: high.",
+      "sku": "HK-TB-500-SS",
+      "updatedAt": "2026-08-15T10:16:41.714Z"
+    },
+    {
+      "id": "L-2026-010",
+      "company": "The Icelandic Store",
+      "market": "IS",
+      "group": "nurture",
+      "source": "The Icelandic Store official corporate gifts page",
+      "sourceUrl": "https://icelandicstore.is/pages/corporate-gifts-for-clients-and-employees",
+      "touch": "draft",
+      "next": "Qualify whether imported branded drinkware could be included in conference gift packages",
+      "due": "2026-08-22",
+      "email": "",
+      "notes": "Iceland corporate gift channel serving conferences, corporate events, delegations and groups of 20-200, with customized packages and bulk orders. However, current positioning emphasizes authentic Icelandic goods and the page does not show drinkware/import activity. Low product-fit confidence; retain as nurture only, not an importer claim.",
+      "sku": "HK-TB-500-SS",
+      "updatedAt": "2026-08-15T10:16:41.720Z"
     }
   ]
 }

@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, readlinkSync, rmSync, writeFileS
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { ensureToolkitPanelInstall, TOOLKIT_PANEL_DIR, TOOLKIT_PANEL_PACKAGE } from '../assemble-toolkit.mjs'
+import { ensureHarborTradeInstall, ensureToolkitPanelInstall, HARBOR_TRADE_DIR, HARBOR_TRADE_PACKAGE, TOOLKIT_PANEL_DIR, TOOLKIT_PANEL_PACKAGE } from '../assemble-toolkit.mjs'
 
 const root = join(import.meta.dirname, '../..')
 
@@ -54,6 +54,12 @@ test('ensureToolkitPanelInstall links the package into web profile node_modules'
     assert.equal(manifest.dependencies[TOOLKIT_PANEL_PACKAGE], `file:${TOOLKIT_PANEL_DIR}`)
     assert.equal(existsSync(join(links[0], 'package.json')), true)
     assert.equal(existsSync(join(links[0], 'lib/client.js')), true)
+    const harbor = ensureHarborTradeInstall(home)
+    assert.equal(readlinkSync(harbor[0]), HARBOR_TRADE_DIR)
+    const webManifest = JSON.parse(readFileSync(join(home, 'profiles/web/package.json'), 'utf8'))
+    assert.equal(webManifest.dependencies[HARBOR_TRADE_PACKAGE], `file:${HARBOR_TRADE_DIR}`)
+    const bundle = JSON.parse(readFileSync(join(root, 'plugins/harbor-trade/package.json'), 'utf8'))
+    assert.equal(bundle.dsh.bundle.patch, './cordis.patch.yml')
   } finally {
     rmSync(home, { recursive: true, force: true })
   }

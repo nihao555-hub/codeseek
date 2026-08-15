@@ -11,7 +11,7 @@
 1. **管家** 立刻 `mcp__trade-open-data__kickoff`，加载 `trade-desk`，派 **营销专家**（不要等人 @，也不要自己搜完就停）。有数量/SKU 再加报价专员。先不要派广告/社媒/建站/合规。
 2. **营销** `mcp__trade-crm__search_queries` → 官方 `web_search` → 有公司站再用 `mcp__web-search__web_fetch` → `mcp__trade-crm__upsert_lead`（必须带 sourceUrl）。没公开邮箱就空着。市场体量 `mcp__trade-open-data__comtrade_preview`（国家×HS，不是提单）。展会 `mcp__trade-open-data__list_fairs`。
 3. 对 `hot` 线索 `mcp__trade-crm__draft_outreach`，触达保持 `draft`。把英文稿 `report` 给群，让用户自己发出去。
-4. 用户说「已发出 / 对方回了」→ **运营** 把 touch 改成 `user-sent` / `replied`。有数量和 SKU → `upsert_deal` status=`new`。
+4. 用户说「已发出 / 对方回了」→ **运营** `mcp__trade-crm__record_reply`（点名公司 + 数量）。触达改成 `user-sent` / `replied`。报价文件写 `team/deals/<id>.md`。不要给别的线索出 50pcs 试单顶替。
 5. **询盘 / 报价** 用 `mcp__trade-crm__quote_catalog`，数字只来自 `store/data/catalog.json`。报价后 status=`quoted`，档案写 `team/deals/`。
 6. **背调** 在升 `quoted` 前跑 `mcp__buyer-dd__*`。制裁未见命中不是放行。
 7. 样品 / PI / 订金之后由 **运营** 推 `pipeline` 状态，直到 `shipped`。

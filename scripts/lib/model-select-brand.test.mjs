@@ -17,9 +17,12 @@ test('home patch disables the DeepSeek official adapter', () => {
 })
 
 test('schedule overlay inserts official dsh-schedule for new root sessions', () => {
-  const yaml = readFileSync(join(root, 'plugins/schedule/cordis.patch.yml'), 'utf8')
+  const yaml = readFileSync(join(root, 'plugins/harbor-trade/cordis.patch.yml'), 'utf8')
+  assert.match(yaml, /codeseek-harbor-trade/)
   assert.match(yaml, /@deepseek-ai\/dsh-time-context/)
   assert.match(yaml, /@deepseek-ai\/dsh-schedule/)
+  const manifest = JSON.parse(readFileSync(join(root, 'plugins/harbor-trade/package.json'), 'utf8'))
+  assert.equal(manifest.dsh.bundle.patch, './cordis.patch.yml')
 })
 
 test('settings catalog only lists GRS Gemini and GPT seats', () => {
@@ -82,8 +85,8 @@ test('start.sh puts --patch before web app flags like --port', () => {
   assert.match(sh, /bin\.ts" web "\$\{patches\[@\]\}" "\$@"/)
   assert.match(sh, /patches\+=\(--patch "\$mcp_patch"\)/)
   assert.match(sh, /patches\+=\(--patch "\$ui_patch"\)/)
-  assert.match(sh, /sched_patch=/)
-  assert.match(sh, /patches\+=\(--patch "\$sched_patch"\)/)
+  assert.match(sh, /harbor_patch=/)
+  assert.match(sh, /patches\+=\(--patch "\$harbor_patch"\)/)
   assert.doesNotMatch(sh, /"\$@" --patch/)
 })
 

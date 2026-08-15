@@ -508,6 +508,13 @@
   ],
   "communityPlugins": [
     {
+      "id": "dsh-mcp-manager",
+      "repo": "hyqhyq3/dsh-mcp-manager",
+      "title": "MCP 管理页",
+      "why": "awesome-dsh-plugin 收录。本仓库已有 codeseek-toolkit-panel，不必再装一套设置页。",
+      "install": "不要 dsh plugin add 进 gitignored profile。"
+    },
+    {
       "id": "dsh-at-file",
       "repo": "omdsh-dev/dsh-at-file",
       "title": "@file 提及",

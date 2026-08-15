@@ -159,11 +159,14 @@ export function syncPatch(catalog = loadCatalog(), enabled = loadEnabled()) {
   const yaml = renderMcpPatch(catalog, enabled)
   writeFileSync(PATCH_PATH, yaml)
   ensureToolkitPanelInstall()
+  ensureHarborTradeInstall()
   return PATCH_PATH
 }
 
 export const TOOLKIT_PANEL_PACKAGE = 'codeseek-toolkit-panel'
 export const TOOLKIT_PANEL_DIR = join(ROOT, 'plugins/toolkit-panel')
+export const HARBOR_TRADE_PACKAGE = 'codeseek-harbor-trade'
+export const HARBOR_TRADE_DIR = join(ROOT, 'plugins/harbor-trade')
 
 function ensureSymlink(link, target) {
   mkdirSync(dirname(link), { recursive: true })
@@ -182,26 +185,34 @@ function ensureSymlink(link, target) {
   return link
 }
 
+export function ensureLocalPluginInstall(pkg, dir, home = process.env.DSH_HOME || join(ROOT, 'dsh-home')) {
+  const links = [
+    ensureSymlink(join(home, 'profiles/web/node_modules', pkg), dir),
+    ensureSymlink(join(home, 'profiles/node_modules', pkg), dir),
+  ]
+  const manifestPath = join(home, 'profiles/web/package.json')
+  if (existsSync(manifestPath)) {
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+    const spec = `file:${dir}`
+    manifest.dependencies = manifest.dependencies || {}
+    if (manifest.dependencies[pkg] !== spec) {
+      manifest.dependencies[pkg] = spec
+      writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
+    }
+  }
+  return links
+}
+
 /**
  * Client 半边靠 package.json 的 dsh.client 扫描。overlay 必须用包名，
  * 并且这个包要从 web profile 的 node_modules 解析到。
  */
 export function ensureToolkitPanelInstall(home = process.env.DSH_HOME || join(ROOT, 'dsh-home')) {
-  const links = [
-    ensureSymlink(join(home, 'profiles/web/node_modules', TOOLKIT_PANEL_PACKAGE), TOOLKIT_PANEL_DIR),
-    ensureSymlink(join(home, 'profiles/node_modules', TOOLKIT_PANEL_PACKAGE), TOOLKIT_PANEL_DIR),
-  ]
-  const manifestPath = join(home, 'profiles/web/package.json')
-  if (existsSync(manifestPath)) {
-    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-    const spec = `file:${TOOLKIT_PANEL_DIR}`
-    manifest.dependencies = manifest.dependencies || {}
-    if (manifest.dependencies[TOOLKIT_PANEL_PACKAGE] !== spec) {
-      manifest.dependencies[TOOLKIT_PANEL_PACKAGE] = spec
-      writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
-    }
-  }
-  return links
+  return ensureLocalPluginInstall(TOOLKIT_PANEL_PACKAGE, TOOLKIT_PANEL_DIR, home)
+}
+
+export function ensureHarborTradeInstall(home = process.env.DSH_HOME || join(ROOT, 'dsh-home')) {
+  return ensureLocalPluginInstall(HARBOR_TRADE_PACKAGE, HARBOR_TRADE_DIR, home)
 }
 
 function ensureWhenToUse(markdown, whenToUse) {

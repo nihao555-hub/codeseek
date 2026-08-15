@@ -79,6 +79,7 @@ test('kickoffPlan dispatches marketing immediately and skips ads/social/site', (
   assert.ok(plan.seats.some((row) => row.name === '报价专员'))
   assert.ok(plan.skip.includes('广告专员'))
   assert.match(formatKickoff(plan), /立刻派/)
+  assert.match(formatKickoff(plan), /record_reply/)
 })
 
 test('one sentence without quote keywords only dispatches marketing', () => {

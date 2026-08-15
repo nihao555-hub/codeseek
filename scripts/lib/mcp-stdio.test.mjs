@@ -133,7 +133,7 @@ test('trade-crm MCP speaks NDJSON and lists CRM tools', async () => {
   const replies = await rpcServer('scripts/trade-crm-mcp.mjs', handshake)
   assert.equal(replies[0].result.serverInfo.name, 'trade-crm')
   const names = replies[1].result.tools.map((row) => row.name)
-  for (const id of ['list_leads', 'upsert_lead', 'quote_catalog', 'draft_outreach', 'search_queries']) {
+  for (const id of ['list_leads', 'upsert_lead', 'quote_catalog', 'draft_outreach', 'search_queries', 'record_reply']) {
     assert.ok(names.includes(id), id)
   }
 })

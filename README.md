@@ -55,3 +55,5 @@ npm start              # 或 bash scripts/start.sh web
 插件清单参考 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin)。社区 Cordis 皮肤/宠物/渗透不装；办公/附件类优先复用本仓库 NDJSON MCP，设置 → 插件 → 工具与 MCP 可看可开。
 
 `subagent` 的 description 必须是花名。产品只以 `store/data/catalog.json` 为准。不发真实邮件，不编造海关数据和邮箱。
+
+外贸能力按 DSH **一切皆插件**：组合包 `plugins/harbor-trade`（官方 schedule + 本仓库 MCP）。优先 GitHub 高星 / 官方 API，本仓库只做 NDJSON 包装和 `team/crm/` 落盘。

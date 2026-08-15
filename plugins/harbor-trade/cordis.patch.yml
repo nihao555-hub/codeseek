@@ -1,0 +1,13 @@
+# 港窑外贸组合包。一切皆插件：
+# - 本行 codeseek-harbor-trade 是树外 bundle
+# - time-context / schedule 复用上游官方包（examples/web-schedule）
+# - 获客成交 MCP（trade-crm / trade-open-data / buyer-dd / web-search）由
+#   assemble-toolkit 生成的 dsh-home/cordis.mcp.patch.yml 插入 @deepseek-ai/dsh-mcp-client
+# 定时工具只对加载本 overlay 之后新建的根会话生效。every_seconds 最短 300。
+- insert:
+    - id: codeseek-harbor-trade
+      name: codeseek-harbor-trade
+    - id: time-context
+      name: '@deepseek-ai/dsh-time-context'
+    - id: schedule
+      name: '@deepseek-ai/dsh-schedule'

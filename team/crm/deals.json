@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-15T09:34:58.297Z",
+  "updatedAt": "2026-08-15T10:47:59.494Z",
   "deals": [
     {
       "id": "HK-2026-001",
@@ -11,6 +11,66 @@
       "due": "2026-08-22",
       "file": "deals/HK-2026-001-nordic.md",
       "leadId": "L-2026-001"
+    },
+    {
+      "id": "HK-2026-002",
+      "buyer": "TTF-International Oy Ltd / Merkkitukku",
+      "sku": "HK-TB-500-SS",
+      "qty": 50,
+      "status": "quoted",
+      "next": "Send draft introduction and confirm current 500ml vacuum tumbler sourcing brief; ask whether 50 pcs trial or 200+ pcs logo order is relevant",
+      "due": "2026-08-19",
+      "file": "/workspace/team/deals/L-2026-008-quotation.md",
+      "leadId": "L-2026-008",
+      "updatedAt": "2026-08-15T10:24:37.714Z"
+    },
+    {
+      "id": "L-2026-008",
+      "buyer": "TTF-International Oy Ltd / Merkkitukku",
+      "sku": "HK-TB-500-SS",
+      "qty": 50,
+      "status": "on-hold",
+      "next": "Duplicate record; superseded by primary deal HK-2026-002. Do not follow up from this record.",
+      "due": "2026-08-29",
+      "file": "/workspace/team/deals/L-2026-008-quotation.md",
+      "leadId": "L-2026-008",
+      "updatedAt": "2026-08-15T10:47:59.494Z"
+    },
+    {
+      "id": "HK-2026-003",
+      "buyer": "Prendo AB",
+      "sku": "HK-TB-500-SS",
+      "qty": 50,
+      "status": "quoted",
+      "next": "Present as replacement for discontinued 500ml TransCup; confirm trial quantity, color, packing and private-label requirements",
+      "due": "2026-08-19",
+      "file": "deals/HK-2026-003.md",
+      "leadId": "L-2026-004",
+      "updatedAt": "2026-08-15T10:33:29.143Z"
+    },
+    {
+      "id": "HK-2026-004",
+      "buyer": "The Branding Company",
+      "sku": "HK-TB-500-SS",
+      "qty": 50,
+      "status": "quoted",
+      "next": "Confirm interest in a 50 pcs trial or 200+ pcs custom-logo order; confirm color and gift packing",
+      "due": "2026-08-19",
+      "file": "deals/HK-2026-004.md",
+      "leadId": "L-2026-007",
+      "updatedAt": "2026-08-15T10:33:29.148Z"
+    },
+    {
+      "id": "HK-2026-005",
+      "buyer": "HEF Group",
+      "sku": "HK-TB-500-SS",
+      "qty": 50,
+      "status": "quoted",
+      "next": "Ask whether they onboard direct OEM drinkware suppliers and confirm trial quantity, logo and packing needs",
+      "due": "2026-08-19",
+      "file": "deals/HK-2026-005.md",
+      "leadId": "L-2026-009",
+      "updatedAt": "2026-08-15T10:33:29.154Z"
     }
   ]
 }

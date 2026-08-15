@@ -11,6 +11,7 @@ import {
   listLeads,
   pipelineSummary,
   quoteCatalog,
+  recordReply,
   searchQueries,
   upsertDeal,
   upsertLead,
@@ -88,15 +89,31 @@ const TOOLS = [
   },
   {
     name: 'quote_catalog',
-    description: 'USD quote from store/data/catalog.json. Client draft only; bottom price stays internal.',
+    description: 'USD quote from store/data/catalog.json only. Accepts catalog SKU or a hint like "500ml tumbler"/"保温杯"; never invent prices. Client draft only.',
     inputSchema: {
       type: 'object',
       properties: {
-        sku: { type: 'string', description: 'SKU or product id' },
+        sku: { type: 'string', description: 'Catalog SKU (HK-TB-500-SS) or product hint (500ml tumbler)' },
         qty: { type: 'number' },
         buyer: { type: 'string' },
       },
       required: ['sku', 'qty'],
+    },
+  },
+  {
+    name: 'record_reply',
+    description: 'User said they sent outreach or the buyer replied. Updates touch to user-sent/replied, quotes the NAMED company at the given qty from catalog, writes team/deals/<id>.md. Do not quote other companies instead.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company: { type: 'string' },
+        sku: { type: 'string' },
+        qty: { type: 'number' },
+        touch: { type: 'string', description: 'user-sent | replied' },
+        market: { type: 'string' },
+        text: { type: 'string' },
+      },
+      required: ['company'],
     },
   },
   {
@@ -152,6 +169,15 @@ startStdioMcpServer({
     if (name === 'quote_catalog') {
       const quote = quoteCatalog(args || {})
       return quote.markdown
+    }
+    if (name === 'record_reply') {
+      const out = recordReply(args || {})
+      const quoteText = out.quote?.markdown || out.note || ''
+      return [
+        `lead ${out.lead.id} ${out.lead.company} touch=${out.lead.touch}`,
+        out.deal ? `deal ${out.deal.id} ${out.deal.sku} x${out.deal.qty} ${out.deal.status} file=${out.deal.file}` : '',
+        quoteText,
+      ].filter(Boolean).join('\n')
     }
     if (name === 'draft_outreach') {
       const out = draftOutreach(args || {})

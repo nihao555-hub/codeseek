@@ -24,6 +24,8 @@ LSP `Content-Length` 会让 `dsh-mcp-client` 握手挂死，工具名永远不�
 | 制裁名单 | [opensanctions/opensanctions](https://github.com/opensanctions/opensanctions) | `mcp__buyer-dd__sanctions_search` |
 | 拆步骤 | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) sequential-thinking | `mcp__sequential-thinking__*` |
 | 完整 CRM 产品 | [twentyhq/twenty](https://github.com/twentyhq/twenty)（5 万星，要 Postgres） | **不在本机拉起**。团员落盘只用 `team/crm/*.json` |
+| DSH 插件形态 | 官方 `dsh plugin add` / `@deepseek-ai/dsh-mcp-client` / `dsh-schedule` | 本仓库组合包 `plugins/harbor-trade`（`dsh.bundle`） |
+| 外贸硅基军团 MCP | [WangM-A3/silicon-army-mcp](https://github.com/WangM-A3/silicon-army-mcp) | **不装**。含代发邮件和海关 Demo，和本产品红线冲突 |
 | 市场体量（不是提单） | 联合国 [Comtrade preview](https://comtradeapi.un.org/public/v1/preview/C/A/HS)；轮子 [uncomtrade/comtradeapicall](https://github.com/uncomtrade/comtradeapicall) | `mcp__trade-open-data__comtrade_preview`。国家×HS×年汇总，**没有进口商公司名** |
 | 展会档期 | [LensmorOfficial/trade-show-calendar](https://github.com/LensmorOfficial/trade-show-calendar) 开源 JSON | `mcp__trade-open-data__list_fairs`；失败用 `toolkit/data/trade-shows.json`。仍要打开官网确认 |
 | 办公附件 UI | awesome-dsh：`dsh-files` / `dsh-office-tools` / `dsh-cowork` | 审源码再 overlay；读内容走 `mcp__documents__read_document` |
@@ -101,8 +103,8 @@ Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页�
 ## 团员怎么用（不要发明工具名）
 
 - 营销：`kickoff` 后 `mcp__trade-crm__search_queries` → `web_search` → `mcp__web-search__web_fetch` → `upsert_lead`；开发信 `draft_outreach`（不代发）。市场体量 `mcp__trade-open-data__comtrade_preview`。展会 `list_fairs`。
-- 询盘 / 报价：`mcp__trade-crm__quote_catalog` → `upsert_deal`。数字只来自 `store/data/catalog.json`。
-- 运营：`list_leads` / `list_deals` 分层跟进；触达只允许 draft / user-sent / replied。
+- 询盘 / 报价：`mcp__trade-crm__quote_catalog`（口头品类对 catalog SKU）→ `upsert_deal`（必须写出 `team/deals/<id>.md`）。数字只来自 `store/data/catalog.json`，不是买家官网标价。
+- 运营：用户点名「已发出/回了」用 `mcp__trade-crm__record_reply`；`list_leads` / `list_deals` 分层跟进；触达只允许 draft / user-sent / replied。
 - 背调：`mcp__buyer-dd__company_search` → `mcp__buyer-dd__sanctions_search` → 官网 `web_fetch`。模板 `team/templates/due-diligence.md`。
 - 建站：读 catalog + `webapp-testing` skill；独立站是获客货架，走本仓库 `store/`。
 - 社媒：`trade-social` + 公开检索；不编互动数据、不登录对方后台。

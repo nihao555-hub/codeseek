@@ -110,10 +110,32 @@ export function upsertLead(input, root = workspaceRoot()) {
   return row
 }
 
+export function dealFilePath(row, root = workspaceRoot()) {
+  const raw = String(row.file || `deals/${row.id}.md`).trim()
+  if (!raw) return join(root, 'team/deals', `${row.id}.md`)
+  if (raw.startsWith('/')) return raw
+  if (raw.startsWith('deals/')) return join(root, 'team', raw)
+  if (raw.startsWith('team/')) return join(root, raw)
+  return join(root, 'team/deals', raw)
+}
+
+export function writeDealQuotation(row, root = workspaceRoot()) {
+  if (!row?.sku || !row?.qty) return null
+  const quote = quoteCatalog({ sku: row.sku, qty: row.qty, buyer: row.buyer }, root)
+  const rel = row.file && row.file.startsWith('deals/') ? row.file : `deals/${row.id}.md`
+  row.file = rel
+  row.sku = quote.sku
+  const abs = dealFilePath(row, root)
+  mkdirSync(dirname(abs), { recursive: true })
+  writeFileSync(abs, `${quote.markdown}\n`)
+  return quote
+}
+
 export function upsertDeal(input, root = workspaceRoot()) {
   const crm = loadCrm(root)
   const buyer = clip(input.buyer || input.company, 120)
   if (!buyer) throw new Error('buyer is required')
+  const resolved = input.sku ? resolveProduct(input.sku, root).product : null
   let row = crm.deals.find((item) => item.id === input.id)
   if (!row) {
     row = { id: input.id || nextId('HK', crm.deals) }
@@ -122,7 +144,7 @@ export function upsertDeal(input, root = workspaceRoot()) {
   Object.assign(row, {
     id: row.id,
     buyer,
-    sku: clip(input.sku || row.sku, 40),
+    sku: clip(resolved?.sku || input.sku || row.sku, 40),
     qty: Number(input.qty || row.qty || 0) || 0,
     status: pick(input.status, DEAL_STATUS, row.status || 'new'),
     next: clip(input.next || row.next, 200),
@@ -131,8 +153,50 @@ export function upsertDeal(input, root = workspaceRoot()) {
     leadId: clip(input.leadId || input.lead_id || row.leadId, 40),
     updatedAt: new Date().toISOString(),
   })
+  if (['quoted', 'pi'].includes(row.status) && row.sku && row.qty) {
+    writeDealQuotation(row, root)
+  }
   saveCrm(crm, root)
   return row
+}
+
+/**
+ * 用户说「已发出 / 对方回了」：改触达，并按用户给的数量用 catalog 报价落盘。
+ * 不要改成别的公司的 MOQ 试单。
+ */
+export function recordReply(input = {}, root = workspaceRoot()) {
+  const company = clip(input.company || input.buyer, 120)
+  if (!company) throw new Error('company is required')
+  const touch = pick(input.touch, ['user-sent', 'replied'], /回了|replied/i.test(String(input.text || '')) ? 'replied' : 'user-sent')
+  const qty = Number(input.qty)
+  const skuHintValue = input.sku || input.product || ''
+  const existing = listLeads({ q: company }, root).find((row) => row.company.toLowerCase() === company.toLowerCase())
+    || listLeads({ q: company }, root)[0]
+  const lead = upsertLead({
+    ...(existing || {}),
+    company,
+    market: input.market || existing?.market,
+    sku: skuHintValue || existing?.sku,
+    touch,
+    group: existing?.group === 'nurture' || !existing ? 'hot' : existing.group,
+    source: existing?.source || 'user reply',
+    sourceUrl: existing?.sourceUrl || input.sourceUrl || '',
+    next: clip(input.next || `${qty || ''} pcs quote`.trim(), 200),
+    notes: clip(input.notes || existing?.notes, 400),
+  }, root)
+  if (!Number.isInteger(qty) || qty < 1) {
+    return { lead, deal: null, quote: null, note: 'touch updated; qty missing so no quotation file' }
+  }
+  const quote = quoteCatalog({ sku: skuHintValue || lead.sku, qty, buyer: lead.company }, root)
+  const deal = upsertDeal({
+    buyer: lead.company,
+    sku: quote.sku,
+    qty: quote.qty,
+    status: 'quoted',
+    leadId: lead.id,
+    next: `User-named buyer ${lead.company}: ${quote.qty} pcs ${quote.sku}`,
+  }, root)
+  return { lead, deal, quote }
 }
 
 export function listLeads({ group, market, q } = {}, root = workspaceRoot()) {
@@ -174,6 +238,15 @@ export function pipelineSummary(root = workspaceRoot()) {
   }
 }
 
+function productHay(row) {
+  return [
+    row.sku, row.id, row.slug, row.category,
+    row.name?.en, row.name?.zh,
+    ...(row.specs?.en || []),
+    ...(row.specs?.zh || []),
+  ].join(' ').toLowerCase()
+}
+
 export function findProduct(skuOrId, root = workspaceRoot()) {
   const catalog = loadCatalog(root)
   const key = String(skuOrId || '').trim().toLowerCase()
@@ -181,9 +254,48 @@ export function findProduct(skuOrId, root = workspaceRoot()) {
   return catalog.find((row) => row.sku.toLowerCase() === key || row.id.toLowerCase() === key || row.slug === key) || null
 }
 
+/**
+ * 产品口头描述（保温杯 / 500ml tumbler）对到 catalog SKU，避免 quote_catalog 报 unknown SKU。
+ * 对不上时返回候选，不编价格。
+ */
+export function resolveProduct(skuOrHint, root = workspaceRoot()) {
+  const catalog = loadCatalog(root)
+  const raw = String(skuOrHint || '').trim()
+  const exact = findProduct(raw, root)
+  if (exact) return { product: exact, resolvedFrom: 'sku', candidates: [] }
+  if (!raw) return { product: null, resolvedFrom: '', candidates: catalog }
+  const lower = raw.toLowerCase()
+  const scored = catalog.map((row) => {
+    const hay = productHay(row)
+    let score = 0
+    if (/hk-tb-500|tumbler|保温杯|vacuum|flask|9617/.test(lower) && /tumbler|flask|保温杯/.test(hay)) score += 4
+    if (/tumbler|保温杯|vacuum|flask/.test(lower) && row.category === 'tumbler') score += 5
+    if (/tumbler|保温杯/.test(lower) && row.category === 'gift') score -= 3
+    if (/500\s*ml|500ml/.test(lower) && Number(row.volumeMl) === 500) score += 4
+    if (/500/.test(lower) && /500/.test(hay)) score += 2
+    if (/hk-mg|mug|陶瓷|6912/.test(lower) && /mug|ceramic|陶瓷/.test(hay)) score += 4
+    if (/20oz|590|trail/.test(lower) && /20oz|590|trail/.test(hay)) score += 4
+    if (hay.includes(lower)) score += 5
+    return { row, score }
+  }).filter((item) => item.score > 0).sort((a, b) => b.score - a.score)
+  if (!scored.length) return { product: null, resolvedFrom: '', candidates: catalog }
+  const best = scored[0]
+  const second = scored[1]
+  if (!second || best.score >= second.score + 2) {
+    return { product: best.row, resolvedFrom: 'hint', candidates: scored.slice(1).map((item) => item.row) }
+  }
+  return { product: null, resolvedFrom: '', candidates: scored.map((item) => item.row) }
+}
+
+function skuHint(rows) {
+  return rows.map((row) => `${row.sku} (${row.name?.en || row.id})`).join('; ')
+}
+
 export function quoteCatalog({ sku, qty, buyer = '' } = {}, root = workspaceRoot()) {
-  const product = findProduct(sku, root)
-  if (!product) throw new Error(`unknown SKU: ${sku}`)
+  const { product, candidates } = resolveProduct(sku, root)
+  if (!product) {
+    throw new Error(`unknown SKU: ${sku}. Use a catalog SKU: ${skuHint(candidates.length ? candidates : loadCatalog(root))}`)
+  }
   const count = Number(qty)
   if (!Number.isInteger(count) || count < 1) throw new Error('qty must be a positive integer')
   const lineUsd = Number((product.priceUsd * count).toFixed(2))

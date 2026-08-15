@@ -121,7 +121,7 @@ run_dsh() {
   local tsx_loader="$src/node_modules/tsx/dist/esm/index.mjs"
   local mcp_patch="${DSH_HOME}/cordis.mcp.patch.yml"
   local ui_patch="$ROOT/plugins/toolkit-panel/cordis.patch.yml"
-  local sched_patch="$ROOT/plugins/schedule/cordis.patch.yml"
+  local harbor_patch="$ROOT/plugins/harbor-trade/cordis.patch.yml"
   if [[ -f "$src/apps/cli/src/bin.ts" && -f "$tsx_loader" ]]; then
     # 绝对导入 tsx，并钉死 Harness 的 tsconfig，这样 cwd 可以是仓库根。
     export TSX_TSCONFIG_PATH="${TSX_TSCONFIG_PATH:-$src/tsconfig.json}"
@@ -133,13 +133,13 @@ run_dsh() {
       local patches=()
       if [[ -f "$mcp_patch" ]]; then patches+=(--patch "$mcp_patch"); fi
       if [[ -f "$ui_patch" ]]; then patches+=(--patch "$ui_patch"); fi
-      if [[ -f "$sched_patch" ]]; then patches+=(--patch "$sched_patch"); fi
+      if [[ -f "$harbor_patch" ]]; then patches+=(--patch "$harbor_patch"); fi
       exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" web "${patches[@]}" "$@"
     fi
-    # headless：MCP + 定时。不要给无界面会话挂 toolkit-panel UI overlay。
+    # headless：MCP + 港窑外贸组合包（含官方 schedule）。不要给无界面会话挂 toolkit-panel UI overlay。
     local patches=()
     if [[ -f "$mcp_patch" ]]; then patches+=(--patch "$mcp_patch"); fi
-    if [[ -f "$sched_patch" ]]; then patches+=(--patch "$sched_patch"); fi
+    if [[ -f "$harbor_patch" ]]; then patches+=(--patch "$harbor_patch"); fi
     if ((${#patches[@]})); then
       exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" "${patches[@]}" "$@"
     fi

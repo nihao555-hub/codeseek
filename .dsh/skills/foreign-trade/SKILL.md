@@ -23,6 +23,7 @@ whenToUse: 任何跨境销售、@团员、挖客、询盘、报价、跟单、�
 | inbound 询盘 | 询盘专员 | `trade-inquiry` | `team/playbooks/inquiry.md` |
 | 报价 / PI | 报价专员 | `trade-quote` | `team/playbooks/quote.md` |
 | 认证 / 法规 | 合规专员 | `trade-compliance` | `team/playbooks/compliance.md` |
+| 买家背调 / 尽调 | 背调专员 | `trade-dd` | `team/playbooks/due-diligence.md` |
 | 广告 | 广告专员 | `meta-ads` | 广告 skill |
 | 改代码 | 开发 | `software-dev` | — |
 

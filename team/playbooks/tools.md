@@ -7,9 +7,11 @@
 
 | 工具 | 来源 | 作用 | 默认 |
 |---|---|---|---|
-| web-search | `@modelcontextprotocol/server-brave-search` 包装；无 Brave key 时走 SearXNG → DuckDuckGo | 买家、展会、竞品公开检索 | 开 |
-| web_fetch | DeepSeek Harness 内置 MCP | 打开买家官网、目录页 | 开（Harness） |
-| trade-desk / foreign-trade / trade-marketing / trade-social / harbor-kiln | 本仓库 `.dsh/skills` | 工位派工、港窑人设 | 开 |
+| web-search | 本仓库 `scripts/web-search-mcp.mjs`；SearXNG → DuckDuckGo | 买家、展会、竞品公开检索 | 开 |
+| web_fetch | `mcp__web-search__web_fetch`（官方 web_fetch 关） | 打开买家官网、目录页 | 开 |
+| buyer-dd | OpenCorporates API + OpenSanctions API（GitHub 公开项目） | 工商检索、制裁名单 | 开 |
+| sequential-thinking | `github.com/modelcontextprotocol/servers` | 管家拆步骤 | 开 |
+| trade-desk / foreign-trade / trade-marketing / trade-dd / … | 本仓库 `.dsh/skills` | 工位派工、港窑人设、公开源背调 | 开 |
 | doc-coauthoring / pdf / pptx / xlsx | `github.com/anthropics/skills` | 报价表、画册、介绍信 | 按许可证；docx/pdf/pptx/xlsx **默认不拉**，要办公套件再 `fetch-skills --include-restricted` |
 | webapp-testing | `github.com/anthropics/skills` | 独立站走查 | 已拉 |
 | internal-comms | `github.com/anthropics/skills` | 对内简报 | 已拉 |
@@ -17,12 +19,9 @@
 
 ## 建议打开（无密钥）
 
-```bash
-npm run toolkit -- enable sequential-thinking
-```
+`sequential-thinking` 与 `buyer-dd` 已写入 `toolkit/enabled.json`。
 
-GitHub：`https://github.com/modelcontextprotocol/servers` → `src/sequentialthinking`  
-给管家拆「先查买家再写开发信」的步骤，减少一次把整封信写完却没核过 catalog。
+给管家拆「先查买家再写开发信」的步骤；背调用工商库 + 制裁名单，**仍然没有海关提单**。
 
 ## 有密钥再开
 
@@ -43,7 +42,8 @@ GitHub：`https://github.com/modelcontextprotocol/servers` → `src/sequentialth
 
 ## 团员怎么用（不要发明工具名）
 
-- 营销 / 询盘：`web_search` → `web_fetch` → 对照 `store/data/catalog.json` 写开发信，草稿进 `team/outbox/`。
+- 营销 / 询盘：`web_search` → `mcp__web-search__web_fetch` → 对照 `store/data/catalog.json` 写开发信，草稿进 `team/outbox/`。
+- 背调：`mcp__buyer-dd__company_search` → `mcp__buyer-dd__sanctions_search` → 官网 `web_fetch`。模板 `team/templates/due-diligence.md`。
 - 建站：读 catalog + `webapp-testing` skill；改独立站走本仓库 `store/`。
 - 社媒：`trade-social` + 公开检索；不编互动数据。
 - 广告：仅在 Meta MCP 就绪时用官方工具；否则只出文案草稿。

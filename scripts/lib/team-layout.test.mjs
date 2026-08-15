@@ -21,6 +21,8 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
     'team/playbooks/site.md',
     'team/playbooks/wecom.md',
     'team/playbooks/tools.md',
+    'team/playbooks/due-diligence.md',
+    'team/templates/due-diligence.md',
     'team/templates/inquiry-reply.en.md',
     'team/templates/quotation.md',
     'team/templates/deal.md',
@@ -44,6 +46,7 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
   assert.match(readme, /@营销专家/)
   const roster = readFileSync(join(root, 'team/roster.md'), 'utf8')
   assert.match(roster, /营销专家/)
+  assert.match(roster, /背调专员/)
   assert.match(roster, /subagent/)
   const pipeline = readFileSync(join(root, 'team/pipeline.md'), 'utf8')
   assert.match(pipeline, /HK-2026-001/)

@@ -62,7 +62,7 @@ npm run store          # http://127.0.0.1:5173  （API 在 :8788）
 
 ## 外贸团队
 
-默认人设是港窑 **管家**。主会话是企业微信群：输入 `@营销专家 找北欧买家` 指派，团员在后台工位执行，用 `report` 往群里发 `【营销专家】进行中|报错|完成`。花名册 `team/roster.md`，工位剧本 `team/playbooks/wecom.md`，工具箱 `team/playbooks/tools.md`（优先 GitHub 官方仓库）。独立站演示工位：`npm run store` 后打开 http://127.0.0.1:5173/#/team 。
+默认人设是港窑 **管家**。主会话是企业微信群：输入 `@营销专家 找北欧买家` 指派，团员在后台工位执行，用 `report` 往群里发 `【营销专家】进行中|报错|完成`。花名册 `team/roster.md`，工位剧本 `team/playbooks/wecom.md`，工具箱 `team/playbooks/tools.md`（优先 GitHub 官方仓库）。独立站微信式工位：`npm run store` 后打开 http://127.0.0.1:5173/#/team 。买家背调走公开源 `mcp__buyer-dd__*`，没有海关提单库。
 
 - 线索池 `team/crm/leads.md`
 - 商机看板 `team/pipeline.md`

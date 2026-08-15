@@ -24,6 +24,7 @@
     { "id": "trade-ops", "kind": "local", "group": "business" },
     { "id": "trade-social", "kind": "local", "group": "business" },
     { "id": "trade-compliance", "kind": "local", "group": "business" },
+    { "id": "trade-dd", "kind": "local", "group": "business" },
     { "id": "meta-ads", "kind": "local", "group": "business" },
     { "id": "software-dev", "kind": "local", "group": "engineering" },
     { "id": "ecommerce-store", "kind": "local", "group": "store" },
@@ -174,6 +175,17 @@
       },
       "enableWhen": { "flag": "MCP_WEB_SEARCH" },
       "docs": "https://github.com/searxng/searxng"
+    },
+    {
+      "id": "buyer-dd",
+      "title": "公开源买家背调",
+      "description": "OpenCorporates 公司检索 + OpenSanctions 制裁名单。不是海关提单。工具名 mcp__buyer-dd__company_search / mcp__buyer-dd__sanctions_search。",
+      "transport": "stdio",
+      "serverName": "buyer-dd",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/buyer-dd-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_BUYER_DD" },
+      "docs": "https://github.com/opencorporates/api-documentation"
     },
     {
       "id": "github",

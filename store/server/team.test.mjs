@@ -8,6 +8,7 @@ test('parseMentions and suggestAssignee map roster handles', () => {
   assert.deepEqual(parseMentions('@营销 和 @报价专员'), ['marketing', 'quote'])
   assert.equal(suggestAssignee('写一封开发信'), 'marketing')
   assert.equal(suggestAssignee('HK-TB-500-SS 的 FDA'), 'compliance')
+  assert.equal(suggestAssignee('先背调这家瑞典进口商'), 'dd')
 })
 
 test('group @mention posts reports in the group and a private draft', () => {

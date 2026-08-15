@@ -14,6 +14,7 @@
 | @询盘 @询盘专员 @inquiry | 询盘专员 | `trade-inquiry` | inbound 回复 |
 | @报价 @报价专员 @quote | 报价专员 | `trade-quote` | USD 报价 |
 | @合规 @合规专员 @compliance | 合规专员 | `trade-compliance` | 认证、法规 |
+| @背调 @背调专员 @dd | 背调专员 | `trade-dd` | 公开源尽调（工商 + 制裁，无海关库） |
 | @广告 @广告专员 @ads | 广告专员 | `meta-ads` | Meta 广告 |
 | @开发 @dev | 开发 | `software-dev` | 改本仓库代码 |
 

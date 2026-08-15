@@ -96,6 +96,16 @@ export const TEAM_MEMBERS = [
     skill: 'trade-compliance',
   },
   {
+    id: 'dd',
+    kind: 'dm',
+    name: '背调专员',
+    title: '公开源尽调',
+    handle: '@背调专员',
+    initials: '调',
+    tone: 'gold',
+    skill: 'trade-dd',
+  },
+  {
     id: 'ads',
     kind: 'dm',
     name: '广告专员',
@@ -133,6 +143,7 @@ export function parseMentions(text) {
 
 export function suggestAssignee(text) {
   const source = String(text || '')
+  if (/背调|尽调|OFAC|空壳|工商|制裁|opencorporates/i.test(source)) return 'dd'
   if (/开发信|挖客|进口商|cold\s*mail|outreach|linkedin/i.test(source)) return 'marketing'
   if (/报价|MOQ|FOB|PI\b|单价/i.test(source)) return 'quote'
   if (/询盘|回复邮件|whatsapp inbound/i.test(source)) return 'inquiry'
@@ -187,6 +198,16 @@ function draftFor(memberId, text) {
   }
   if (memberId === 'compliance') {
     return `${product.sku} 目录认证：${product.certs.join(' / ') || '无'}。没有的证书写 TBD, factory confirm，不编。`
+  }
+  if (memberId === 'dd') {
+    return [
+      `公开源背调草稿（不是海关提单）· 对照 ${product.sku}`,
+      '1. mcp__buyer-dd__company_search 查公司英文名 / 本地名',
+      '2. mcp__buyer-dd__sanctions_search 查 OFAC / EU / UN 名单；命中只写 possible match',
+      '3. web_search + web_fetch 官网 / 登记机关 / 展会名录',
+      '4. 模板 team/templates/due-diligence.md；未知写 TBD',
+      '没有提单、货值、供应商列表。不要编。',
+    ].join('\n')
   }
   if (memberId === 'ops') {
     return '看板 HK-2026-001 Nordic Home Co. 现为 quoted，下一步等镭雕与样品地址（2026-08-22）。线索池见 team/crm/leads.md。'

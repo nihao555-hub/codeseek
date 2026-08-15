@@ -1,13 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from './api.js'
 
-function Avatar({ member }) {
+function clock(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
+function Avatar({ member, size = 40 }) {
   return (
-    <span className={`desk-avatar tone-${member.tone}`} aria-hidden="true">{member.initials}</span>
+    <span
+      className={`wx-avatar tone-${member?.tone || 'navy'}`}
+      style={{ width: size, height: size, fontSize: size > 36 ? 15 : 13 }}
+      aria-hidden="true"
+    >
+      {member?.initials || '?'}
+    </span>
   )
 }
 
-export default function TeamDesk({ lang }) {
+export default function TeamDesk({ lang, onBack, onToggleLang }) {
   const [desk, setDesk] = useState(null)
   const [draft, setDraft] = useState('')
   const [error, setError] = useState('')
@@ -58,77 +71,86 @@ export default function TeamDesk({ lang }) {
   }
 
   if (!desk) {
-    return <p className="meta" role="status">{lang === 'zh' ? '正在打开工位…' : 'Opening the trade desk…'}</p>
+    return <p className="wx-loading" role="status">{lang === 'zh' ? '正在进入微信工位…' : 'Opening WeChat-style desk…'}</p>
   }
 
   return (
-    <section className="desk" aria-label={lang === 'zh' ? '外贸专家团队' : 'Trade desk'}>
-      <aside className="desk-rail" aria-label={lang === 'zh' ? '会话列表' : 'Conversations'}>
-        <div className="desk-rail-head">
-          <strong>{lang === 'zh' ? '外贸专家团队' : 'Trade desk'}</strong>
-          <span>{lang === 'zh' ? '总群 + 队员工位' : 'Group + member seats'}</span>
+    <section className="wx" aria-label={lang === 'zh' ? '外贸专家团队' : 'Trade desk'}>
+      <aside className="wx-rail" aria-label={lang === 'zh' ? '会话列表' : 'Conversations'}>
+        <div className="wx-rail-head">
+          <button type="button" className="wx-back" onClick={onBack}>{lang === 'zh' ? '返回' : 'Back'}</button>
+          <strong>{lang === 'zh' ? '微信' : 'WeChat'}</strong>
+          <button type="button" className="wx-lang" onClick={onToggleLang}>{lang === 'en' ? '中文' : 'EN'}</button>
         </div>
-        <ul className="desk-list">
+        <div className="wx-search" aria-hidden="true">{lang === 'zh' ? '搜索' : 'Search'}</div>
+        <ul className="wx-list">
           {desk.threads.map((row) => (
             <li key={row.id}>
               <button
                 type="button"
-                className={`desk-row ${row.id === active ? 'on' : ''}`}
+                className={`wx-row ${row.id === active ? 'on' : ''}`}
                 onClick={() => openThread(row.id)}
               >
-                <Avatar member={row} />
-                <span className="desk-row-copy">
-                  <b>{row.name}</b>
+                <span className="wx-avatar-wrap">
+                  <Avatar member={row} />
+                  {row.unread > 0 && <span className="wx-badge">{row.unread > 99 ? '99+' : row.unread}</span>}
+                </span>
+                <span className="wx-row-copy">
+                  <span className="wx-row-top">
+                    <b>{row.name}</b>
+                    <time>{clock(row.lastAt)}</time>
+                  </span>
                   <em>{row.lastPreview || row.title}</em>
                 </span>
-                {row.unread > 0 && <span className="desk-badge">{row.unread}</span>}
               </button>
             </li>
           ))}
         </ul>
       </aside>
 
-      <div className="desk-main">
-        <header className="desk-chat-head">
-          <Avatar member={current || desk.threads[0]} />
-          <div>
-            <h2>{current?.name}</h2>
-            <p>{current?.kind === 'group'
-              ? (lang === 'zh' ? '在这里 @花名 指派。团员会汇报到总群，详细稿进工位。' : 'Mention a teammate with @. They report in the group; drafts land in their seat.')
-              : `${current?.title} · ${current?.handle}`}</p>
-          </div>
+      <div className="wx-main">
+        <header className="wx-chat-head">
+          <h2>{current?.kind === 'group' ? (current?.name || '外贸开发总群') : current?.name}</h2>
+          <p>{current?.kind === 'group'
+            ? (lang === 'zh' ? '群聊 · @队员派工，进度回总群' : 'Group · @ a teammate to assign')
+            : `${current?.title}`}</p>
         </header>
 
-        <div className="desk-log" ref={logRef} role="log" aria-live="polite">
+        <div className="wx-log" ref={logRef} role="log" aria-live="polite">
           {(desk.messages || []).map((row) => (
-            <article key={row.id} className={`desk-bubble kind-${row.kind}`}>
-              <span className="desk-who">{row.fromName}</span>
-              <pre>{row.text}</pre>
+            <article key={row.id} className={`wx-msg kind-${row.kind}`}>
+              {row.kind !== 'you' && <Avatar member={desk.threads.find((t) => t.id === row.fromId) || { initials: row.fromName?.slice(0, 1), tone: 'navy' }} />}
+              <div className="wx-col">
+                {row.kind !== 'you' && <span className="wx-who">{row.fromName}</span>}
+                <div className="wx-bubble"><pre>{row.text}</pre></div>
+                <time>{clock(row.at)}</time>
+              </div>
+              {row.kind === 'you' && <Avatar member={{ initials: lang === 'zh' ? '我' : 'Me', tone: 'green' }} />}
             </article>
           ))}
         </div>
 
         {current?.kind === 'group' && (
-          <div className="desk-mentions" aria-label="@">
+          <div className="wx-mentions" aria-label="@">
             {desk.threads.filter((row) => row.kind === 'dm' && row.id !== 'lead').map((row) => (
-              <button key={row.id} type="button" className="desk-chip" onClick={() => mention(row.handle)}>
+              <button key={row.id} type="button" className="wx-chip" onClick={() => mention(row.handle)}>
                 {row.handle}
               </button>
             ))}
           </div>
         )}
 
-        {error && <p className="warn" role="alert">{error}</p>}
+        {error && <p className="wx-warn" role="alert">{error}</p>}
 
-        <form className="desk-composer" onSubmit={(e) => { e.preventDefault(); send() }}>
-          <label className="skip" htmlFor="desk-input">{lang === 'zh' ? '消息' : 'Message'}</label>
+        <form className="wx-composer" onSubmit={(e) => { e.preventDefault(); send() }}>
+          <label className="skip" htmlFor="wx-input">{lang === 'zh' ? '消息' : 'Message'}</label>
           <textarea
-            id="desk-input"
-            rows={3}
+            id="wx-input"
+            rows={2}
             value={draft}
             placeholder={current?.kind === 'group'
               ? (lang === 'zh' ? '@营销专家 找北欧买家…' : '@营销专家 find Nordic buyers…')
-              : (lang === 'zh' ? `私聊 ${current?.name}` : `Message ${current?.name}`)}
+              : (lang === 'zh' ? `发消息给 ${current?.name}` : `Message ${current?.name}`)}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -137,7 +159,7 @@ export default function TeamDesk({ lang }) {
               }
             }}
           />
-          <button className="btn" type="submit" disabled={busy || !draft.trim()}>
+          <button className="wx-send" type="submit" disabled={busy || !draft.trim()}>
             {lang === 'zh' ? '发送' : 'Send'}
           </button>
         </form>

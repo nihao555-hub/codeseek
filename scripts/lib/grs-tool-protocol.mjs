@@ -4,6 +4,8 @@
  */
 
 const TOOL_CALL_RE = /<tool_call\b[^>]*>([\s\S]*?)<\/tool_call>/gi
+const FUNCTION_CALL_RE = /<function_call\b[^>]*>([\s\S]*?)<\/function_call>/gi
+const HERMES_FN_RE = /<function=([A-Za-z0-9_.-]+)>([\s\S]*?)<\/function>/gi
 const INVOKE_RE = /<invoke\b[^>]*name\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/invoke>/gi
 const FENCE_RE = /```(?:tool_call|toolcall|json)\s*\n([\s\S]*?)```/gi
 
@@ -88,6 +90,73 @@ export const EMPTY_COMPLETION_FALLBACK = [
   '上一轮模型完成了但没有可见正文（常见于 gpt-5.6-sol 把字写进思考栏）。',
   '请再发一次同样的任务，或改用 gemini-3.5-flash。',
 ].join('')
+
+export const TOOL_SKIP_NUDGE = [
+  '[runtime] Your last completion had no executable <tool_call> block.',
+  'This gateway cannot run tools from prose, hidden reasoning, or "I will now…" sentences.',
+  'Immediately emit one or more <tool_call> JSON blocks using the available tools.',
+  'Typical first calls: skill, read, web_search, list_agents, bash.',
+  'Do not apologize. Do not recap the plan without a tool call.',
+].join(' ')
+
+const CHAT_ONLY_RE = /^(你好|您好|嗨|哈喽|在吗|谢谢|thanks|thank you|ok|okay|嗯|好的|hi|hello|hey)[\s!！。.?？~]*$/i
+const AGENT_TASK_RE = /@|找客|挖客|背调|尽调|搜|搜索|报价|询盘|开发信|独立站|改代码|实现|修复|读取|打开|写入|派|web_search|SKU|MOQ|买家|进口商|海关|OFAC|工商|制裁|read |write |search |fix |build |implement |dispatch |subagent|catalog/i
+const SKIPPED_TOOL_TALK_RE = /I('ll| will) (now )?(search|read|call|use|check|look)|let me (search|read|check|look|use)|我(先|来|将|这就)?(搜索|检索|读取|调用|用工具|查一下|打开)|使用\s*(web_search|bash|read|skill)|calling (the )?\w+ tool|接下来(我)?(会|将)(调用|使用)/i
+
+/**
+ * @param {unknown[]} messages
+ */
+export function lastUserText(messages) {
+  const list = Array.isArray(messages) ? messages : []
+  for (let i = list.length - 1; i >= 0; i -= 1) {
+    const message = list[i]
+    if (!message || message.role !== 'user') continue
+    const text = asText(message.content)
+    if (text.includes('<tool_result')) continue
+    return text
+  }
+  return ''
+}
+
+/**
+ * 用户这句像要干活（搜、读、派工），而不是寒暄。
+ * @param {unknown[]} messages
+ */
+export function userTurnExpectsTools(messages) {
+  if (lastTurnIsToolResult(messages)) return false
+  const text = lastUserText(messages).trim()
+  if (!text || CHAT_ONLY_RE.test(text)) return false
+  return AGENT_TASK_RE.test(text) || text.length > 48
+}
+
+/**
+ * 模型在说话「我去搜/读」，但没吐出可执行的 tool_call。
+ * @param {string} content
+ */
+export function looksLikeSkippedToolCall(content) {
+  const text = String(content || '')
+  if (!text.trim()) return true
+  return SKIPPED_TOOL_TALK_RE.test(text)
+}
+
+/**
+ * @param {{ rewrite: boolean, messages?: unknown[], calls?: unknown[], content?: string }} input
+ */
+export function shouldRetryMissingToolCalls({ rewrite, messages, calls, content } = {}) {
+  if (!rewrite) return false
+  if (Array.isArray(calls) && calls.length > 0) return false
+  if (!userTurnExpectsTools(messages)) return false
+  return true
+}
+
+/**
+ * @param {Record<string, unknown>} body
+ */
+export function nudgeToolSkipRetry(body) {
+  const next = { ...body, messages: [...(Array.isArray(body.messages) ? body.messages : [])] }
+  next.messages.push({ role: 'user', content: TOOL_SKIP_NUDGE })
+  return next
+}
 
 /**
  * @param {Record<string, unknown>} body
@@ -190,7 +259,7 @@ function assignCanonical(out, canonical, aliases) {
  */
 export const TEAM_ROSTER_LABELS = [
   '管家', '营销专家', '运营专家', '建站专家', '社媒专家',
-  '询盘专员', '报价专员', '合规专员', '广告专员', '开发',
+  '询盘专员', '报价专员', '合规专员', '背调专员', '广告专员', '开发',
 ]
 
 const TEAM_ROSTER_ALIASES = {
@@ -208,6 +277,9 @@ const TEAM_ROSTER_ALIASES = {
   quote: '报价专员',
   合规: '合规专员',
   compliance: '合规专员',
+  背调: '背调专员',
+  dd: '背调专员',
+  尽调: '背调专员',
   广告: '广告专员',
   ads: '广告专员',
   开发: '开发',
@@ -403,7 +475,27 @@ export function parseAssistantToolPayload(text) {
   }
 
   if (calls.length === 0) {
-    const dangling = source.match(/<tool_call\b[^>]*>([\s\S]*)$/i)
+    for (const match of source.matchAll(FUNCTION_CALL_RE)) {
+      const call = parseCallBody(match[1], match[0])
+      if (call) {
+        calls.push(call)
+        used.push(match[0])
+      }
+    }
+  }
+
+  if (calls.length === 0) {
+    for (const match of source.matchAll(HERMES_FN_RE)) {
+      const call = parseCallBody(match[2], `name="${match[1]}"`)
+      if (call) {
+        calls.push(call)
+        used.push(match[0])
+      }
+    }
+  }
+
+  if (calls.length === 0) {
+    const dangling = source.match(/<(?:tool_call|function_call)\b[^>]*>([\s\S]*)$/i)
     if (dangling) {
       const call = parseCallBody(dangling[1], dangling[0])
       if (call) {
@@ -475,6 +567,7 @@ export const TOOL_CONTINUE_HINT = [
   'If skill is unknown, skip it and keep implementing under /workspace/store/.',
   'Prefer official web_search for live lookup (SearXNG, then DuckDuckGo).',
   'Official web_fetch is disabled; fetch URLs with mcp__web-search__web_fetch.',
+  'Buyer due diligence: mcp__buyer-dd__company_search and mcp__buyer-dd__sanctions_search; never invent customs B/L.',
   'Harbor Kiln team: @member means list_agents then send_message or subagent. subagent description must be the roster 花名 (营销专家, not the task summary). Members report with 【花名】进行中|报错|完成.',
 ].join(' ')
 
@@ -534,12 +627,14 @@ export function buildToolProtocolPrompt(tools) {
   }).join('\n')
   return [
     'You are in a multi-step agent loop. One user message can require many tool rounds.',
-    'When a tool is required, emit one or more <tool_call> blocks, then stop generating.',
+    'Hidden reasoning / thinking is discarded and is NOT a tool call.',
+    'When a tool is required, the visible completion MUST contain one or more <tool_call> JSON blocks, then stop generating.',
     '"Stop generating" only ends this model completion. The runtime will run the tools and call you again with <tool_result>.',
     'After <tool_result>, continue the same task with more <tool_call> blocks. Do not wait for the human.',
     'Never ask the user to reply 继续 / continue so you can write files or run the next command.',
     'Never stop after a single ls/read/bash inspection if the user asked you to implement, fix, or build something.',
     'Do not claim you already read a file or ran a command unless a <tool_result> is in this conversation.',
+    'If the user asked to search, read files, due-diligence a buyer, dispatch teammates, or change the repo, you MUST call a tool in this completion. Prose plans are not executed.',
     'Exact format:',
     '<tool_call>',
     '{"name": "TOOL_NAME", "arguments": { }}',
@@ -550,6 +645,7 @@ export function buildToolProtocolPrompt(tools) {
     '- bash requires command and description (5-10 words; description is shown in the UI)',
     '- glob requires pattern; skill requires name',
     '- search the web with official web_search (SearXNG, then DuckDuckGo). Official web_fetch is off; fetch URLs with mcp__web-search__web_fetch',
+    '- buyer due diligence: OpenCorporates / OpenSanctions via mcp__buyer-dd__* plus web_search; never invent customs bills of lading',
     '- if the user @s a Harbor Kiln teammate, list_agents then send_message or subagent; do not do that person\'s job yourself',
     '- subagent description MUST be the roster 花名 (营销专家 / 建站专家 / …), never a task summary; that label is the sidebar and @ picker name',
     '- teammates report with report output like 【营销专家】进行中：… including errors',
@@ -665,6 +761,9 @@ export function toUpstreamChatBody(body) {
   delete out.parallel_tool_calls
   delete out.functions
   delete out.function_call
+  if (useProtocol && isReasoningModel(out.model) && out.reasoning_effort == null) {
+    out.reasoning_effort = 'low'
+  }
   return out
 }
 

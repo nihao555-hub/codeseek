@@ -37,6 +37,22 @@
           initialDelayMs: 1000
           maxDelayMs: 30000
           maxAttempts: 10
+    - id: mcp-buyer-dd
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js "!(true || process.env.MCP_BUYER_DD === '1')"
+      config:
+        serverName: buyer-dd
+        transport: stdio
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+        command: node
+        args:
+          - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/buyer-dd-mcp.mjs'"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
     - id: mcp-github
       name: '@deepseek-ai/dsh-mcp-client'
       disabled: !!js "!(process.env.MCP_GITHUB === '1' || Boolean(process.env.GITHUB_TOKEN) || Boolean(process.env.GITHUB_PERSONAL_ACCESS_TOKEN))"

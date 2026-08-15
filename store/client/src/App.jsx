@@ -173,6 +173,16 @@ export default function App() {
     }
   }
 
+  if (route === '/team') {
+    return (
+      <TeamDesk
+        lang={lang}
+        onBack={() => go('/')}
+        onToggleLang={() => setLang(lang === 'en' ? 'zh' : 'en')}
+      />
+    )
+  }
+
   return (
     <>
       <a className="skip" href="#main">{t(lang, 'skip')}</a>
@@ -193,12 +203,10 @@ export default function App() {
         </nav>
       </header>
 
-      <main className={route === '/team' ? 'desk-page' : 'wrap'} id="main">
+      <main className="wrap" id="main">
         {notice && <p className="ok" role="status">{notice}</p>}
         {error && <p className="warn" role="alert">{error}</p>}
-        {loading && route !== '/team' && <p className="meta" role="status">{t(lang, 'loading')}</p>}
-
-        {route === '/team' && <TeamDesk lang={lang} />}
+        {loading && <p className="meta" role="status">{t(lang, 'loading')}</p>}
 
         {route === '/' && (
           <>
@@ -385,7 +393,7 @@ export default function App() {
         </aside>
       )}
 
-      {route !== '/team' && <footer className="wrap foot">{t(lang, 'footer')}</footer>}
+      <footer className="wrap foot">{t(lang, 'footer')}</footer>
     </>
   )
 }

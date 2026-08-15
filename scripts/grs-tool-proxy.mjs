@@ -13,7 +13,9 @@ import {
   EMPTY_COMPLETION_FALLBACK,
   isEmptyAssistant,
   nudgeEmptyRetry,
+  nudgeToolSkipRetry,
   parseAssistantToolPayload,
+  shouldRetryMissingToolCalls,
   sseEncode,
   toUpstreamChatBody,
   withLiftedReasoning,
@@ -27,6 +29,7 @@ const passthrough = process.env.GRS_TOOL_PROXY_PASSTHROUGH === '1'
 const timeoutMs = Number(process.env.GRS_TOOL_PROXY_TIMEOUT_MS || 300_000)
 const maxRetries = Number(process.env.GRS_TOOL_PROXY_MAX_RETRIES || 3)
 const emptyRetries = Number(process.env.GRS_EMPTY_COMPLETION_RETRIES || 2)
+const toolSkipRetries = Number(process.env.GRS_TOOL_SKIP_RETRIES || 1)
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 function log(message) {
@@ -180,12 +183,43 @@ async function handleChat(req, rawBody, res) {
     }
   }
 
+  let parsed = parseAssistantToolPayload(collected.content)
+  for (let skip = 0; skip < toolSkipRetries; skip++) {
+    if (!shouldRetryMissingToolCalls({
+      rewrite,
+      messages: body.messages,
+      calls: parsed.calls,
+      content: collected.content,
+    })) break
+    const delay = retryDelayMs(skip)
+    log(`missing tool_call retry ${skip + 1}/${toolSkipRetries} in ${delay}ms (${body.model || '?'})`)
+    await sleep(delay)
+    payload = bumpReasoningBudget(nudgeToolSkipRetry(payload))
+    result = await postChat(req, payload, stream)
+    if (result.error && !result.buf) {
+      send(res, 502, { 'content-type': 'application/json' }, JSON.stringify({ error: { message: result.reason || 'upstream failed' } }))
+      return
+    }
+    raw = result.buf
+    if (!raw || result.status !== 200) {
+      send(res, result.status || 502, { 'content-type': result.contentType || 'application/json' }, raw || Buffer.from(JSON.stringify({ error: { message: result.reason || 'upstream failed' } })))
+      return
+    }
+    try {
+      collected = withLiftedReasoning(collectCompletion(raw.toString('utf8'), stream))
+    } catch (err) {
+      log(`collect failed: ${err instanceof Error ? err.message : err}`)
+      send(res, 502, { 'content-type': 'application/json' }, JSON.stringify({ error: { message: 'upstream parse failed' } }))
+      return
+    }
+    parsed = parseAssistantToolPayload(collected.content)
+  }
+
   if (collected.nativeToolCalls && !collected.lifted) {
     respondChat(res, stream, raw)
     return
   }
 
-  const parsed = parseAssistantToolPayload(collected.content)
   if (parsed.calls.length > 0 && rewrite) {
     log(`parsed ${parsed.calls.length} tool call(s): ${parsed.calls.map((c) => c.name).join(',')}`)
     const rewritten = buildClientResponse({

@@ -18,6 +18,10 @@ import {
   nudgeEmptyRetry,
   bumpReasoningBudget,
   canonicalRosterLabel,
+  shouldRetryMissingToolCalls,
+  userTurnExpectsTools,
+  looksLikeSkippedToolCall,
+  nudgeToolSkipRetry,
 } from './grs-tool-protocol.mjs'
 
 test('parses hermes <tool_call> json', () => {
@@ -227,6 +231,7 @@ test('canonicalRosterLabel maps @handles to sidebar 花名', () => {
   assert.equal(canonicalRosterLabel('@营销'), '营销专家')
   assert.equal(canonicalRosterLabel('marketing'), '营销专家')
   assert.equal(canonicalRosterLabel('建站专家'), '建站专家')
+  assert.equal(canonicalRosterLabel('背调'), '背调专员')
   assert.equal(canonicalRosterLabel('random'), '')
 })
 
@@ -337,4 +342,45 @@ test('nudgeEmptyRetry appends a user hint and bumpReasoningBudget raises the flo
   assert.match(nudged.messages.at(-1).content, /empty visible content/)
   const bumped = bumpReasoningBudget({ model: 'gpt-5.6-sol', max_tokens: 512 })
   assert.equal(bumped.max_completion_tokens, 8192)
+})
+
+test('parses function_call and hermes function tags', () => {
+  const fn = parseAssistantToolPayload('<function_call>{"name":"web_search","arguments":{"query":"OFAC tumbler"}}</function_call>')
+  assert.equal(fn.calls[0].name, 'web_search')
+  assert.equal(fn.calls[0].arguments.query, 'OFAC tumbler')
+  const hermes = parseAssistantToolPayload('<function=read>{"file_path":"/workspace/team/roster.md"}</function>')
+  assert.equal(hermes.calls[0].name, 'read')
+  assert.equal(hermes.calls[0].arguments.file_path, '/workspace/team/roster.md')
+})
+
+test('retries when a trade task got prose instead of a tool call', () => {
+  const messages = [{ role: 'user', content: '@营销专家 找北欧买家并背调' }]
+  assert.equal(userTurnExpectsTools(messages), true)
+  assert.equal(userTurnExpectsTools([{ role: 'user', content: '你好' }]), false)
+  assert.equal(looksLikeSkippedToolCall('我先搜索一下北欧进口商'), true)
+  assert.equal(shouldRetryMissingToolCalls({
+    rewrite: true,
+    messages,
+    calls: [],
+    content: '好的，我去找买家。',
+  }), true)
+  assert.equal(shouldRetryMissingToolCalls({
+    rewrite: true,
+    messages,
+    calls: [{ name: 'web_search', arguments: { query: 'x' } }],
+    content: '',
+  }), false)
+  const nudged = nudgeToolSkipRetry({ messages })
+  assert.match(nudged.messages.at(-1).content, /no executable <tool_call>/)
+})
+
+test('gpt-5 tool protocol lowers reasoning effort so visible tool_call survives', () => {
+  const out = toUpstreamChatBody({
+    model: 'gpt-5.6-sol',
+    tools: [{ type: 'function', function: { name: 'web_search', description: 'search', parameters: { type: 'object' } } }],
+    messages: [{ role: 'user', content: 'search Nordic importers' }],
+  })
+  assert.equal(out.reasoning_effort, 'low')
+  assert.match(out.messages[0].content, /Hidden reasoning/)
+  assert.match(out.messages[0].content, /mcp__buyer-dd__/)
 })

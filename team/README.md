@@ -34,6 +34,7 @@
 | （港窑加项）询盘 |  inbound 回复 | `trade-inquiry` | `playbooks/inquiry.md` |
 | （港窑加项）报价 | FOB / MOQ | `trade-quote` | `playbooks/quote.md` |
 | （港窑加项）合规 | 认证 / 出口 | `trade-compliance` | `playbooks/compliance.md` |
+| （港窑加项）背调 | 公开源尽调 | `trade-dd` | `playbooks/due-diligence.md` |
 | 广告 | Meta | `meta-ads` | 广告 skill |
 
 ## 群里怎么用

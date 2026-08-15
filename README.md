@@ -56,4 +56,4 @@ npm start              # 或 bash scripts/start.sh web
 
 `subagent` 的 description 必须是花名。产品只以 `store/data/catalog.json` 为准。不发真实邮件，不编造海关数据和邮箱。
 
-外贸能力按 DSH **一切皆插件**：组合包 `plugins/harbor-trade`（官方 schedule + 本仓库 MCP），右侧实时面板 `plugins/activity-panel`（复用 [dsh-hud](https://github.com/a903067276-rgb/dsh-hud) 的 `shell.overlay` 槽，不装 [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) 那套终端工作台）。优先 GitHub 高星 / 官方 API，本仓库只做 NDJSON 包装和 `team/crm/` 落盘。
+外贸能力按 DSH **一切皆插件**：组合包 `plugins/harbor-trade`（官方 schedule + 本仓库 MCP），会话顶栏「港窑实时」`plugins/activity-panel`（和 Chat / Trajectory 一样注册 `conversation.view`，不装 [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) 那套终端工作台）。优先 GitHub 高星 / 官方 API，本仓库只做 NDJSON 包装和 `team/crm/` 落盘。

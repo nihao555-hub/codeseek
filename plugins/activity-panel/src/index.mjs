@@ -1,7 +1,7 @@
 /**
- * 港窑实时活动面板：Web 右侧栏。
- * 官方已有 details 列（点开工具才出现）和对话里的 workflow-run。
- * 本插件把「正在做什么」常驻右侧：宿主听 session/event，浏览器每 2 秒拉 CRM + 在飞工具。
+ * 港窑实时：会话顶栏 conversation.view（和 Chat / Trajectory 并列）。
+ * 官方 details 列要点开工具才出现；本插件把「正在做什么」做成一页。
+ * 宿主听 session/event，浏览器每 2 秒拉 CRM + 在飞工具。
  */
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'

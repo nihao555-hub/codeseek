@@ -1,5 +1,5 @@
 /**
- * 港窑实时活动快照：右侧面板每 2 秒拉一次。
+ * 港窑实时活动快照：会话顶栏视图每 2 秒拉一次。
  * 报价数字只来自 catalog.json；线索来自 team/crm 公开检索落盘。
  */
 import { loadCatalog, loadCrm, pipelineSummary } from './trade-crm.mjs'

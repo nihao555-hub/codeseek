@@ -1,6 +1,7 @@
 # 由 scripts/assemble-toolkit.mjs sync 生成。不要手改；改 toolkit/catalog.json 或 toolkit/enabled.json。
 # 每个 MCP 默认关闭：有对应密钥、或 MCP_<FLAG>=1、或写入 enabled.json 后才会加载。
 # 工具名形如 mcp__<serverName>__<rawName>。
+# web-search-codeseek 把官方 web_search 接到本地 SearXNG/DuckDuckGo。
 
 - insert:
     - id: mcp-meta-ads
@@ -422,3 +423,5 @@
           initialDelayMs: 1000
           maxDelayMs: 30000
           maxAttempts: 10
+    - id: web-search-codeseek
+      name: /workspace/scripts/web-search-provider.mjs

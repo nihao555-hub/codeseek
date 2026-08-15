@@ -52,6 +52,8 @@ test('web-search local mcp is default-on via enabled patch', () => {
   assert.match(yaml, /serverName: web-search/)
   assert.match(yaml, /web-search-mcp\.mjs/)
   assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_WEB_SEARCH === '1'\)"/)
+  assert.match(yaml, /id: web-search-codeseek/)
+  assert.match(yaml, /scripts\/web-search-provider\.mjs/)
 })
 
 test('fetchRemoteSkills writes SKILL.md with whenToUse', async () => {

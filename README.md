@@ -1,6 +1,6 @@
 # codeseek · 超级员工
 
-基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 Agent，用来做外贸、广告、开发，并附带一个可跑的独立站演示：
+基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 Agent，默认是 **港窑外贸团队**（询盘、报价、跟单、合规），顺带做广告和改独立站：
 
 - **跨境外贸**：询盘、报价、跟单、合规
 - **Meta 广告**：官方 Ads MCP（`https://mcp.facebook.com/ads`）
@@ -26,7 +26,7 @@ cp .env.example .env   # 填入 GRS_API_KEY
 npm start              # 或 bash scripts/start.sh web
 ```
 
-浏览器打开 http://127.0.0.1:3080 。`scripts/start.sh web` 会把仓库根登记成工作区 **codeseek**（`/workspace` 或你 clone 下来的路径）。新会话请选这一项，不要选空标题或 `pkg`。选错时 Agent 仍应读写 `/workspace`，独立站在 `store/`。`scripts/start.sh web` 还会在 `0.0.0.0:3081` 起一层反代（把 Host 改写回回环，避开 Harness 的本机信任栅栏），方便云端端口转发或临时隧道。不需要公网时设 `DSH_PUBLIC_PROXY=0`。
+浏览器打开 http://127.0.0.1:3080 。`scripts/start.sh web` 会把仓库根登记成工作区 **codeseek**（`/workspace` 或你 clone 下来的路径）。新会话请选这一项，不要选空标题或 `pkg`。选错时 Agent 仍应读写 `/workspace`，独立站在 `store/`，外贸台账在 `team/`。`scripts/start.sh web` 还会在 `0.0.0.0:3081` 起一层反代（把 Host 改写回回环，避开 Harness 的本机信任栅栏），方便云端端口转发或临时隧道。临时公网：`bash scripts/public-tunnel.sh`（Cloudflare quick tunnel，地址会变）。不需要公网时设 `DSH_PUBLIC_PROXY=0`。
 
 模型选择栏只保留 GRS 的 **Gemini 3.5 Flash** 和 **GPT-5.6 Sol**（带对应 logo）；DeepSeek 官方那几档暂时关掉。
 
@@ -39,6 +39,7 @@ npm start              # 或 bash scripts/start.sh web
 | `npm start` / `scripts/start.sh web` | 启动 Web UI（本机 :3080，公网反代 :3081） |
 | `scripts/start.sh headless "任务"` | 无界面跑一条任务 |
 | `scripts/start.sh doctor` | 检查 Node、密钥、GRS 连通、工具代理 |
+| `scripts/public-tunnel.sh` | Cloudflare 临时公网 URL（反代 :3081） |
 | `npm test` | 工具协议解析单测 + 独立站 API 单测 |
 | `npm run store` | 启动港窑独立站（API :8788 + Vite :5173） |
 | `npm run store:test` | 只跑独立站测试 |
@@ -58,6 +59,17 @@ npm run store          # http://127.0.0.1:5173  （API 在 :8788）
 ```
 
 约定与 API 说明见 `store/README.md`。Agent 改店面时加载 `.dsh/skills/` 里的前端/后端 skill。
+
+## 外贸团队
+
+默认人设是港窑 **Trade Lead**。台账在 `team/`：
+
+- 看板 `team/pipeline.md`
+- 单笔成交 `team/deals/`
+- 真实客户隐私 `team/deals/local/`（不提交）
+- 角色 skill：`trade-inquiry` / `trade-quote` / `trade-ops` / `trade-compliance`
+
+产品价格、MOQ、认证只以 `store/data/catalog.json` 为准。Agent 只出可粘贴的客户稿，不发真实邮件。
 
 ## 装配自己的工具
 

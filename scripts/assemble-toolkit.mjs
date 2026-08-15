@@ -132,10 +132,17 @@ export function renderMcpPatch(catalog, enabled) {
     rows.push(lines.join('\n'))
   }
 
+  const searchPlugin = join(ROOT, 'scripts/web-search-provider.mjs')
+  rows.push([
+    '    - id: web-search-codeseek',
+    `      name: ${yamlScalar(searchPlugin)}`,
+  ].join('\n'))
+
   return [
     '# 由 scripts/assemble-toolkit.mjs sync 生成。不要手改；改 toolkit/catalog.json 或 toolkit/enabled.json。',
     '# 每个 MCP 默认关闭：有对应密钥、或 MCP_<FLAG>=1、或写入 enabled.json 后才会加载。',
     '# 工具名形如 mcp__<serverName>__<rawName>。',
+    '# web-search-codeseek 把官方 web_search 接到本地 SearXNG/DuckDuckGo。',
     '',
     '- insert:',
     ...rows,

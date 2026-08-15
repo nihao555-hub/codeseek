@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-14",
+  "updated": "2026-08-15",
   "hostTools": [
     { "id": "bash", "description": "在工作区跑 shell 命令" },
     { "id": "read", "description": "读文件；Web 会话 cwd 可能是 /，请用绝对路径 /workspace/..." },
@@ -12,11 +12,15 @@
     { "id": "todo_write", "description": "任务清单" },
     { "id": "get_goal", "description": "当前会话目标" },
     { "id": "job_*", "description": "后台作业控制" },
-    { "id": "web_search", "description": "Harness 原生搜索；Web overlay 里 tool-web 默认 disabled。用默认打开的 MCP web-search（SearXNG，失败则 DuckDuckGo）" }
+    { "id": "web_search", "description": "官方模型可见搜索。本仓库后端为 SearXNG，失败则 DuckDuckGo。" }
   ],
   "skills": [
     { "id": "assemble-toolkit", "kind": "local", "group": "platform", "description": "装配本仓库 skill / MCP / 主机工具" },
     { "id": "foreign-trade", "kind": "local", "group": "business" },
+    { "id": "trade-inquiry", "kind": "local", "group": "business" },
+    { "id": "trade-quote", "kind": "local", "group": "business" },
+    { "id": "trade-ops", "kind": "local", "group": "business" },
+    { "id": "trade-compliance", "kind": "local", "group": "business" },
     { "id": "meta-ads", "kind": "local", "group": "business" },
     { "id": "software-dev", "kind": "local", "group": "engineering" },
     { "id": "ecommerce-store", "kind": "local", "group": "store" },

@@ -30,9 +30,10 @@ test('cordis apply registers the provider on ctx.web', () => {
 })
 
 test('home patch points official web_search at the local provider', () => {
-  const yaml = readFileSync(join(root, 'dsh-home/cordis.patch.yml'), 'utf8')
-  assert.match(yaml, /searchProvider: codeseek-searxng/)
-  assert.match(yaml, /id: web-search-codeseek/)
-  assert.match(yaml, /scripts\/web-search-provider\.mjs/)
-  assert.match(yaml, /- id: web-search-deepseek\n  disabled: true/)
+  const home = readFileSync(join(root, 'dsh-home/cordis.patch.yml'), 'utf8')
+  assert.match(home, /searchProvider: codeseek-searxng/)
+  assert.match(home, /- id: web-search-deepseek\n  disabled: true/)
+  const mcp = readFileSync(join(root, 'dsh-home/cordis.mcp.patch.yml'), 'utf8')
+  assert.match(mcp, /id: web-search-codeseek/)
+  assert.match(mcp, /scripts\/web-search-provider\.mjs/)
 })

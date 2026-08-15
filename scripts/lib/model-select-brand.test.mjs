@@ -86,7 +86,9 @@ test('start.sh puts --patch before web app flags like --port', () => {
   assert.match(sh, /patches\+=\(--patch "\$mcp_patch"\)/)
   assert.match(sh, /patches\+=\(--patch "\$ui_patch"\)/)
   assert.match(sh, /harbor_patch=/)
+  assert.match(sh, /activity_patch=/)
   assert.match(sh, /patches\+=\(--patch "\$harbor_patch"\)/)
+  assert.match(sh, /patches\+=\(--patch "\$activity_patch"\)/)
   assert.doesNotMatch(sh, /"\$@" --patch/)
 })
 

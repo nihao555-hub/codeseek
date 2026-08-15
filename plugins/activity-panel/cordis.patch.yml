@@ -1,0 +1,7 @@
+# 港窑实时活动面板。一切皆插件：
+# 槽位复用 awesome 上 a903067276-rgb/dsh-hud（shell.overlay + input.left），
+# 不装 omdsh-dev/DSH-better-sidebar 那套终端/Git 工作台。
+# 必须用包名，client-modules 才读 dsh.client。
+- insert:
+    - id: codeseek-activity-panel
+      name: codeseek-activity-panel

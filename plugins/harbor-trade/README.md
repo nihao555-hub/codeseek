@@ -13,6 +13,7 @@ DeepSeek Harness **一切皆插件**。本目录是可 `dsh plugin add` 的组�
 | 展会 | [LensmorOfficial/trade-show-calendar](https://github.com/LensmorOfficial/trade-show-calendar) | `list_fairs` |
 | 完整 CRM 产品 | [twentyhq/twenty](https://github.com/twentyhq/twenty) | 本机不拉起 |
 | 办公附件 UI | awesome-dsh：`dsh-files` / `dsh-office-tools` | catalog 只展示 |
+| 右侧实时面板槽位 | [a903067276-rgb/dsh-hud](https://github.com/a903067276-rgb/dsh-hud) 的 `shell.overlay` | `plugins/activity-panel`。不装 better-sidebar |
 
 不要装：[WangM-A3/silicon-army-mcp](https://github.com/WangM-A3/silicon-army-mcp) 的发信 / 海关 Demo（我们不代发、不编提单）。MCP 设置页已有本仓库 `codeseek-toolkit-panel`，不必再装 `hyqhyq3/dsh-mcp-manager`。
 

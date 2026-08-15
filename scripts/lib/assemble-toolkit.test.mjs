@@ -91,7 +91,7 @@ test('local memory/time/documents MCP use NDJSON node scripts', () => {
   assert.match(yaml, /scripts\/trade-open-data-mcp\.mjs/)
   assert.ok(Array.isArray(catalog.communityPlugins))
   const pluginIds = catalog.communityPlugins.map((row) => row.id)
-  for (const id of ['dsh-at-file', 'dsh-files', 'dsh-office-tools', 'dsh-cowork', 'dsh-tool-csv', 'dsh-mcp-manager']) {
+  for (const id of ['dsh-at-file', 'dsh-files', 'dsh-office-tools', 'dsh-cowork', 'dsh-tool-csv', 'dsh-mcp-manager', 'dsh-hud', 'dsh-better-sidebar']) {
     assert.ok(pluginIds.includes(id), id)
   }
   assert.ok(!pluginIds.some((id) => /pet|skin|reverse|balance/i.test(id)))

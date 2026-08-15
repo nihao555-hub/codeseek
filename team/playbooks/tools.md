@@ -25,6 +25,7 @@ LSP `Content-Length` 会让 `dsh-mcp-client` 握手挂死，工具名永远不�
 | 拆步骤 | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) sequential-thinking | `mcp__sequential-thinking__*` |
 | 完整 CRM 产品 | [twentyhq/twenty](https://github.com/twentyhq/twenty)（5 万星，要 Postgres） | **不在本机拉起**。团员落盘只用 `team/crm/*.json` |
 | DSH 插件形态 | 官方 `dsh plugin add` / `@deepseek-ai/dsh-mcp-client` / `dsh-schedule` | 本仓库组合包 `plugins/harbor-trade`（`dsh.bundle`） |
+| 右侧看 agent | [a903067276-rgb/dsh-hud](https://github.com/a903067276-rgb/dsh-hud) 槽位；不装 [omdsh-dev/DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) | `plugins/activity-panel`，`GET /__codeseek/activity` |
 | 外贸硅基军团 MCP | [WangM-A3/silicon-army-mcp](https://github.com/WangM-A3/silicon-army-mcp) | **不装**。含代发邮件和海关 Demo，和本产品红线冲突 |
 | 市场体量（不是提单） | 联合国 [Comtrade preview](https://comtradeapi.un.org/public/v1/preview/C/A/HS)；轮子 [uncomtrade/comtradeapicall](https://github.com/uncomtrade/comtradeapicall) | `mcp__trade-open-data__comtrade_preview`。国家×HS×年汇总，**没有进口商公司名** |
 | 展会档期 | [LensmorOfficial/trade-show-calendar](https://github.com/LensmorOfficial/trade-show-calendar) 开源 JSON | `mcp__trade-open-data__list_fairs`；失败用 `toolkit/data/trade-shows.json`。仍要打开官网确认 |

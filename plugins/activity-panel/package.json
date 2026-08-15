@@ -1,0 +1,28 @@
+{
+  "name": "codeseek-activity-panel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": ["src/index.mjs", "lib/client.js", "cordis.patch.yml", "README.md", "index.mjs"],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ],
+      "immediately": true,
+      "platform": "web"
+    }
+  },
+  "description": "港窑右侧实时面板：正在调用的工具、子代理、CRM 线索。槽位复用 dsh-hud，不装 better-sidebar。"
+}

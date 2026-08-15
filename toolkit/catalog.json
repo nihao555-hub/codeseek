@@ -557,6 +557,27 @@
       "install": "先读仓库 README，再用 overlay，不要改 vendor。"
     },
     {
+      "id": "dsh-hud",
+      "repo": "a903067276-rgb/dsh-hud",
+      "title": "HUD 浮层",
+      "why": "awesome 收录。槽位（shell.overlay）已被本仓库 codeseek-activity-panel 复用；不必再装一套 Git/token HUD。",
+      "install": "不要 dsh plugin add。右侧看 agent 用本仓库实时面板。"
+    },
+    {
+      "id": "dsh-better-sidebar",
+      "repo": "omdsh-dev/DSH-better-sidebar",
+      "title": "右侧 IDE 工作台",
+      "why": "文件/终端/Git/pty，过重。本产品只要看团员在干什么，不把 DSH 变成 VS Code。",
+      "install": "不要装；不要 pnpm approve-builds node-pty。"
+    },
+    {
+      "id": "dsh-task-status",
+      "repo": "vlln/dsh-task-status",
+      "title": "后台任务条",
+      "why": "conversation.input.dock 任务进度。本仓库实时面板已读 runningCalls。",
+      "install": "不必再 overlay。"
+    },
+    {
       "id": "dsh-notification",
       "repo": "omdsh-dev/dsh-notification",
       "title": "回合结束通知",

@@ -160,6 +160,7 @@ export function syncPatch(catalog = loadCatalog(), enabled = loadEnabled()) {
   writeFileSync(PATCH_PATH, yaml)
   ensureToolkitPanelInstall()
   ensureHarborTradeInstall()
+  ensureActivityPanelInstall()
   return PATCH_PATH
 }
 
@@ -167,6 +168,8 @@ export const TOOLKIT_PANEL_PACKAGE = 'codeseek-toolkit-panel'
 export const TOOLKIT_PANEL_DIR = join(ROOT, 'plugins/toolkit-panel')
 export const HARBOR_TRADE_PACKAGE = 'codeseek-harbor-trade'
 export const HARBOR_TRADE_DIR = join(ROOT, 'plugins/harbor-trade')
+export const ACTIVITY_PANEL_PACKAGE = 'codeseek-activity-panel'
+export const ACTIVITY_PANEL_DIR = join(ROOT, 'plugins/activity-panel')
 
 function ensureSymlink(link, target) {
   mkdirSync(dirname(link), { recursive: true })
@@ -213,6 +216,10 @@ export function ensureToolkitPanelInstall(home = process.env.DSH_HOME || join(RO
 
 export function ensureHarborTradeInstall(home = process.env.DSH_HOME || join(ROOT, 'dsh-home')) {
   return ensureLocalPluginInstall(HARBOR_TRADE_PACKAGE, HARBOR_TRADE_DIR, home)
+}
+
+export function ensureActivityPanelInstall(home = process.env.DSH_HOME || join(ROOT, 'dsh-home')) {
+  return ensureLocalPluginInstall(ACTIVITY_PANEL_PACKAGE, ACTIVITY_PANEL_DIR, home)
 }
 
 function ensureWhenToUse(markdown, whenToUse) {

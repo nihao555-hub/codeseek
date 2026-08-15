@@ -121,6 +121,7 @@ run_dsh() {
   local tsx_loader="$src/node_modules/tsx/dist/esm/index.mjs"
   local mcp_patch="${DSH_HOME}/cordis.mcp.patch.yml"
   local ui_patch="$ROOT/plugins/toolkit-panel/cordis.patch.yml"
+  local activity_patch="$ROOT/plugins/activity-panel/cordis.patch.yml"
   local harbor_patch="$ROOT/plugins/harbor-trade/cordis.patch.yml"
   if [[ -f "$src/apps/cli/src/bin.ts" && -f "$tsx_loader" ]]; then
     # 绝对导入 tsx，并钉死 Harness 的 tsconfig，这样 cwd 可以是仓库根。
@@ -133,6 +134,7 @@ run_dsh() {
       local patches=()
       if [[ -f "$mcp_patch" ]]; then patches+=(--patch "$mcp_patch"); fi
       if [[ -f "$ui_patch" ]]; then patches+=(--patch "$ui_patch"); fi
+      if [[ -f "$activity_patch" ]]; then patches+=(--patch "$activity_patch"); fi
       if [[ -f "$harbor_patch" ]]; then patches+=(--patch "$harbor_patch"); fi
       exec node --import "$tsx_loader" "$src/apps/cli/src/bin.ts" web "${patches[@]}" "$@"
     fi

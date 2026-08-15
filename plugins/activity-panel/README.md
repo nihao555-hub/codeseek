@@ -12,7 +12,7 @@ GitHub 上已经有右侧栏轮子，对照后没有原样安装：
 | [omdsh-dev/DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) | 终端 / Git / node-pty 工作台，过重 | 不装 |
 | [vlln/dsh-task-status](https://github.com/vlln/dsh-task-status) | 只覆盖后台 bash 任务条 | 会话 `runningCalls` 已覆盖工具中 |
 
-官方对话流里已有 `ui-workflow-run`（子代理折叠卡）和点选后的 `details` 列。本面板是**常驻右侧**，默认打开。
+官方对话流里已有 `ui-workflow-run`（子代理折叠卡）和点选后的 `details` 列。本面板是**常驻右侧**，默认打开。客户端把面板直接挂到 `document.body`（不依赖 overlay 槽位是否画出节点），再用 `conversation.input.left` / `.dock` 读当前会话的 `runningCalls`。
 
 ## 数据从哪来
 

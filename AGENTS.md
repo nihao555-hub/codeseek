@@ -4,7 +4,7 @@
 
 1. **花名册**：`team/roster.md`。工位：`team/playbooks/wecom.md`。调度 `foreign-trade` / `trade-desk`。
 2. **产品**：只信 `store/data/catalog.json`。独立站在 `store/`。微信式工位 `/#/team`。
-3. **背调**：`trade-dd` + `mcp__buyer-dd__*`（OpenCorporates / OpenSanctions）。没有海关提单库，禁止编造货值。
+3. **背调**：`trade-dd` + `mcp__buyer-dd__*`（OpenCorporates / OpenSanctions，401 时 GLEIF 与公开 HTML）。没有海关提单库，禁止编造货值。未见制裁命中不是放行。
 4. **Meta 广告**：`mcp__meta-ads__*`，skill `meta-ads`。没有 `META_ACCESS_TOKEN` 时先说缺口。
 5. **开发**：skill `software-dev`。复杂任务用 `gpt-5.6-sol`。
 

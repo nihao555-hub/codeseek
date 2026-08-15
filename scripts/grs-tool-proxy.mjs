@@ -20,14 +20,15 @@ import {
   toUpstreamChatBody,
   withLiftedReasoning,
 } from './lib/grs-tool-protocol.mjs'
-import { isRetryableGrsFailure, retryDelayMs, runWithRetries } from './lib/grs-retry.mjs'
+import { isRetryableGrsFailure, parseRetryAfter, retryDelayMs, runWithRetries } from './lib/grs-retry.mjs'
 
 const host = process.env.GRS_TOOL_PROXY_HOST || '127.0.0.1'
 const port = Number(process.env.GRS_TOOL_PROXY_PORT || 18765)
 const upstreamBase = (process.env.GRS_UPSTREAM_BASE_URL || process.env.GRS_BASE_URL || 'https://grsaiapi.com/v1').replace(/\/$/, '')
 const passthrough = process.env.GRS_TOOL_PROXY_PASSTHROUGH === '1'
 const timeoutMs = Number(process.env.GRS_TOOL_PROXY_TIMEOUT_MS || 300_000)
-const maxRetries = Number(process.env.GRS_TOOL_PROXY_MAX_RETRIES || 3)
+const maxRetries = Number(process.env.GRS_TOOL_PROXY_MAX_RETRIES || 4)
+const maxDelayMs = Number(process.env.GRS_TOOL_PROXY_MAX_DELAY_MS || 15_000)
 const emptyRetries = Number(process.env.GRS_EMPTY_COMPLETION_RETRIES || 2)
 const toolSkipRetries = Number(process.env.GRS_TOOL_SKIP_RETRIES || 1)
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -61,10 +62,12 @@ async function fetchUpstream(url, init) {
       const buf = Buffer.from(await upstream.arrayBuffer())
       const bodyText = buf.toString('utf8').slice(0, 4000)
       if (!upstream.ok && isRetryableGrsFailure({ status: upstream.status, bodyText })) {
+        const retryAfterMs = parseRetryAfter(upstream.headers.get('retry-after'))
         return {
           retry: true,
           reason: `${upstream.status} ${bodyText.replace(/\s+/g, ' ').slice(0, 160)}`,
           status: upstream.status,
+          retryAfterMs,
           buf,
           contentType: upstream.headers.get('content-type') || 'application/json',
         }
@@ -87,6 +90,7 @@ async function fetchUpstream(url, init) {
     }
   }, {
     maxRetries,
+    maxDelayMs,
     onRetry: ({ attempt, maxRetries: max, delay, reason }) => {
       log(`retry ${attempt}/${max} in ${delay}ms: ${reason}`)
     },

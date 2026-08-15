@@ -33,7 +33,7 @@ load_env() {
   export GRS_BASE_URL="${GRS_BASE_URL:-https://grsaiapi.com/v1}"
   export GRS_UPSTREAM_BASE_URL="${GRS_UPSTREAM_BASE_URL:-$GRS_BASE_URL}"
   export GRS_TOOL_PROXY_PORT="${GRS_TOOL_PROXY_PORT:-18765}"
-  export GRS_TOOL_PROXY_MAX_RETRIES="${GRS_TOOL_PROXY_MAX_RETRIES:-3}"
+  export GRS_TOOL_PROXY_MAX_RETRIES="${GRS_TOOL_PROXY_MAX_RETRIES:-4}"
   export DSH_PERMISSION_MODE="${DSH_PERMISSION_MODE:-danger-full-access}"
   mkdir -p "$DSH_HOME/sessions" "$DSH_HOME/profiles"
 }
@@ -244,7 +244,7 @@ PY
   echo
   echo "== 联网搜索 =="
   if grep -q 'web-search' "$ROOT/toolkit/enabled.json" 2>/dev/null; then
-    echo "web-search MCP: enabled.json 已打开（SearXNG → DuckDuckGo）"
+    echo "web-search MCP: enabled.json 已打开（SearXNG → DuckDuckGo → Wikipedia；429 冷却不露给 UI）"
   else
     echo "web-search MCP: 未在 enabled.json（可用 MCP_WEB_SEARCH=1 打开）"
   fi

@@ -77,7 +77,12 @@ function record(name, ok, detail) {
 async function main() {
   try {
     const search = await searchWeb('Sweden housewares importer stainless steel drinkware')
-    record('lib.web_search', Boolean(search.results?.length), `${search.source} · ${search.results?.[0]?.title} ${search.results?.[0]?.url}`)
+    const leaked = /\b429\b|too many requests/i.test(search.text || '')
+    record(
+      'lib.web_search',
+      Boolean(search.results?.length) && !leaked,
+      leaked ? `leaked 429 in tool text: ${clip(search.text, 180)}` : `${search.source} · ${search.results?.[0]?.title} ${search.results?.[0]?.url}`,
+    )
   } catch (error) {
     record('lib.web_search', false, error.message)
   }
@@ -109,7 +114,8 @@ async function main() {
       arguments: { query: 'Harbor Kiln tea infuser FOB Shenzhen' },
     }))
     const text = callText(replies)
-    record('mcp.web-search handshake+search', /Search:|http/i.test(text), text)
+    const leaked = /\b429\b|too many requests/i.test(text)
+    record('mcp.web-search handshake+search', /Search:|http/i.test(text) && !leaked, leaked ? `leaked 429: ${clip(text, 180)}` : text)
   } catch (error) {
     record('mcp.web-search handshake+search', false, error.message)
   }

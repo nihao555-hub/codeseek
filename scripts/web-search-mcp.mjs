@@ -10,7 +10,7 @@ import { startStdioMcpServer } from './lib/mcp-stdio.mjs'
 const TOOLS = [
   {
     name: 'web_search',
-    description: 'Search the public web. Tries open-source SearXNG first, then DuckDuckGo HTML if public instances fail.',
+    description: 'Search the public web. Tries SearXNG, then DuckDuckGo, then Wikipedia if public instances are busy.',
     inputSchema: {
       type: 'object',
       properties: {

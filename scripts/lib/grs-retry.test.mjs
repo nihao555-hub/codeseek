@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   isRetryableGrsFailure,
+  parseRetryAfter,
   retryDelayMs,
   runWithRetries,
 } from './grs-retry.mjs'
@@ -27,6 +28,20 @@ test('backoff doubles then caps', () => {
   assert.equal(retryDelayMs(2), 4000)
   assert.equal(retryDelayMs(3), 8000)
   assert.equal(retryDelayMs(8), 8000)
+})
+
+test('429 uses Retry-After and a longer floor', () => {
+  assert.equal(retryDelayMs(0, { status: 429 }), 2000)
+  assert.equal(retryDelayMs(0, { status: 429, retryAfterMs: 3500 }), 3500)
+  assert.equal(retryDelayMs(0, { status: 429, retryAfterMs: 20_000, maxDelayMs: 8000 }), 8000)
+})
+
+test('parseRetryAfter reads seconds and HTTP dates', () => {
+  assert.equal(parseRetryAfter('2'), 2000)
+  assert.equal(parseRetryAfter('1.5'), 1500)
+  const now = Date.parse('Wed, 21 Oct 2015 07:28:00 GMT')
+  assert.equal(parseRetryAfter('Wed, 21 Oct 2015 07:28:05 GMT', now), 5000)
+  assert.equal(parseRetryAfter('nope'), undefined)
 })
 
 test('runWithRetries tries first success once', async () => {
@@ -64,4 +79,14 @@ test('runWithRetries stops after maxRetries failures', async () => {
   assert.equal(n, 4)
   assert.equal(out.retry, true)
   assert.equal(out.status, 400)
+})
+
+test('runWithRetries honors 429 Retry-After', async () => {
+  const delays = []
+  await runWithRetries(async () => ({ retry: true, reason: '429', status: 429, retryAfterMs: 2500 }), {
+    maxRetries: 2,
+    maxDelayMs: 15_000,
+    sleep: async (ms) => { delays.push(ms) },
+  })
+  assert.deepEqual(delays, [2500, 4000])
 })

@@ -41,6 +41,9 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 | web_fetch | `mcp__web-search__web_fetch`（官方 web_fetch 关） | 打开买家官网、目录页 | 开 |
 | buyer-dd | OpenCorporates API + OpenSanctions API；401 时回退 GLEIF LEI 与 OpenSanctions 公开 HTML | 工商 / LEI / 制裁名单 | 开 |
 | sequential-thinking | `github.com/modelcontextprotocol/servers` | 管家拆步骤；首次 `npx` 会下载 | 开 |
+| memory | 本仓库 `scripts/memory-mcp.mjs` | 本地图谱备忘，不写客户隐私 | 开 |
+| time | 本仓库 `scripts/time-mcp.mjs` | 时区转换 | 开 |
+| documents | 本仓库 `scripts/documents-mcp.mjs` | 读工作区 md/docx/xlsx/pdf | 开 |
 | trade-desk / foreign-trade / trade-marketing / trade-dd / … | 本仓库 `.dsh/skills` | 工位派工、港窑人设、公开源背调 | 开 |
 | doc-coauthoring / pdf / pptx / xlsx | `github.com/anthropics/skills` | 报价表、画册、介绍信 | 按许可证；docx/pdf/pptx/xlsx **默认不拉**，要办公套件再 `fetch-skills --include-restricted` |
 | webapp-testing | `github.com/anthropics/skills` | 独立站走查 | 已拉 |
@@ -49,11 +52,13 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 
 ## 建议打开（无密钥）
 
-`sequential-thinking` 与 `buyer-dd` 已写入 `toolkit/enabled.json`。
+`sequential-thinking`、`buyer-dd`、`memory`、`time`、`documents` 已写入 `toolkit/enabled.json`。
 
-给管家拆「先查买家再写开发信」的步骤；背调用工商库 + 制裁名单，**仍然没有海关提单**。
+Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页没有这个入口）。改完重启 Web。
 
-无密钥但不要默认开：`memory`（知识图谱，污染工具列表）、`context7`（拉库文档，偏开发）、`MCP_TIME=1`（要 `uvx`）。
+给管家拆「先查买家再写开发信」的步骤；背调用工商库 + 制裁名单，**仍然没有海关提单**。本地记忆不要写客户隐私。询盘 PDF/DOCX 用 `mcp__documents__read_document`。
+
+无密钥但不要默认开：`context7`（拉库文档，偏开发）、`filesystem`（和 read/write 重复）、Playwright（要下载浏览器，在设置页再开）。
 
 ## 有密钥再开
 

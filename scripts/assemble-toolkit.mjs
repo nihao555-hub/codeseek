@@ -98,7 +98,7 @@ export function renderMcpPatch(catalog, enabled) {
       throw new Error(`serverName 不合法: ${serverName}`)
     }
     const expr = enableExpression(entry, forced.has(entry.id))
-    const timeout = ['meta-ads', 'playwright', 'searxng', 'web-search', 'open-websearch'].includes(entry.id) ? 120000 : 60000
+    const timeout = ['meta-ads', 'playwright', 'searxng', 'web-search', 'open-websearch', 'documents'].includes(entry.id) ? 120000 : 60000
     const lines = [
       `    - id: mcp-${entry.id}`,
       `      name: '@deepseek-ai/dsh-mcp-client'`,
@@ -227,6 +227,61 @@ export async function refreshMcpSnapshot({ fetchImpl = fetch, queries = ['github
   const snapshot = { fetchedAt: new Date().toISOString(), count: servers.length, servers }
   writeFileSync(SNAPSHOT_PATH, `${JSON.stringify(snapshot, null, 2)}\n`)
   return snapshot
+}
+
+export function isMcpEnabled(entry, enabled, env = process.env) {
+  const forced = new Set(enabled.mcp || [])
+  if (forced.has(entry.id)) return true
+  if (entry.enableWhen?.flag && env[entry.enableWhen.flag] === '1') return true
+  return (entry.enableWhen?.anyEnv || []).some((name) => Boolean(env[name]))
+}
+
+export function describeToolkit(catalog = loadCatalog(), enabled = loadEnabled(), env = process.env) {
+  const forced = new Set(enabled.mcp || [])
+  const skills = existsSync(SKILLS_DIR) ? localSkillNames() : []
+  return {
+    hostTools: catalog.hostTools,
+    skills: catalog.skills.map((skill) => ({
+      id: skill.id,
+      kind: skill.kind,
+      group: skill.group || null,
+      description: skill.description || skill.whenToUse || '',
+      installed: skills.includes(skill.id),
+    })),
+    mcp: catalog.mcp.map((entry) => {
+      const keys = entry.enableWhen?.anyEnv || []
+      const missingKeys = keys.filter((name) => !env[name])
+      return {
+        id: entry.id,
+        title: entry.title,
+        description: entry.description,
+        transport: entry.transport,
+        serverName: entry.serverName,
+        docs: entry.docs || '',
+        enabled: isMcpEnabled(entry, enabled, env),
+        forced: forced.has(entry.id),
+        needsKey: keys.length > 0,
+        missingKeys,
+        flag: entry.enableWhen?.flag || null,
+        toolPrefix: `mcp__${entry.serverName || entry.id}__`,
+      }
+    }),
+    communityPlugins: catalog.communityPlugins || [],
+    note: enabled.note || '',
+    restartHint: '开关 MCP 后必须重启 Web（scripts/start.sh web），设置页才会加载新工具。',
+  }
+}
+
+export function setMcpEnabled(id, on, catalog = loadCatalog(), enabled = loadEnabled()) {
+  if (!catalog.mcp.some((entry) => entry.id === id)) {
+    throw new Error(`未知 MCP: ${id}`)
+  }
+  const mcp = new Set(enabled.mcp)
+  if (on) mcp.add(id)
+  else mcp.delete(id)
+  const next = saveEnabled({ mcp: [...mcp], note: enabled.note })
+  syncPatch(catalog, next)
+  return describeToolkit(catalog, next)
 }
 
 function printList(catalog, enabled) {

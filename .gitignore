@@ -17,6 +17,7 @@ branding/.applied-stamp
 dsh-home/*.log
 dsh-home/*.pid
 dsh-home/public-url.txt
+dsh-home/memory-graph.json
 tmp/
 store/node_modules/
 store/client/dist/

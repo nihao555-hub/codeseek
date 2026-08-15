@@ -30,6 +30,8 @@ npm run toolkit -- doctor
 
 密钥只放 gitignored `.env`。工具名：`mcp__<serverName>__<rawName>`。
 
+Web 设置 → **插件 → 工具与 MCP** 也可以开关；改完必须重启 Web。斜杠命令 `/toolkit` 列出当前状态。
+
 ## 远程 skill
 
 `fetch-skills` 只拉 catalog 里 `kind: remote` 且许可证允许的 `SKILL.md`。Anthropic 的 docx/pdf/pptx/xlsx **默认不拉**（非开源）。

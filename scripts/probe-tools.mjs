@@ -189,6 +189,26 @@ async function main() {
     record('mcp.open-websearch handshake+search', false, error.message)
   }
 
+  try {
+    const replies = await rpc(process.execPath, [join(root, 'scripts/time-mcp.mjs')], handshakePlus({
+      name: 'get_current_time',
+      arguments: { timezone: 'Europe/Stockholm' },
+    }))
+    record('mcp.time get_current_time', /Europe\/Stockholm|UTC/i.test(callText(replies)), callText(replies))
+  } catch (error) {
+    record('mcp.time get_current_time', false, error.message)
+  }
+
+  try {
+    const replies = await rpc(process.execPath, [join(root, 'scripts/documents-mcp.mjs')], handshakePlus({
+      name: 'read_document',
+      arguments: { path: join(root, 'team/playbooks/tools.md') },
+    }))
+    record('mcp.documents read_document', /MCP|web_search/i.test(callText(replies)), callText(replies))
+  } catch (error) {
+    record('mcp.documents read_document', false, error.message)
+  }
+
   const failed = rows.filter((row) => !row.ok)
   console.log(`\n${rows.length - failed.length}/${rows.length} passed`)
   if (failed.length) process.exitCode = 1

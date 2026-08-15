@@ -144,16 +144,15 @@
           maxAttempts: 10
     - id: mcp-memory
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js "!(process.env.MCP_MEMORY === '1')"
+      disabled: !!js "!(true || process.env.MCP_MEMORY === '1')"
       config:
         serverName: memory
         transport: stdio
         toolCallTimeoutMs: 60000
         failOnStartupError: false
-        command: npx
+        command: node
         args:
-          - -y
-          - "@modelcontextprotocol/server-memory"
+          - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/memory-mcp.mjs'"
         reconnect:
           enabled: true
           initialDelayMs: 1000
@@ -195,15 +194,31 @@
           maxAttempts: 10
     - id: mcp-time
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js "!(process.env.MCP_TIME === '1')"
+      disabled: !!js "!(true || process.env.MCP_TIME === '1')"
       config:
         serverName: time
         transport: stdio
         toolCallTimeoutMs: 60000
         failOnStartupError: false
-        command: uvx
+        command: node
         args:
-          - mcp-server-time
+          - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/time-mcp.mjs'"
+        reconnect:
+          enabled: true
+          initialDelayMs: 1000
+          maxDelayMs: 30000
+          maxAttempts: 10
+    - id: mcp-documents
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js "!(true || process.env.MCP_DOCUMENTS === '1')"
+      config:
+        serverName: documents
+        transport: stdio
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+        command: node
+        args:
+          - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/documents-mcp.mjs'"
         reconnect:
           enabled: true
           initialDelayMs: 1000

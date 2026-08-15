@@ -70,7 +70,9 @@ test('start.sh rebuilds the model-selection client plugin with the web frontend'
 
 test('start.sh puts --patch before web app flags like --port', () => {
   const sh = readFileSync(join(root, 'scripts/start.sh'), 'utf8')
-  assert.match(sh, /web --patch "\$mcp_patch"/)
+  assert.match(sh, /bin\.ts" web "\$\{patches\[@\]\}" "\$@"/)
+  assert.match(sh, /patches\+=\(--patch "\$mcp_patch"\)/)
+  assert.match(sh, /patches\+=\(--patch "\$ui_patch"\)/)
   assert.doesNotMatch(sh, /"\$@" --patch/)
 })
 

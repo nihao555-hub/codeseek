@@ -80,7 +80,14 @@ const handshake = [
 ]
 
 test('shipped MCP servers no longer speak LSP Content-Length', () => {
-  for (const file of ['scripts/web-search-mcp.mjs', 'scripts/buyer-dd-mcp.mjs', 'scripts/open-websearch-mcp.mjs']) {
+  for (const file of [
+    'scripts/web-search-mcp.mjs',
+    'scripts/buyer-dd-mcp.mjs',
+    'scripts/open-websearch-mcp.mjs',
+    'scripts/memory-mcp.mjs',
+    'scripts/time-mcp.mjs',
+    'scripts/documents-mcp.mjs',
+  ]) {
     const body = readFileSync(join(root, file), 'utf8')
     assert.equal(body.includes('Content-Length:'), false, file)
     assert.match(body, /startStdioMcpServer/)
@@ -106,4 +113,16 @@ test('open-websearch MCP speaks NDJSON that DSH can handshake', async () => {
   assert.equal(replies[0].result.serverInfo.name, 'open-websearch')
   const names = replies[1].result.tools.map((row) => row.name).sort()
   assert.deepEqual(names, ['fetch_web', 'search'])
+})
+
+test('memory/time/documents MCP speak NDJSON that DSH can handshake', async () => {
+  const memory = await rpcServer('scripts/memory-mcp.mjs', handshake)
+  assert.equal(memory[0].result.serverInfo.name, 'memory')
+  assert.ok(memory[1].result.tools.some((row) => row.name === 'read_graph'))
+  const time = await rpcServer('scripts/time-mcp.mjs', handshake)
+  assert.equal(time[0].result.serverInfo.name, 'time')
+  assert.ok(time[1].result.tools.some((row) => row.name === 'get_current_time'))
+  const documents = await rpcServer('scripts/documents-mcp.mjs', handshake)
+  assert.equal(documents[0].result.serverInfo.name, 'documents')
+  assert.ok(documents[1].result.tools.some((row) => row.name === 'read_document'))
 })

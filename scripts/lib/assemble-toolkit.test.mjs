@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { loadCatalog, renderMcpPatch, fetchRemoteSkills } from '../assemble-toolkit.mjs'
+import { describeToolkit, isMcpEnabled, loadCatalog, renderMcpPatch, fetchRemoteSkills } from '../assemble-toolkit.mjs'
 
 test('catalog mcp ids and serverNames are unique and valid', () => {
   const catalog = loadCatalog()
@@ -73,6 +73,41 @@ test('open-websearch is default-on stdio MCP without Playwright', () => {
   assert.match(yaml, /open-websearch-mcp\.mjs/)
   assert.match(yaml, /SEARCH_MODE: !!js "'request'"/)
   assert.match(yaml, /disabled: !!js "!\(true \|\| process\.env\.MCP_OPEN_WEBSEARCH === '1'\)"/)
+})
+
+test('local memory/time/documents MCP use NDJSON node scripts', () => {
+  const catalog = loadCatalog()
+  const ids = Object.fromEntries(catalog.mcp.map((item) => [item.id, item]))
+  assert.equal(ids.memory.command, 'node')
+  assert.equal(ids.time.command, 'node')
+  assert.equal(ids.documents.command, 'node')
+  const yaml = renderMcpPatch(catalog, { mcp: ['memory', 'time', 'documents'] })
+  assert.match(yaml, /scripts\/memory-mcp\.mjs/)
+  assert.match(yaml, /scripts\/time-mcp\.mjs/)
+  assert.match(yaml, /scripts\/documents-mcp\.mjs/)
+  assert.ok(Array.isArray(catalog.communityPlugins))
+  assert.ok(catalog.communityPlugins.length >= 4)
+})
+
+test('describeToolkit marks forced MCP as enabled and lists host tools', () => {
+  const catalog = loadCatalog()
+  const data = describeToolkit(catalog, { mcp: ['documents'] }, {})
+  const documents = data.mcp.find((row) => row.id === 'documents')
+  const github = data.mcp.find((row) => row.id === 'github')
+  assert.equal(documents.enabled, true)
+  assert.equal(documents.forced, true)
+  assert.equal(github.enabled, false)
+  assert.equal(github.needsKey, true)
+  assert.ok(data.hostTools.some((row) => row.id === 'web_search'))
+  assert.match(data.restartHint, /重启/)
+})
+
+test('isMcpEnabled respects env flags and secrets', () => {
+  const entry = { id: 'github', enableWhen: { flag: 'MCP_GITHUB', anyEnv: ['GITHUB_TOKEN'] } }
+  assert.equal(isMcpEnabled(entry, { mcp: [] }, {}), false)
+  assert.equal(isMcpEnabled(entry, { mcp: ['github'] }, {}), true)
+  assert.equal(isMcpEnabled(entry, { mcp: [] }, { MCP_GITHUB: '1' }), true)
+  assert.equal(isMcpEnabled(entry, { mcp: [] }, { GITHUB_TOKEN: 'x' }), true)
 })
 
 test('fetchRemoteSkills writes SKILL.md with whenToUse', async () => {

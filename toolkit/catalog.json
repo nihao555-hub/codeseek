@@ -257,14 +257,14 @@
     },
     {
       "id": "memory",
-      "title": "Memory",
-      "description": "本地知识图谱记忆。",
+      "title": "Memory（本地图谱）",
+      "description": "本仓库 NDJSON 知识图谱，写入 dsh-home/memory-graph.json。不要存客户隐私和底价。工具名 mcp__memory__create_entities / search_nodes / read_graph。",
       "transport": "stdio",
       "serverName": "memory",
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/memory-mcp.mjs'" }],
       "enableWhen": { "flag": "MCP_MEMORY" },
-      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-memory"
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory"
     },
     {
       "id": "filesystem",
@@ -290,14 +290,25 @@
     },
     {
       "id": "time",
-      "title": "Time",
-      "description": "时区与时间转换。",
+      "title": "Time（本地时区）",
+      "description": "本仓库 NDJSON：当前时间和时区转换，不需要 uvx。工具名 mcp__time__get_current_time / convert_time。",
       "transport": "stdio",
       "serverName": "time",
-      "command": "uvx",
-      "args": ["mcp-server-time"],
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/time-mcp.mjs'" }],
       "enableWhen": { "flag": "MCP_TIME" },
       "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/time"
+    },
+    {
+      "id": "documents",
+      "title": "询盘附件阅读",
+      "description": "把工作区内的 md/txt/csv/json/docx/xlsx/pdf 读成文本。路径必须在工作区根下。工具名 mcp__documents__read_document。",
+      "transport": "stdio",
+      "serverName": "documents",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/documents-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_DOCUMENTS" },
+      "docs": "https://github.com/nihao555-hub/codeseek"
     },
     {
       "id": "git",
@@ -468,6 +479,50 @@
       "env": { "FIRECRAWL_API_KEY": { "from": ["FIRECRAWL_API_KEY"] } },
       "enableWhen": { "anyEnv": ["FIRECRAWL_API_KEY"], "flag": "MCP_FIRECRAWL" },
       "docs": "https://docs.firecrawl.dev/mcp"
+    }
+  ],
+  "communityPlugins": [
+    {
+      "id": "dsh-at-file",
+      "repo": "omdsh-dev/dsh-at-file",
+      "title": "@file 提及",
+      "why": "Web 输入框搜工作区文件并贴进提示。",
+      "install": "dsh plugin --profile web add github:omdsh-dev/dsh-at-file"
+    },
+    {
+      "id": "dsh-sticky-disclosure",
+      "repo": "Han-1413141/dsh-sticky-disclosure",
+      "title": "一键收起工具卡",
+      "why": "Search / Think 卡片默认折叠，这个能一次收起全部。",
+      "install": "dsh plugin --profile web add github:Han-1413141/dsh-sticky-disclosure"
+    },
+    {
+      "id": "modlens",
+      "repo": "liustack/modlens",
+      "title": "看图 OCR",
+      "why": "产品图、询盘截图。要审源码，预览期可能不兼容 rc.5。",
+      "install": "先读仓库 README，再用 overlay，不要改 vendor。"
+    },
+    {
+      "id": "dsh-files",
+      "repo": "taxueseek/dsh-files",
+      "title": "拖文件进会话",
+      "why": "PDF/DOCX 卡片。本仓库已用 documents MCP 读工作区附件。",
+      "install": "dsh plugin --profile web add github:taxueseek/dsh-files"
+    },
+    {
+      "id": "dsh-browser",
+      "repo": "Lum1104/dsh-browser",
+      "title": "Chrome 侧栏操控浏览器",
+      "why": "登录态站点。本机 Playwright MCP 可在本页打开，但会下载浏览器。",
+      "install": "dsh plugin --profile web add github:Lum1104/dsh-browser"
+    },
+    {
+      "id": "dsh-notification",
+      "repo": "omdsh-dev/dsh-notification",
+      "title": "回合结束通知",
+      "why": "桌面通知。",
+      "install": "dsh plugin --profile web add github:omdsh-dev/dsh-notification"
     }
   ]
 }

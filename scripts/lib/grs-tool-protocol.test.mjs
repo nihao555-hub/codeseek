@@ -383,4 +383,5 @@ test('gpt-5 tool protocol lowers reasoning effort so visible tool_call survives'
   assert.equal(out.reasoning_effort, 'low')
   assert.match(out.messages[0].content, /Hidden reasoning/)
   assert.match(out.messages[0].content, /mcp__buyer-dd__/)
+  assert.match(out.messages[0].content, /mcp__documents__read_document/)
 })

@@ -23,4 +23,6 @@ Harness 用 `@deepseek-ai/dsh-mcp-client`，每个服务器一条 plugin。本�
 3. `.env` 里放密钥或 `MCP_*=1`
 4. 重启 `npm start`
 
+也可以打开 Web **设置 → 插件 → 工具与 MCP** 点「接入」。官方设置页本身没有 MCP 入口，那一页是本仓库插件补的。
+
 改 vendor 里的 mcp-client 源码来接业务 MCP：**禁止**。

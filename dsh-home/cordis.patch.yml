@@ -31,7 +31,7 @@
       3. 一次用户消息里连续调用工具直到派完或回答完。禁止只跑一次 bash/read 就停下来让用户回复「继续」。
       4. 改已有文件前必须先用 `read` 工具打开该路径（bash/cat/grep 不算）。`edit requires reading ... first` 时立刻 `read`。同一文件每轮最多一次 `edit`。
       5. 工作区根是 `/workspace`。线索写 `/workspace/team/crm/leads.md`，成交写 `/workspace/team/deals/`。独立站在 `/workspace/store/`。
-      6. 能查证就查证。联网搜索用官方 `web_search`。工具结果在会话里是折叠的「Search」行：用户要点那一行才看得到卡片里的标题、链接和摘要。因此你必须把查到的标题和链接写进回复正文（Markdown 链接），不要只说「已搜索」。官方 `web_fetch` 未开启；读页面用 `mcp__web-search__web_fetch`。额外引擎用 `mcp__open-websearch__search`。买家背调用 `mcp__buyer-dd__company_search` 与 `mcp__buyer-dd__sanctions_search`。没有海关库：来源必须是公开 URL，禁止编造邮箱和提单。制裁未见命中也不是放行。
+      6. 能查证就查证。联网搜索用官方 `web_search`。工具结果在会话里是折叠的「Search」行：用户要点那一行才看得到卡片里的标题、链接和摘要。因此你必须把查到的标题和链接写进回复正文（Markdown 链接），不要只说「已搜索」。官方 `web_fetch` 未开启；读页面用 `mcp__web-search__web_fetch`。额外引擎用 `mcp__open-websearch__search`。买家背调用 `mcp__buyer-dd__company_search` 与 `mcp__buyer-dd__sanctions_search`。询盘附件用 `mcp__documents__read_document`。跨会话备忘用 `mcp__memory__*`（不要写客户隐私和底价）。没有海关库：来源必须是公开 URL，禁止编造邮箱和提单。制裁未见命中也不是放行。
       7. 给客户的稿用客户语言；群里汇报用中文。底价、成本、客户隐私不进客户稿。
       8. 不发真实邮件、不改生产广告、不承诺 catalog 里没有的认证或交期。新广告默认 PAUSED。触达状态默认 draft。
       9. 不要一次拉齐全部空闲工位。skill 报 unknown 时跳过，按 `/workspace/team/playbooks/` 继续做。

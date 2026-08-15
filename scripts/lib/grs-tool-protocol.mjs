@@ -569,6 +569,7 @@ export const TOOL_CONTINUE_HINT = [
   'Put titles and URLs in the reply text; the Search card is collapsed until the user clicks it.',
   'Extra engines: mcp__open-websearch__search. Official web_fetch is disabled; fetch URLs with mcp__web-search__web_fetch.',
   'Buyer due diligence: mcp__buyer-dd__company_search and mcp__buyer-dd__sanctions_search; never invent customs B/L.',
+  'Local extras: mcp__memory__search_nodes, mcp__time__get_current_time, mcp__documents__read_document for workspace attachments.',
   'Harbor Kiln team: @member means list_agents then send_message or subagent. subagent description must be the roster 花名 (营销专家, not the task summary). Members report with 【花名】进行中|报错|完成.',
 ].join(' ')
 
@@ -647,6 +648,7 @@ export function buildToolProtocolPrompt(tools) {
     '- glob requires pattern; skill requires name',
     '- search the web with official web_search (DuckDuckGo, then Wikipedia). Put result titles and URLs in the reply. Extra engines: mcp__open-websearch__search. Official web_fetch is off; fetch URLs with mcp__web-search__web_fetch',
     '- buyer due diligence: OpenCorporates / OpenSanctions via mcp__buyer-dd__* plus web_search; never invent customs bills of lading',
+    '- workspace attachments (pdf/docx/xlsx/md) via mcp__documents__read_document; local memory via mcp__memory__*; time zones via mcp__time__*',
     '- if the user @s a Harbor Kiln teammate, list_agents then send_message or subagent; do not do that person\'s job yourself',
     '- subagent description MUST be the roster 花名 (营销专家 / 建站专家 / …), never a task summary; that label is the sidebar and @ picker name',
     '- teammates report with report output like 【营销专家】进行中：… including errors',

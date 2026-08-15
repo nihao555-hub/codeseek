@@ -45,7 +45,7 @@ export function AppRoot(props: AppRootProps) {
           ? (
             <>
               <div className={css.spinner} />
-              <div className={css.hint}>正在加载超级员工…</div>
+              <div className={css.hint}>正在加载港窑外贸团队…</div>
             </>
           )
           : (

@@ -39,19 +39,40 @@ root = Path("/workspace/vendor/deepseek-harness")
 
 locales = root / "packages/client/ui-conversation/src/client/locales.ts"
 text = locales.read_text()
-replacements = {
-    "'hero.headline': '探索未至之境'": "'hero.headline': '超级员工已就位'",
-    "'hero.preview': '预览版'": "'hero.preview': 'SUPER'",
-    "'placeholder.hero': '描述你想要构建的内容'": "'placeholder.hero': '交给超级员工：外贸、广告或开发'",
-    "'hero.headline': 'Into the Unknown'": "'hero.headline': 'Super employee, ready'",
-    "'hero.preview': 'Preview'": "'hero.preview': 'SUPER'",
-    "'placeholder.hero': 'Describe what you want to build'": "'placeholder.hero': 'Trade, ads, or a coding task'",
-}
-for old, new in replacements.items():
-    if old in text:
-        text = text.replace(old, new)
-    elif new not in text:
-        raise SystemExit(f"brand patch miss: {old}")
+replacements = [
+    (
+        ["'hero.headline': '探索未至之境'", "'hero.headline': '超级员工已就位'"],
+        "'hero.headline': '港窑外贸团队已就位'",
+    ),
+    (
+        ["'hero.preview': '预览版'", "'hero.preview': 'SUPER'"],
+        "'hero.preview': 'TRADE'",
+    ),
+    (
+        ["'placeholder.hero': '描述你想要构建的内容'", "'placeholder.hero': '交给超级员工：外贸、广告或开发'"],
+        "'placeholder.hero': '@营销专家 找北欧买家，或贴一条询盘'",
+    ),
+    (
+        ["'hero.headline': 'Into the Unknown'", "'hero.headline': 'Super employee, ready'"],
+        "'hero.headline': 'Harbor Kiln trade desk'",
+    ),
+    (
+        ["'hero.preview': 'Preview'"],
+        "'hero.preview': 'TRADE'",
+    ),
+    (
+        ["'placeholder.hero': 'Describe what you want to build'", "'placeholder.hero': 'Trade, ads, or a coding task'"],
+        "'placeholder.hero': '@营销专家 find Nordic buyers, or paste an inquiry'",
+    ),
+]
+for olds, new in replacements:
+    hit = False
+    for old in olds:
+        if old in text:
+            text = text.replace(old, new)
+            hit = True
+    if not hit and new not in text:
+        raise SystemExit(f"brand patch miss: {olds[0]}")
 locales.write_text(text)
 
 hero_tsx = root / "packages/client/ui-conversation/src/client/skeleton/EmptyHero.tsx"

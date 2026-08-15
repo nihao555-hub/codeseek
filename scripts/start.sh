@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 启动超级员工（DeepSeek Harness）。
+# 启动港窑外贸团队（DeepSeek Harness）。
 # 用法：
 #   scripts/start.sh web
 #   scripts/start.sh headless "今天的任务"

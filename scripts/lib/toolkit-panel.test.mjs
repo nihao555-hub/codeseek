@@ -39,6 +39,8 @@ test('activity panel ships a DSH client overlay for the right rail', () => {
   assert.match(client, /window\.__ModuleLoader__\.load/)
   assert.match(client, /shell\.overlay/)
   assert.match(client, /conversation\.input\.left/)
+  assert.match(client, /conversation\.input\.dock/)
+  assert.match(client, /createPortal/)
   assert.match(client, /__codeseek\/activity/)
   assert.match(client, /港窑实时/)
   assert.match(host, /trade-activity\.mjs/)

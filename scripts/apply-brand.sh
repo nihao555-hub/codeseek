@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+# 把 codeseek 品牌资源覆盖进 DeepSeek Harness 前端源码与 public。
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC="$ROOT/vendor/deepseek-harness"
+BRAND="$ROOT/branding"
+
+if [[ ! -d "$SRC/apps/web" ]]; then
+  echo "未找到 vendor/deepseek-harness，请先初始化 submodule。" >&2
+  exit 1
+fi
+
+PUBLIC="$SRC/apps/web/public"
+DIST="$SRC/apps/web/dist"
+mkdir -p "$PUBLIC/brand" "$PUBLIC/brand/models" "$DIST/brand"
+
+cp -f "$BRAND/svg/favicon.svg" "$PUBLIC/favicon.svg"
+cp -f "$BRAND/css/brand.css" "$PUBLIC/brand/brand.css"
+cp -f "$BRAND/generated/codeseek-app-icon.png" "$PUBLIC/brand/app-icon.png"
+cp -f "$BRAND/generated/codeseek-wordmark.png" "$PUBLIC/brand/wordmark.png"
+cp -f "$BRAND/generated/codeseek-hero-glow.png" "$PUBLIC/brand/hero-glow.png"
+cp -f "$BRAND/generated/codeseek-empty-state.png" "$PUBLIC/brand/empty-state.png"
+cp -f "$BRAND/generated/codeseek-sidebar-ornament.png" "$PUBLIC/brand/sidebar-ornament.png"
+cp -f "$BRAND/svg/model-gemini.svg" "$PUBLIC/brand/models/gemini.svg"
+cp -f "$BRAND/svg/model-openai.svg" "$PUBLIC/brand/models/openai.svg"
+cp -f "$BRAND/overrides/index.html" "$SRC/apps/web/index.html"
+cp -f "$BRAND/overrides/manifest.webmanifest" "$PUBLIC/manifest.webmanifest"
+cp -f "$BRAND/overrides/FishLogo.tsx" "$SRC/packages/client/ui-primitives/src/FishLogo.tsx"
+cp -f "$BRAND/overrides/BrandWordmark.tsx" "$SRC/packages/client/ui-primitives/src/BrandWordmark.tsx"
+cp -f "$BRAND/overrides/AppRoot.tsx" "$SRC/packages/client/web/src/AppRoot.tsx"
+cp -f "$BRAND/overrides/ModelSelect.tsx" "$SRC/packages/client/ui-model-selection/src/client/ModelSelect.tsx"
+cp -f "$BRAND/overrides/ModelSelect.module.css" "$SRC/packages/client/ui-model-selection/src/client/ModelSelect.module.css"
+
+python3 - <<'PY'
+from pathlib import Path
+
+root = Path("/workspace/vendor/deepseek-harness")
+
+locales = root / "packages/client/ui-conversation/src/client/locales.ts"
+text = locales.read_text()
+replacements = [
+    (
+        ["'hero.headline': '探索未至之境'", "'hero.headline': '超级员工已就位'"],
+        "'hero.headline': '港窑外贸团队已就位'",
+    ),
+    (
+        ["'hero.preview': '预览版'", "'hero.preview': 'SUPER'"],
+        "'hero.preview': 'TRADE'",
+    ),
+    (
+        ["'placeholder.hero': '描述你想要构建的内容'", "'placeholder.hero': '交给超级员工：外贸、广告或开发'"],
+        "'placeholder.hero': '@营销专家 找北欧买家，或贴一条询盘'",
+    ),
+    (
+        ["'hero.headline': 'Into the Unknown'", "'hero.headline': 'Super employee, ready'"],
+        "'hero.headline': 'Harbor Kiln trade desk'",
+    ),
+    (
+        ["'hero.preview': 'Preview'"],
+        "'hero.preview': 'TRADE'",
+    ),
+    (
+        ["'placeholder.hero': 'Describe what you want to build'", "'placeholder.hero': 'Trade, ads, or a coding task'"],
+        "'placeholder.hero': '@营销专家 find Nordic buyers, or paste an inquiry'",
+    ),
+]
+for olds, new in replacements:
+    hit = False
+    for old in olds:
+        if old in text:
+            text = text.replace(old, new)
+            hit = True
+    if not hit and new not in text:
+        raise SystemExit(f"brand patch miss: {olds[0]}")
+locales.write_text(text)
+
+hero_tsx = root / "packages/client/ui-conversation/src/client/skeleton/EmptyHero.tsx"
+hero = hero_tsx.read_text()
+# 空状态背景回到 Harness 原版淡蓝光晕，不要铺世界地图底图。
+hero = hero.replace('fill="#2DD4BF" fillOpacity="0.12"', 'fill="#6187D8" fillOpacity="0.08"')
+hero_tsx.write_text(hero)
+
+css_path = root / "packages/client/ui-conversation/src/client/skeleton/HeroShell.module.css"
+css = css_path.read_text()
+overlay = """.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 0;
+  padding: 0 24px;
+  overflow: hidden;
+}
+
+.root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(11 18 32 / 35%) 0%, rgb(11 18 32 / 70%) 100%),
+    url('/brand/hero-glow.png') center / cover no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.root > * {
+  position: relative;
+  z-index: 1;
+}"""
+original_root = """.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 0;
+  padding: 0 24px;
+}"""
+if overlay in css:
+    css_path.write_text(css.replace(overlay, original_root, 1))
+elif original_root not in css and "url('/brand/hero-glow.png')" in css:
+    raise SystemExit("brand patch miss: revert HeroShell hero-glow overlay")
+
+boot_css = root / "packages/client/web/src/AppRoot.module.css"
+boot = boot_css.read_text()
+boot = boot.replace(
+    "border-top-color: var(--dsw-alias-brand-primary, #3964fe);",
+    "border-top-color: var(--dsw-alias-brand-primary, #2dd4bf);",
+)
+boot_css.write_text(boot)
+print("brand text/css patches applied")
+PY
+
+# Keep built dist in sync for a running server that already compiled JS.
+if [[ -d "$DIST" ]]; then
+  cp -f "$PUBLIC/favicon.svg" "$DIST/favicon.svg"
+  cp -f "$PUBLIC/manifest.webmanifest" "$DIST/manifest.webmanifest"
+  cp -a "$PUBLIC/brand/." "$DIST/brand/"
+  # Built index.html is generated by Vite; patch title/favicon in place if present.
+  if [[ -f "$DIST/index.html" ]]; then
+    python3 - <<'PY'
+from pathlib import Path
+p = Path("/workspace/vendor/deepseek-harness/apps/web/dist/index.html")
+html = p.read_text()
+html = html.replace("<title>DeepSeek Harness</title>", "<title>codeseek</title>")
+if 'href="/brand/brand.css"' not in html:
+    html = html.replace(
+        '<link rel="icon" type="image/svg+xml" href="/favicon.svg" />',
+        '<link rel="icon" type="image/svg+xml" href="/favicon.svg" />\n    <link rel="apple-touch-icon" href="/brand/app-icon.png" />\n    <link rel="stylesheet" href="/brand/brand.css" />',
+    )
+p.write_text(html)
+PY
+  fi
+fi
+
+echo "codeseek brand applied."

@@ -1,0 +1,6 @@
+# 必须用包名。文件路径能加载 host apply，但 client-modules 不会去读
+# package.json 的 dsh.client，设置里就不会出现「工具与 MCP」。
+# start.sh / assemble-toolkit sync 会把本包链进 web profile 的 node_modules。
+- insert:
+    - id: codeseek-toolkit-panel
+      name: codeseek-toolkit-panel

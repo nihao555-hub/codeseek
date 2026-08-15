@@ -1,0 +1,7 @@
+# 官方 Web 默认树不含定时工具。生产启动请用 plugins/harbor-trade/cordis.patch.yml
+#（同一组 time-context + dsh-schedule，并带上港窑外贸 bundle）。
+- insert:
+    - id: time-context
+      name: '@deepseek-ai/dsh-time-context'
+    - id: schedule
+      name: '@deepseek-ai/dsh-schedule'

@@ -1,0 +1,625 @@
+{
+  "version": 1,
+  "updated": "2026-08-15",
+  "hostTools": [
+    { "id": "bash", "description": "在工作区跑 shell 命令" },
+    { "id": "read", "description": "读文件；Web 会话 cwd 可能是 /，请用绝对路径 /workspace/..." },
+    { "id": "write", "description": "写新文件" },
+    { "id": "edit", "description": "按精确片段替换文件内容（str_replace）" },
+    { "id": "glob", "description": "按文件名模式搜索" },
+    { "id": "grep", "description": "按内容搜索" },
+    { "id": "skill", "description": "加载 .dsh/skills/<name>/SKILL.md" },
+    { "id": "todo_write", "description": "任务清单" },
+    { "id": "get_goal", "description": "当前会话目标" },
+    { "id": "job_*", "description": "后台作业控制" },
+    { "id": "web_search", "description": "官方模型可见搜索。本仓库后端为 DuckDuckGo，失败则 Wikipedia。点 Search 卡片展开看结果。" },
+    { "id": "subagent", "description": "拉团员；description 必须是花名。standard 预设默认后台 continuable" },
+    { "id": "list_agents", "description": "列出已派出的孩子会话" },
+    { "id": "send_message", "description": "给已有孩子补一句" },
+    { "id": "interrupt_agent", "description": "打断孩子" },
+    { "id": "report", "description": "只在 continuable 孩子里出现；团员往群里汇报" },
+    { "id": "ask_user_question", "description": "缺了不猜就会做错的关键信息时问用户" },
+    { "id": "exit_plan_mode", "description": "计划模式交卷；Web 点 /plan 才进入" },
+    { "id": "ralph", "description": "全新子代理多轮死磕一个 objective；适合难修 bug，不适合一次派齐工位" },
+    { "id": "workflow", "description": "跑部署侧写好的工作流脚本" },
+    { "id": "schedule_create", "description": "会话内定时提醒。every_seconds 最短 300。只对加载 schedule overlay 之后新建的根会话生效。" },
+    { "id": "schedule_list", "description": "列出本会话未完成的定时提醒" },
+    { "id": "schedule_delete", "description": "删除本会话一条定时提醒" }
+  ],
+  "skills": [
+    { "id": "assemble-toolkit", "kind": "local", "group": "platform", "description": "装配本仓库 skill / MCP / 主机工具" },
+    { "id": "foreign-trade", "kind": "local", "group": "business" },
+    { "id": "trade-desk", "kind": "local", "group": "business" },
+    { "id": "trade-marketing", "kind": "local", "group": "business" },
+    { "id": "trade-inquiry", "kind": "local", "group": "business" },
+    { "id": "trade-quote", "kind": "local", "group": "business" },
+    { "id": "trade-ops", "kind": "local", "group": "business" },
+    { "id": "trade-social", "kind": "local", "group": "business" },
+    { "id": "trade-compliance", "kind": "local", "group": "business" },
+    { "id": "trade-dd", "kind": "local", "group": "business" },
+    { "id": "meta-ads", "kind": "local", "group": "business" },
+    { "id": "software-dev", "kind": "local", "group": "engineering" },
+    { "id": "ecommerce-store", "kind": "local", "group": "store" },
+    { "id": "frontend-design", "kind": "local", "group": "frontend" },
+    { "id": "react-best-practices", "kind": "local", "group": "frontend" },
+    { "id": "react-storefront", "kind": "local", "group": "frontend" },
+    { "id": "web-accessibility", "kind": "local", "group": "frontend" },
+    { "id": "frontend-performance", "kind": "local", "group": "frontend" },
+    { "id": "seo-independent-site", "kind": "local", "group": "frontend" },
+    { "id": "i18n-storefront", "kind": "local", "group": "frontend" },
+    { "id": "copywriting-conversion", "kind": "local", "group": "frontend" },
+    { "id": "api-design", "kind": "local", "group": "backend" },
+    { "id": "backend-reliability", "kind": "local", "group": "backend" },
+    { "id": "ecommerce-checkout", "kind": "local", "group": "backend" },
+    { "id": "auth-and-secrets", "kind": "local", "group": "engineering" },
+    { "id": "testing-and-qa", "kind": "local", "group": "engineering" },
+    { "id": "code-review", "kind": "local", "group": "engineering" },
+    { "id": "systematic-debugging", "kind": "local", "group": "engineering" },
+    { "id": "mcp-integration", "kind": "local", "group": "platform" },
+    { "id": "git-workflow", "kind": "local", "group": "engineering" },
+    { "id": "github-ops", "kind": "local", "group": "engineering" },
+    { "id": "document-ops", "kind": "local", "group": "office" },
+    { "id": "browser-qa", "kind": "local", "group": "engineering" },
+    { "id": "web-research", "kind": "local", "group": "research" },
+    { "id": "skill-creator", "kind": "local", "group": "platform" },
+    {
+      "id": "mcp-builder",
+      "kind": "remote",
+      "group": "platform",
+      "whenToUse": "从零写一个 MCP server（TypeScript 或 Python）时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/mcp-builder/SKILL.md",
+        "license": "see upstream LICENSE.txt",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/mcp-builder/SKILL.md"
+      }
+    },
+    {
+      "id": "webapp-testing",
+      "kind": "remote",
+      "group": "engineering",
+      "whenToUse": "用 Playwright 测 Web UI、截图、填表时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/webapp-testing/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/webapp-testing/SKILL.md"
+      }
+    },
+    {
+      "id": "doc-coauthoring",
+      "kind": "remote",
+      "group": "office",
+      "whenToUse": "与用户共写长文档、迭代大纲与段落时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/doc-coauthoring/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/doc-coauthoring/SKILL.md"
+      }
+    },
+    {
+      "id": "brand-guidelines",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "按品牌规范出视觉或文案时使用；港窑店面仍以 ecommerce-store 为准。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/brand-guidelines/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/brand-guidelines/SKILL.md"
+      }
+    },
+    {
+      "id": "canvas-design",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "做海报、画布、静态视觉构图时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/canvas-design/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/canvas-design/SKILL.md"
+      }
+    },
+    {
+      "id": "theme-factory",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "生成多套主题色与字体搭配时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/theme-factory/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/theme-factory/SKILL.md"
+      }
+    },
+    {
+      "id": "internal-comms",
+      "kind": "remote",
+      "group": "office",
+      "whenToUse": "写内部通报、更新邮件、状态备忘时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/internal-comms/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/internal-comms/SKILL.md"
+      }
+    },
+    {
+      "id": "web-artifacts-builder",
+      "kind": "remote",
+      "group": "frontend",
+      "whenToUse": "做可分享的单页 HTML 工件时使用。",
+      "source": {
+        "repo": "anthropics/skills",
+        "path": "skills/web-artifacts-builder/SKILL.md",
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/web-artifacts-builder/SKILL.md"
+      }
+    }
+  ],
+  "mcp": [
+    {
+      "id": "meta-ads",
+      "title": "Meta Ads（官方）",
+      "description": "Facebook / Instagram 广告。工具名 mcp__meta-ads__*。新广告保持 PAUSED。",
+      "transport": "streamable-http",
+      "serverName": "meta-ads",
+      "url": "https://mcp.facebook.com/ads",
+      "headers": { "Authorization": { "bearer": "META_ACCESS_TOKEN" } },
+      "enableWhen": { "anyEnv": ["META_ACCESS_TOKEN"], "flag": "MCP_META_ADS" },
+      "docs": "https://mcp.facebook.com/ads"
+    },
+    {
+      "id": "web-search",
+      "title": "联网搜索（DuckDuckGo + Wikipedia）",
+      "description": "本地 MCP：先 DuckDuckGo，失败再 Wikipedia。公开 SearXNG 默认不打（会 429）。工具名 mcp__web-search__web_search / mcp__web-search__web_fetch。",
+      "transport": "stdio",
+      "serverName": "web-search",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/web-search-mcp.mjs'" }],
+      "env": {
+        "SEARXNG_URL": { "from": ["SEARXNG_URL"], "default": "" },
+        "SEARXNG_PUBLIC": { "from": ["SEARXNG_PUBLIC"], "default": "" }
+      },
+      "enableWhen": { "flag": "MCP_WEB_SEARCH" },
+      "docs": "https://github.com/searxng/searxng"
+    },
+    {
+      "id": "open-websearch",
+      "title": "Open-WebSearch",
+      "description": "GitHub 高星无密钥多引擎搜索（Aas-ee/open-webSearch）。本地 NDJSON 包装 CLI，默认 DuckDuckGo，不走 Playwright。工具名 mcp__open-websearch__search。",
+      "transport": "stdio",
+      "serverName": "open-websearch",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/open-websearch-mcp.mjs'" }],
+      "env": {
+        "DEFAULT_SEARCH_ENGINE": { "from": ["OPEN_WEBSEARCH_ENGINE"], "default": "duckduckgo" },
+        "ALLOWED_SEARCH_ENGINES": { "from": [], "default": "duckduckgo,startpage,bing" },
+        "SEARCH_MODE": { "from": [], "default": "request" }
+      },
+      "enableWhen": { "flag": "MCP_OPEN_WEBSEARCH" },
+      "docs": "https://github.com/Aas-ee/open-webSearch"
+    },
+    {
+      "id": "buyer-dd",
+      "title": "公开源买家背调",
+      "description": "OpenCorporates 公司检索 + OpenSanctions 制裁名单。API 要密钥时回退 GLEIF 与公开 HTML。不是海关提单。工具名 mcp__buyer-dd__company_search / mcp__buyer-dd__sanctions_search。",
+      "transport": "stdio",
+      "serverName": "buyer-dd",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/buyer-dd-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_BUYER_DD" },
+      "docs": "https://github.com/opencorporates/api-documentation"
+    },
+    {
+      "id": "github",
+      "title": "GitHub（stdio 参考服务器）",
+      "description": "仓库、Issue、PR、文件。需要 GitHub PAT。",
+      "transport": "stdio",
+      "serverName": "github",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": { "from": ["GITHUB_PERSONAL_ACCESS_TOKEN", "GITHUB_TOKEN"] } },
+      "enableWhen": { "anyEnv": ["GITHUB_TOKEN", "GITHUB_PERSONAL_ACCESS_TOKEN"], "flag": "MCP_GITHUB" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-github"
+    },
+    {
+      "id": "github-official",
+      "title": "GitHub 官方远程 MCP",
+      "description": "api.githubcopilot.com/mcp/ ，Bearer 用 GITHUB_TOKEN。",
+      "transport": "streamable-http",
+      "serverName": "github-official",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": { "bearer": "GITHUB_TOKEN" } },
+      "enableWhen": { "anyEnv": ["GITHUB_TOKEN"], "flag": "MCP_GITHUB_OFFICIAL" },
+      "docs": "https://github.com/github/github-mcp-server"
+    },
+    {
+      "id": "playwright",
+      "title": "Playwright",
+      "description": "真实浏览器点击、截图、填表。首次 npx 会下载浏览器。",
+      "transport": "stdio",
+      "serverName": "playwright",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "enableWhen": { "flag": "MCP_PLAYWRIGHT" },
+      "docs": "https://github.com/microsoft/playwright-mcp"
+    },
+    {
+      "id": "sequential-thinking",
+      "title": "Sequential Thinking",
+      "description": "多步推理草稿板，无外部密钥。",
+      "transport": "stdio",
+      "serverName": "sequential-thinking",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "enableWhen": { "flag": "MCP_SEQUENTIAL" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-sequential-thinking"
+    },
+    {
+      "id": "memory",
+      "title": "Memory（本地图谱）",
+      "description": "本仓库 NDJSON 知识图谱，写入 dsh-home/memory-graph.json。不要存客户隐私和底价。工具名 mcp__memory__create_entities / search_nodes / read_graph。",
+      "transport": "stdio",
+      "serverName": "memory",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/memory-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_MEMORY" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory"
+    },
+    {
+      "id": "filesystem",
+      "title": "Filesystem MCP",
+      "description": "额外文件系统 MCP（Harness 已有 read/write，一般不必开）。",
+      "transport": "stdio",
+      "serverName": "filesystem",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", { "js": "process.env.DSH_WORKSPACE || process.cwd()" }],
+      "enableWhen": { "flag": "MCP_FILESYSTEM" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-filesystem"
+    },
+    {
+      "id": "fetch",
+      "title": "Fetch",
+      "description": "把 URL 拉成可读文本。需要 uvx（pipx/uv）。",
+      "transport": "stdio",
+      "serverName": "fetch",
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "enableWhen": { "flag": "MCP_FETCH" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch"
+    },
+    {
+      "id": "time",
+      "title": "Time（本地时区）",
+      "description": "本仓库 NDJSON：当前时间和时区转换，不需要 uvx。工具名 mcp__time__get_current_time / convert_time。",
+      "transport": "stdio",
+      "serverName": "time",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/time-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_TIME" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/time"
+    },
+    {
+      "id": "documents",
+      "title": "询盘附件阅读",
+      "description": "把工作区内的 md/txt/csv/json/docx/xlsx/pdf 读成文本。路径必须在工作区根下。工具名 mcp__documents__read_document。",
+      "transport": "stdio",
+      "serverName": "documents",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/documents-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_DOCUMENTS" },
+      "docs": "https://github.com/nihao555-hub/codeseek"
+    },
+    {
+      "id": "trade-crm",
+      "title": "外贸 CRM（线索到订单）",
+      "description": "把线索/商机写进 team/crm JSON。官网 Impressum 核实过的邮箱可以 send_outreach 代发。禁止编造邮箱。工具名 mcp__trade-crm__list_leads / upsert_lead / capture_public_email / send_outreach / quote_catalog。",
+      "transport": "stdio",
+      "serverName": "trade-crm",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-crm-mcp.mjs'" }],
+      "env": {
+        "MAIL_FROM": { "from": ["MAIL_FROM", "SMTP_FROM"] },
+        "SMTP_HOST": { "from": ["SMTP_HOST"] },
+        "SMTP_PORT": { "from": ["SMTP_PORT"] },
+        "SMTP_USER": { "from": ["SMTP_USER"] },
+        "SMTP_PASS": { "from": ["SMTP_PASS", "SMTP_PASSWORD"] },
+        "SMTP_SECURE": { "from": ["SMTP_SECURE"] },
+        "RESEND_API_KEY": { "from": ["RESEND_API_KEY"] }
+      },
+      "enableWhen": { "flag": "MCP_TRADE_CRM" },
+      "docs": "https://github.com/nihao555-hub/codeseek"
+    },
+    {
+      "id": "trade-open-data",
+      "title": "开源外贸数据（Comtrade + 展会）",
+      "description": "UN Comtrade 官方 preview：国家×HS 年度汇总，不是提单、没有进口商公司名。展会日历来自 GitHub LensmorOfficial/trade-show-calendar。一句话开干用 kickoff。工具名 mcp__trade-open-data__kickoff / comtrade_preview / list_fairs。",
+      "transport": "stdio",
+      "serverName": "trade-open-data",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-open-data-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_TRADE_OPEN_DATA" },
+      "docs": "https://comtradedeveloper.un.org/"
+    },
+    {
+      "id": "git",
+      "title": "Git",
+      "description": "只读/受限 git 操作 MCP。日常仍优先用 bash git。",
+      "transport": "stdio",
+      "serverName": "git",
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", { "js": "process.env.DSH_WORKSPACE || process.cwd()" }],
+      "enableWhen": { "flag": "MCP_GIT" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/git"
+    },
+    {
+      "id": "postgres",
+      "title": "PostgreSQL",
+      "description": "查询 Postgres。",
+      "transport": "stdio",
+      "serverName": "postgres",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", { "js": "process.env.POSTGRES_URL || ''" }],
+      "enableWhen": { "anyEnv": ["POSTGRES_URL"], "flag": "MCP_POSTGRES" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-postgres"
+    },
+    {
+      "id": "sqlite",
+      "title": "SQLite",
+      "description": "本地 SQLite。路径 SQLITE_PATH。",
+      "transport": "stdio",
+      "serverName": "sqlite",
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", { "js": "process.env.SQLITE_PATH || '/tmp/codeseek.sqlite'" }],
+      "enableWhen": { "flag": "MCP_SQLITE" },
+      "docs": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite"
+    },
+    {
+      "id": "searxng",
+      "title": "SearXNG（开源元搜索）",
+      "description": "完整 SearXNG MCP（分页、读 URL）。自建实例时启用：设 SEARXNG_URL 后 npm run toolkit -- enable searxng。日常默认用本地 web-search。",
+      "transport": "stdio",
+      "serverName": "searxng",
+      "command": "npx",
+      "args": ["-y", "mcp-searxng"],
+      "env": {
+        "SEARXNG_URL": {
+          "from": ["SEARXNG_URL"],
+          "default": "https://searx.tiekoetter.com;https://priv.au;https://search.ononoki.org"
+        },
+        "SEARXNG_HTML_FALLBACK": { "from": ["SEARXNG_HTML_FALLBACK"], "default": "true" }
+      },
+      "enableWhen": { "flag": "MCP_SEARXNG" },
+      "docs": "https://github.com/ihor-sokoliuk/mcp-searxng"
+    },
+    {
+      "id": "brave-search",
+      "title": "Brave Search",
+      "description": "网页搜索。",
+      "transport": "stdio",
+      "serverName": "brave-search",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": { "BRAVE_API_KEY": { "from": ["BRAVE_API_KEY"] } },
+      "enableWhen": { "anyEnv": ["BRAVE_API_KEY"], "flag": "MCP_BRAVE" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search"
+    },
+    {
+      "id": "slack",
+      "title": "Slack",
+      "description": "频道与消息。",
+      "transport": "stdio",
+      "serverName": "slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": { "from": ["SLACK_BOT_TOKEN"] },
+        "SLACK_TEAM_ID": { "from": ["SLACK_TEAM_ID"] }
+      },
+      "enableWhen": { "anyEnv": ["SLACK_BOT_TOKEN"], "flag": "MCP_SLACK" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-slack"
+    },
+    {
+      "id": "google-maps",
+      "title": "Google Maps",
+      "description": "官方 Places API（要 GOOGLE_MAPS_API_KEY）。获客默认不走地图；有密钥再开。",
+      "transport": "stdio",
+      "serverName": "google-maps",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-google-maps"],
+      "env": { "GOOGLE_MAPS_API_KEY": { "from": ["GOOGLE_MAPS_API_KEY"] } },
+      "enableWhen": { "anyEnv": ["GOOGLE_MAPS_API_KEY"], "flag": "MCP_GOOGLE_MAPS" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-google-maps"
+    },
+    {
+      "id": "puppeteer",
+      "title": "Puppeteer",
+      "description": "无头 Chrome。更推荐 Playwright。",
+      "transport": "stdio",
+      "serverName": "puppeteer",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "enableWhen": { "flag": "MCP_PUPPETEER" },
+      "docs": "https://www.npmjs.com/package/@modelcontextprotocol/server-puppeteer"
+    },
+    {
+      "id": "context7",
+      "title": "Context7",
+      "description": "按库名拉最新官方文档。可选 CONTEXT7_API_KEY。",
+      "transport": "stdio",
+      "serverName": "context7",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": { "CONTEXT7_API_KEY": { "from": ["CONTEXT7_API_KEY"] } },
+      "enableWhen": { "flag": "MCP_CONTEXT7" },
+      "docs": "https://github.com/upstash/context7"
+    },
+    {
+      "id": "stripe",
+      "title": "Stripe 官方远程 MCP",
+      "description": "客户、产品、支付。演示站不要拿这个当真收款。",
+      "transport": "streamable-http",
+      "serverName": "stripe",
+      "url": "https://mcp.stripe.com",
+      "headers": { "Authorization": { "bearer": "STRIPE_SECRET_KEY" } },
+      "enableWhen": { "anyEnv": ["STRIPE_SECRET_KEY"], "flag": "MCP_STRIPE" },
+      "docs": "https://docs.stripe.com/mcp"
+    },
+    {
+      "id": "linear",
+      "title": "Linear 官方远程 MCP",
+      "description": "Issue 与项目管理。",
+      "transport": "streamable-http",
+      "serverName": "linear",
+      "url": "https://mcp.linear.app/mcp",
+      "headers": { "Authorization": { "bearer": "LINEAR_API_KEY" } },
+      "enableWhen": { "anyEnv": ["LINEAR_API_KEY"], "flag": "MCP_LINEAR" },
+      "docs": "https://linear.app/docs/mcp"
+    },
+    {
+      "id": "notion",
+      "title": "Notion 远程 MCP",
+      "description": "页面与数据库。",
+      "transport": "streamable-http",
+      "serverName": "notion",
+      "url": "https://mcp.notion.com/mcp",
+      "headers": { "Authorization": { "bearer": "NOTION_TOKEN" } },
+      "enableWhen": { "anyEnv": ["NOTION_TOKEN"], "flag": "MCP_NOTION" },
+      "docs": "https://developers.notion.com/docs/mcp"
+    },
+    {
+      "id": "sentry",
+      "title": "Sentry",
+      "description": "错误与 issue。",
+      "transport": "stdio",
+      "serverName": "sentry",
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server"],
+      "env": { "SENTRY_ACCESS_TOKEN": { "from": ["SENTRY_AUTH_TOKEN", "SENTRY_ACCESS_TOKEN"] } },
+      "enableWhen": { "anyEnv": ["SENTRY_AUTH_TOKEN", "SENTRY_ACCESS_TOKEN"], "flag": "MCP_SENTRY" },
+      "docs": "https://github.com/getsentry/sentry-mcp"
+    },
+    {
+      "id": "firecrawl",
+      "title": "Firecrawl",
+      "description": "把网页爬成干净 markdown。",
+      "transport": "stdio",
+      "serverName": "firecrawl",
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": { "FIRECRAWL_API_KEY": { "from": ["FIRECRAWL_API_KEY"] } },
+      "enableWhen": { "anyEnv": ["FIRECRAWL_API_KEY"], "flag": "MCP_FIRECRAWL" },
+      "docs": "https://docs.firecrawl.dev/mcp"
+    }
+  ],
+  "communityPlugins": [
+    {
+      "id": "dsh-mcp-manager",
+      "repo": "hyqhyq3/dsh-mcp-manager",
+      "title": "MCP 管理页",
+      "why": "awesome-dsh-plugin 收录。本仓库已有 codeseek-toolkit-panel，不必再装一套设置页。",
+      "install": "不要 dsh plugin add 进 gitignored profile。"
+    },
+    {
+      "id": "dsh-at-file",
+      "repo": "omdsh-dev/dsh-at-file",
+      "title": "@file 提及",
+      "why": "把询盘 PDF / 报价表从输入框贴进会话。awesome-dsh-plugin 收录。本仓库已有 documents MCP，这个是 UI 糖。",
+      "install": "审源码后再 overlay；不要 dsh plugin add 进 gitignored profile 就当交付。"
+    },
+    {
+      "id": "dsh-files",
+      "repo": "taxueseek/dsh-files",
+      "title": "拖文件进会话",
+      "why": "询盘附件卡片。读内容优先 mcp__documents__read_document。",
+      "install": "dsh plugin --profile web add github:taxueseek/dsh-files"
+    },
+    {
+      "id": "dsh-office-tools",
+      "repo": "kw78/dsh-office-tools",
+      "title": "Word / Excel / PPT",
+      "why": "awesome 上现成的办公轮子。报价数字本仓库用 mcp__trade-crm__quote_catalog，不要两套数。",
+      "install": "需要出 xlsx 客户稿时再 overlay。"
+    },
+    {
+      "id": "dsh-cowork",
+      "repo": "Jesse-njx/dsh-cowork",
+      "title": "单元格读写 xlsx/pdf/docx",
+      "why": "awesome 收录。询盘附件精读可复用；日常走 documents MCP。",
+      "install": "审 rc.5 兼容后再 overlay。"
+    },
+    {
+      "id": "dsh-tool-csv",
+      "repo": "omdsh-dev/dsh-tool-csv",
+      "title": "CSV 解析",
+      "why": "线索表。本仓库 mcp__trade-crm__export_leads_csv 已覆盖导出。",
+      "install": "不必装，除非要解析客户自己丢来的大 CSV。"
+    },
+    {
+      "id": "modlens",
+      "repo": "liustack/modlens",
+      "title": "看图 OCR",
+      "why": "产品图、询盘截图。awesome 收录。预览期可能不兼容 rc.5。",
+      "install": "先读仓库 README，再用 overlay，不要改 vendor。"
+    },
+    {
+      "id": "dsh-hud",
+      "repo": "a903067276-rgb/dsh-hud",
+      "title": "HUD 浮层",
+      "why": "awesome 收录。槽位（shell.overlay）已被本仓库 codeseek-activity-panel 复用；不必再装一套 Git/token HUD。",
+      "install": "不要 dsh plugin add。右侧看 agent 用本仓库实时面板。"
+    },
+    {
+      "id": "dsh-better-sidebar",
+      "repo": "omdsh-dev/DSH-better-sidebar",
+      "title": "右侧 IDE 工作台",
+      "why": "文件/终端/Git/pty，过重。本产品只要看团员在干什么，不把 DSH 变成 VS Code。",
+      "install": "不要装；不要 pnpm approve-builds node-pty。"
+    },
+    {
+      "id": "dsh-task-status",
+      "repo": "vlln/dsh-task-status",
+      "title": "后台任务条",
+      "why": "conversation.input.dock 任务进度。本仓库实时面板已读 runningCalls。",
+      "install": "不必再 overlay。"
+    },
+    {
+      "id": "dsh-notification",
+      "repo": "omdsh-dev/dsh-notification",
+      "title": "回合结束通知",
+      "why": "团员后台跑完提醒你接管谈单。",
+      "install": "dsh plugin --profile web add github:omdsh-dev/dsh-notification"
+    },
+    {
+      "id": "dsh-sticky-disclosure",
+      "repo": "Han-1413141/dsh-sticky-disclosure",
+      "title": "一键收起工具卡",
+      "why": "Search / Think 卡片默认折叠。",
+      "install": "dsh plugin --profile web add github:Han-1413141/dsh-sticky-disclosure"
+    },
+    {
+      "id": "dsh-browser",
+      "repo": "Lum1104/dsh-browser",
+      "title": "Chrome 侧栏操控浏览器",
+      "why": "登录态买家站。不默认装；本产品不登录对方后台群发。",
+      "install": "不要为了获客去爬 LinkedIn / 海关付费站。"
+    },
+    {
+      "id": "treg",
+      "repo": "superdesigndev/treg",
+      "title": "TREG 数据目录",
+      "why": "awesome 上的 enrichment / SERP / 广告库目录。要 TREG_TOKEN，按次计费。有密钥再开。",
+      "install": "先读 README；不要默认打开。"
+    },
+    {
+      "id": "dsh-agent-team-room",
+      "repo": "ishuowang/dsh-agent-team-room",
+      "title": "Agent 会议室",
+      "why": "多 session 房间。本仓库已用企业微信式 @花名 + report，不必再装一层。",
+      "install": "不要和 trade-desk 叠两套工位。"
+    }
+  ]
+}

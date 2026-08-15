@@ -1,0 +1,10 @@
+/* codeseek brand overlay served from /brand/ */
+:root {
+  --codeseek-teal: #2dd4bf;
+  --codeseek-gold: #f5c16c;
+  --codeseek-navy: #14233d;
+}
+
+img.codeseek-mark {
+  display: block;
+}

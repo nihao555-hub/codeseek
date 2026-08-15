@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 188 24" fill="none">
+  <path d="M19.4 12.2a7.4 7.4 0 1 1-2.97-5.91" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+  <path d="M18.35 4.85l.5 1.16 1.26.15-.95.83.31 1.24-1.13-.67-1.13.67.31-1.24-.95-.83 1.26-.15z" fill="#F5C16C"/>
+  <text x="28" y="16.5" fill="currentColor" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="13.5" font-weight="600" letter-spacing="0.04em">codeseek</text>
+  <rect x="132" y="5" width="50" height="14" rx="2" fill="currentColor"/>
+  <text x="157" y="15.2" text-anchor="middle" fill="var(--dsw-alias-label-primary-inverted, #fff)" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="8.5" font-weight="700" letter-spacing="0.14em">SUPER</text>
+</svg>

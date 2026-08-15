@@ -1,10 +1,19 @@
 /**
  * 港窑外贸 CRM：线索 → 商机 → 报价。本地 JSON，镜像成 Markdown。
- * 对齐网易外贸通「线索到订单」，没有海关库、不代发邮件。
+ * 对齐网易外贸通「线索到订单」。没有海关库。
+ * 官网页面核实过的邮箱可以代发；禁止编造收件人、价格、认证。
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  appendSentLog,
+  extractPublicEmails,
+  fetchPage,
+  mailConfig,
+  sendMail,
+  sameSite,
+} from './trade-mail.mjs'
 
 export const GROUPS = ['hot', 'warm', 'nurture', 'sleeping', 'closed']
 export const TOUCH = ['none', 'draft', 'user-sent', 'replied']
@@ -100,7 +109,8 @@ export function upsertLead(input, root = workspaceRoot()) {
     touch: pick(input.touch, TOUCH, row.touch || 'none'),
     next: clip(input.next || row.next, 200),
     due: clip(input.due || row.due, 20),
-    email: clip(input.email || row.email, 120),
+    email: row.email || '',
+    emailSourceUrl: row.emailSourceUrl || '',
     notes: clip(input.notes || row.notes, 400),
     sku: clip(input.sku || row.sku, 40),
     updatedAt: new Date().toISOString(),
@@ -342,7 +352,7 @@ export function quoteCatalog({ sku, qty, buyer = '' } = {}, root = workspaceRoot
   }
 }
 
-export function draftOutreach({ leadId, sku } = {}, root = workspaceRoot()) {
+export function draftOutreach({ leadId, sku, forSend = false } = {}, root = workspaceRoot()) {
   const crm = loadCrm(root)
   const lead = crm.leads.find((row) => row.id === leadId) || crm.leads.find((row) => row.company === leadId)
   if (!lead) throw new Error(`unknown lead: ${leadId}`)
@@ -351,7 +361,7 @@ export function draftOutreach({ leadId, sku } = {}, root = workspaceRoot()) {
   const fact = lead.sourceUrl
     ? `your public page ${lead.sourceUrl}`
     : (lead.source || 'a public listing (URL still TBD — do not invent an email)')
-  const letter = [
+  const lines = [
     `Subject: ${product.name.en} for ${lead.company} — Harbor Kiln`,
     '',
     `Hi ${lead.company} team,`,
@@ -366,11 +376,113 @@ export function draftOutreach({ leadId, sku } = {}, root = workspaceRoot()) {
     '',
     'Best regards,',
     'Harbor Kiln team',
-    '',
-    '---',
-    'INTERNAL: draft only, not sent. Do not invent email/WhatsApp/LinkedIn. Touch status stays draft until the user says they sent it.',
-  ].join('\n')
-  return { lead, product: { sku: product.sku, name: product.name.en }, letter }
+  ]
+  if (!forSend) {
+    lines.push(
+      '',
+      '---',
+      'INTERNAL: send with mcp__trade-crm__send_outreach after capture_public_email. Never invent the To: address.',
+    )
+  }
+  const letter = lines.join('\n')
+  return {
+    lead,
+    product: { sku: product.sku, name: product.name.en },
+    subject: `${product.name.en} for ${lead.company} — Harbor Kiln`,
+    letter,
+    body: letter.replace(/^Subject:.*\n+/, ''),
+  }
+}
+
+export function mailStatus(env = process.env) {
+  const cfg = mailConfig(env)
+  if (cfg.ready) {
+    return `发信已配置：${cfg.kind}  from=${cfg.from}。有官网核实邮箱后用 send_outreach。`
+  }
+  return `还不能代发。缺 ${cfg.missing.join('、')}。把港窑邮箱写入 MAIL_FROM，再配 RESEND_API_KEY 或 SMTP_HOST/SMTP_USER/SMTP_PASS。禁止编造收件人。`
+}
+
+export async function capturePublicEmail({ leadId, sourceUrl, fetchImpl } = {}, root = workspaceRoot()) {
+  const crm = loadCrm(root)
+  const lead = crm.leads.find((row) => row.id === leadId) || crm.leads.find((row) => row.company === leadId)
+  if (!lead) throw new Error(`unknown lead: ${leadId}`)
+  const pageUrl = String(sourceUrl || lead.sourceUrl || '').trim()
+  if (!/^https?:\/\//i.test(pageUrl)) throw new Error('sourceUrl must be an http(s) page on the company site')
+  if (lead.sourceUrl && !sameSite(pageUrl, lead.sourceUrl)) {
+    throw new Error(`page ${pageUrl} is not the same site as ${lead.sourceUrl}`)
+  }
+  const html = await fetchPage(pageUrl, fetchImpl)
+  const found = extractPublicEmails(html, pageUrl, lead.sourceUrl || pageUrl)
+  if (!found.length) {
+    throw new Error(`no public email on ${pageUrl} (do not invent one)`)
+  }
+  const picked = found[0]
+  lead.email = picked.email
+  lead.emailSourceUrl = picked.sourceUrl
+  lead.updatedAt = new Date().toISOString()
+  saveCrm(crm, root)
+  return {
+    lead,
+    email: picked.email,
+    emailSourceUrl: picked.sourceUrl,
+    candidates: found,
+  }
+}
+
+export async function sendOutreach({ leadId, sku, send, env } = {}, root = workspaceRoot()) {
+  const cfg = mailConfig(env || process.env)
+  const draft = draftOutreach({ leadId, sku, forSend: true }, root)
+  const lead = draft.lead
+  if (!cfg.ready) {
+    return {
+      sent: false,
+      reason: 'mail_not_configured',
+      missing: cfg.missing,
+      letter: draft.letter,
+      hint: mailStatus(env || process.env),
+    }
+  }
+  if (!lead.email || !lead.emailSourceUrl) {
+    return {
+      sent: false,
+      reason: 'no_verified_email',
+      letter: draft.letter,
+      hint: `先 mcp__trade-crm__capture_public_email 打开官网 Impressum/Kontakt。不要编 ${lead.company} 的邮箱。`,
+    }
+  }
+  const sendFn = send || ((mail) => sendMail(cfg, mail))
+  const result = await sendFn({
+    to: lead.email,
+    from: cfg.from,
+    subject: draft.subject,
+    text: draft.body,
+  })
+  const crm = loadCrm(root)
+  const row = crm.leads.find((item) => item.id === lead.id)
+  if (row) {
+    row.touch = 'user-sent'
+    row.next = clip(`Sent HK outreach from ${cfg.from} to verified ${lead.emailSourceUrl}`, 200)
+    row.updatedAt = new Date().toISOString()
+    saveCrm(crm, root)
+  }
+  appendSentLog(root, {
+    at: new Date().toISOString(),
+    leadId: lead.id,
+    company: lead.company,
+    to: lead.email,
+    from: cfg.from,
+    sourceUrl: lead.emailSourceUrl,
+    transport: result.transport || cfg.kind,
+  })
+  return {
+    sent: true,
+    leadId: lead.id,
+    company: lead.company,
+    to: lead.email,
+    from: cfg.from,
+    emailSourceUrl: lead.emailSourceUrl,
+    transport: result.transport || cfg.kind,
+  }
 }
 
 export function searchQueries({ product, market } = {}, root = workspaceRoot()) {
@@ -378,7 +490,7 @@ export function searchQueries({ product, market } = {}, root = workspaceRoot()) 
   const name = item ? item.name.en : String(product || 'stainless tumbler')
   const place = String(market || 'EU').trim() || 'EU'
   return {
-    note: '没有海关提单库。用官方 web_search 跑这些查询，再用 mcp__web-search__web_fetch 打开公司页，最后 mcp__trade-crm__upsert_lead。禁止编造邮箱。',
+    note: '没有海关提单库。用官方 web_search 跑这些查询，再用 mcp__web-search__web_fetch 打开公司页，最后 mcp__trade-crm__upsert_lead。禁止编造邮箱；公示邮箱用 capture_public_email。',
     queries: [
       `${name} importer wholesaler ${place}`,
       `${name} housewares distributor ${place}`,
@@ -412,7 +524,7 @@ export function renderLeadsMarkdown(leads) {
     '对齐网易外贸通「运营专家」：分组、沉睡激活。没有海关库。线索只能来自 `web_search` / 独立站询盘 / 用户提供的名片。',
     '',
     '分组：`hot` / `warm` / `nurture` / `sleeping` / `closed`。触达只允许 `draft` / `user-sent` / `replied` / `none`。',
-    '没有公开邮箱就留空，不要编。机器写入走 `mcp__trade-crm__*`，本文件由 sync 镜像，不要手改表格。',
+    '没有公开邮箱就留空，不要编。公示邮箱用 `capture_public_email` 从官网页抓取后再 `send_outreach`。机器写入走 `mcp__trade-crm__*`，本文件由 sync 镜像，不要手改表格。',
     '',
     '| 编号 | 公司 | 市场 | 分组 | 来源 | 触达 | 下一步 | 截止日期 |',
     '| --- | --- | --- | --- | --- | --- | --- | --- |',

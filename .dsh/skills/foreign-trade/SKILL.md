@@ -34,7 +34,8 @@ whenToUse: 挖客、开发信、询盘、报价、跟单、独立站获客，或
 
 ## 红线
 
-- 不发真实邮件、不登录社媒后台
+- 官网核实过的邮箱用 `capture_public_email` 再 `send_outreach` 代发；没有 MAIL_FROM 就报缺密钥，不要假装已发送
+- 不登录社媒后台
 - 不编认证、不编邮箱、不把 Comtrade 汇总说成海关提单
 - 底价不进客户稿
 - 真实客户隐私写 `team/deals/local/`

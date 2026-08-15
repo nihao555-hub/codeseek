@@ -64,7 +64,7 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 | memory | 本仓库 `scripts/memory-mcp.mjs` | 本地图谱备忘，不写客户隐私 | 开 |
 | time | 本仓库 `scripts/time-mcp.mjs` | 时区转换 | 开 |
 | documents | 本仓库 `scripts/documents-mcp.mjs` | 读工作区 md/docx/xlsx/pdf | 开 |
-| trade-crm | 本仓库 `scripts/trade-crm-mcp.mjs` | 线索 / 商机 / 目录报价 / 开发信草稿（不代发） | 开 |
+| trade-crm | 本仓库 `scripts/trade-crm-mcp.mjs` | 线索 / 商机 / 目录报价 / 核实官网邮箱后代发 | 开 |
 | trade-open-data | 本仓库 `scripts/trade-open-data-mcp.mjs` | 一句话开干 `kickoff`；UN Comtrade preview；GitHub 展会日历 | 开 |
 | context7 | `@upstash/context7-mcp` | 按库名拉最新官方文档 | 开 |
 | trade-desk / foreign-trade / trade-marketing / trade-dd / … | 本仓库 `.dsh/skills` | 工位派工、港窑人设、公开源背调 | 开 |
@@ -97,15 +97,15 @@ Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页�
 | 工具 | 原因 |
 |---|---|
 | Playwright MCP (`MCP_PLAYWRIGHT=1`) | 首次 `npx` 会下整套浏览器，拖慢 Harness 启动。要「打开买家公开页截图」时再开。仓库：`github.com/microsoft/playwright-mcp` |
-| 非官方 LinkedIn / 海关提单库 / 群发 SMTP | 本产品不做爬虫、不代发邮件。Comtrade preview 只给国家×HS 汇总，不是提单。 |
+| 非官方 LinkedIn / 海关提单库 / 群发猜测邮箱 | 本产品不爬 LinkedIn、不编提单。Comtrade preview 只给国家×HS 汇总。代发只发官网核实过的地址。 |
 | 地图抓取 / Google Maps scraper | 不做。获客走公开网页搜索 + 工商库，不另写一套地图爬虫。 |
 | 社区「marketing-skills」杂包 | 许可证和来源不明，不进 `toolkit/catalog.json`。 |
 
 ## 团员怎么用（不要发明工具名）
 
-- 营销：`kickoff` 后 `mcp__trade-crm__search_queries` → `web_search` → `mcp__web-search__web_fetch` → `upsert_lead`；开发信 `draft_outreach`（不代发）。市场体量 `mcp__trade-open-data__comtrade_preview`。展会 `list_fairs`。
+- 营销：`kickoff` 后 `mcp__trade-crm__search_queries` → `web_search` → `mcp__web-search__web_fetch` → `upsert_lead`；Impressum 用 `capture_public_email`；开发信 `draft_outreach` / `send_outreach`。市场体量 `mcp__trade-open-data__comtrade_preview`。展会 `list_fairs`。
 - 询盘 / 报价：`mcp__trade-crm__quote_catalog`（口头品类对 catalog SKU）→ `upsert_deal`（必须写出 `team/deals/<id>.md`）。数字只来自 `store/data/catalog.json`，不是买家官网标价。
-- 运营：用户点名「已发出/回了」用 `mcp__trade-crm__record_reply`；`list_leads` / `list_deals` 分层跟进；触达只允许 draft / user-sent / replied。
+- 运营：对方回了用 `mcp__trade-crm__record_reply`；`list_leads` / `list_deals` 分层跟进；触达只允许 draft / user-sent / replied。
 - 背调：`mcp__buyer-dd__company_search` → `mcp__buyer-dd__sanctions_search` → 官网 `web_fetch`。模板 `team/templates/due-diligence.md`。
 - 建站：读 catalog + `webapp-testing` skill；独立站是获客货架，走本仓库 `store/`。
 - 社媒：`trade-social` + 公开检索；不编互动数据、不登录对方后台。

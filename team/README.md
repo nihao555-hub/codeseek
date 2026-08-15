@@ -13,13 +13,13 @@
 | 网易能力 | 我们怎么做 |
 | --- | --- |
 | 海关 / 社媒 / Google 挖客 | 无提单库。市场体量用 UN Comtrade preview（国家×HS）；挖客 `search_queries` → `web_search` → `web_fetch` → `upsert_lead`；展会用开源日历 `list_fairs` |
-| 开发信多轮触达 | `mcp__trade-crm__draft_outreach`，**不代发**；触达状态只允许 draft / user-sent / replied |
+| 开发信多轮触达 | `capture_public_email` 核实官网邮箱后 `send_outreach`；没有 MAIL_FROM 则停在 `draft` |
 | 高潜分组 / 沉睡激活 | `mcp__trade-crm__list_leads` / `upsert_lead`（镜像 `crm/leads.md`） |
 | 独立站 + SEO + 访客线索 | `store/` + `@建站专家` |
 | 报价到订单 | `mcp__trade-crm__quote_catalog` → `upsert_deal` → `deals/` |
 | 多平台内容 / 私信 | 只出帖子和私信稿，不登录对方后台 |
 
-禁止编造邮箱、海关提单、认证和“已发送”状态。没有 60 亿海关库、没有高信誉发信 IP。
+禁止编造邮箱、海关提单、认证。没有 send_outreach 成功回执时不要写“已发送”。没有 60 亿海关库。代发需要你们自己的 MAIL_FROM。
 
 ## 角色
 

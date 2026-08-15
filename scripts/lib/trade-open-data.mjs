@@ -235,7 +235,7 @@ export function kickoffPlan({ market, product, text } = {}) {
     how: [
       '管家立刻 list_agents，没有营销专家就 subagent（description=营销专家），不要等人 @。',
       '一句话回群：已派营销开干。',
-      '营销：search_queries → web_search / open-websearch → web_fetch → upsert_lead（必须 sourceUrl）。',
+      '营销：search_queries → web_search / open-websearch → web_fetch → upsert_lead（必须 sourceUrl）→ capture_public_email → send_outreach。',
       'quote_catalog 只认 store/data/catalog.json。口头「保温杯」应对到 HK-TB-500-SS，禁止 unknown SKU 后改报别的公司。',
       '用户点名公司+数量：mcp__trade-crm__record_reply，不要给别的线索出 50pcs 试单顶替。',
       'upsert_deal status=quoted 必须写出 team/deals/<id>.md。',

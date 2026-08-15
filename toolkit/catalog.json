@@ -316,11 +316,20 @@
     {
       "id": "trade-crm",
       "title": "外贸 CRM（线索到订单）",
-      "description": "把线索/商机写进 team/crm JSON（给团员落盘）。不是 Twenty/HubSpot。挖客用 open-webSearch + OpenCorporates + OpenSanctions。工具名 mcp__trade-crm__list_leads / upsert_lead / quote_catalog / draft_outreach。",
+      "description": "把线索/商机写进 team/crm JSON。官网 Impressum 核实过的邮箱可以 send_outreach 代发。禁止编造邮箱。工具名 mcp__trade-crm__list_leads / upsert_lead / capture_public_email / send_outreach / quote_catalog。",
       "transport": "stdio",
       "serverName": "trade-crm",
       "command": "node",
       "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-crm-mcp.mjs'" }],
+      "env": {
+        "MAIL_FROM": { "from": ["MAIL_FROM", "SMTP_FROM"] },
+        "SMTP_HOST": { "from": ["SMTP_HOST"] },
+        "SMTP_PORT": { "from": ["SMTP_PORT"] },
+        "SMTP_USER": { "from": ["SMTP_USER"] },
+        "SMTP_PASS": { "from": ["SMTP_PASS", "SMTP_PASSWORD"] },
+        "SMTP_SECURE": { "from": ["SMTP_SECURE"] },
+        "RESEND_API_KEY": { "from": ["RESEND_API_KEY"] }
+      },
       "enableWhen": { "flag": "MCP_TRADE_CRM" },
       "docs": "https://github.com/nihao555-hub/codeseek"
     },

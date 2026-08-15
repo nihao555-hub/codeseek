@@ -1,18 +1,22 @@
 #!/usr/bin/env node
 /**
- * 港窑外贸 CRM MCP：线索、商机、目录报价、开发信草稿。NDJSON，不代发邮件。
+ * 港窑外贸 CRM MCP：线索、商机、目录报价、核实官网邮箱后代发。NDJSON。
+ * 禁止编造收件人、价格、认证、提单。
  */
 import {
+  capturePublicEmail,
   draftOutreach,
   exportLeadsCsv,
   formatDeals,
   formatLeads,
   listDeals,
   listLeads,
+  mailStatus,
   pipelineSummary,
   quoteCatalog,
   recordReply,
   searchQueries,
+  sendOutreach,
   upsertDeal,
   upsertLead,
 } from './lib/trade-crm.mjs'
@@ -118,7 +122,7 @@ const TOOLS = [
   },
   {
     name: 'draft_outreach',
-    description: 'English cold-email draft for a lead. Not sent. Do not invent contact details.',
+    description: 'English cold-email draft for a lead. After capture_public_email, send it with send_outreach. Never invent contact details.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -137,6 +141,35 @@ const TOOLS = [
         product: { type: 'string' },
         market: { type: 'string' },
       },
+    },
+  },
+  {
+    name: 'capture_public_email',
+    description: 'Fetch an official company page (Impressum/Kontakt) and save an email that actually appears on that page. Same site as the lead sourceUrl. Never invent an address.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        leadId: { type: 'string' },
+        sourceUrl: { type: 'string', description: 'https Impressum/contact/about page on the same site' },
+      },
+      required: ['leadId'],
+    },
+  },
+  {
+    name: 'mail_status',
+    description: 'Whether Harbor Kiln SMTP/Resend is configured. Missing MAIL_FROM means outreach cannot be sent.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'send_outreach',
+    description: 'Send the catalog outreach email to a lead whose email was captured from an official page. Requires MAIL_FROM plus SMTP or Resend. Does not invent To: addresses.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        leadId: { type: 'string' },
+        sku: { type: 'string' },
+      },
+      required: ['leadId'],
     },
   },
   {
@@ -182,6 +215,15 @@ startStdioMcpServer({
     if (name === 'draft_outreach') {
       const out = draftOutreach(args || {})
       return out.letter
+    }
+    if (name === 'capture_public_email') {
+      const out = await capturePublicEmail(args || {})
+      return `captured ${out.email} from ${out.emailSourceUrl} for ${out.lead.id} ${out.lead.company}`
+    }
+    if (name === 'mail_status') return mailStatus()
+    if (name === 'send_outreach') {
+      const out = await sendOutreach(args || {})
+      return asText(out)
     }
     if (name === 'search_queries') return asText(searchQueries(args || {}))
     if (name === 'export_leads_csv') return exportLeadsCsv()

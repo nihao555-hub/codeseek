@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
+  capturePublicEmail,
   draftOutreach,
   exportLeadsCsv,
   listLeads,
@@ -12,6 +13,7 @@ import {
   quoteCatalog,
   recordReply,
   searchQueries,
+  sendOutreach,
   upsertDeal,
   upsertLead,
 } from './trade-crm.mjs'
@@ -52,7 +54,7 @@ test('upsert_lead then quote and outreach stay draft-only', () => {
     assert.match(quote.markdown, /draft quotation/i)
     const letter = draftOutreach({ leadId: lead.id, sku: 'HK-TB-500-SS' }, root)
     assert.match(letter.letter, /Kitchenlab AB/)
-    assert.match(letter.letter, /not sent/i)
+    assert.match(letter.letter, /send_outreach/)
     assert.doesNotMatch(letter.letter, /@kitchenlab/)
     const deal = upsertDeal({
       buyer: lead.company,
@@ -130,6 +132,56 @@ test('record_reply marks the named buyer and writes their quotation file', () =>
     const body = readFileSync(join(root, 'team', out.deal.file), 'utf8')
     assert.match(body, /Kitchenlab AB/)
     assert.match(body, /2560\.00/)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('upsert_lead ignores invented emails; capture requires the address on the page', async () => {
+  const root = fixtureRoot()
+  try {
+    const lead = upsertLead({
+      company: 'Thermobecher.shop',
+      market: 'DE',
+      sourceUrl: 'https://www.thermobecher.shop/',
+      email: 'invented@not-real.example',
+      sku: 'HK-TB-500-SS',
+    }, root)
+    assert.equal(lead.email, '')
+    await assert.rejects(
+      () => capturePublicEmail({
+        leadId: lead.id,
+        sourceUrl: 'https://www.thermobecher.shop/impressum',
+        fetchImpl: async () => ({ ok: true, text: async () => '<p>no mail here</p>' }),
+      }, root),
+      /do not invent/,
+    )
+    const captured = await capturePublicEmail({
+      leadId: lead.id,
+      sourceUrl: 'https://www.thermobecher.shop/impressum',
+      fetchImpl: async () => ({
+        ok: true,
+        text: async () => '<p>Impressum info@thermobecher.shop</p>',
+      }),
+    }, root)
+    assert.equal(captured.email, 'info@thermobecher.shop')
+    assert.match(captured.emailSourceUrl, /impressum/)
+    const blocked = await sendOutreach({ leadId: lead.id, env: {} }, root)
+    assert.equal(blocked.sent, false)
+    assert.equal(blocked.reason, 'mail_not_configured')
+    const sent = await sendOutreach({
+      leadId: lead.id,
+      env: { MAIL_FROM: 'sales@harborkiln.example', RESEND_API_KEY: 're_test' },
+      send: async (mail) => {
+        assert.equal(mail.to, 'info@thermobecher.shop')
+        assert.equal(mail.from, 'sales@harborkiln.example')
+        assert.match(mail.subject, /Harbor Kiln/)
+        assert.doesNotMatch(mail.text, /INTERNAL/)
+        return { transport: 'mock' }
+      },
+    }, root)
+    assert.equal(sent.sent, true)
+    assert.equal(listLeads({ q: lead.id }, root)[0].touch, 'user-sent')
   } finally {
     rmSync(root, { recursive: true, force: true })
   }

@@ -230,11 +230,19 @@
       config:
         serverName: trade-crm
         transport: stdio
-        toolCallTimeoutMs: 60000
+        toolCallTimeoutMs: 120000
         failOnStartupError: false
         command: node
         args:
           - !!js "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-crm-mcp.mjs'"
+        env:
+          MAIL_FROM: !!js "process.env.MAIL_FROM || process.env.SMTP_FROM || ''"
+          SMTP_HOST: !!js "process.env.SMTP_HOST || ''"
+          SMTP_PORT: !!js "process.env.SMTP_PORT || ''"
+          SMTP_USER: !!js "process.env.SMTP_USER || ''"
+          SMTP_PASS: !!js "process.env.SMTP_PASS || process.env.SMTP_PASSWORD || ''"
+          SMTP_SECURE: !!js "process.env.SMTP_SECURE || ''"
+          RESEND_API_KEY: !!js "process.env.RESEND_API_KEY || ''"
         reconnect:
           enabled: true
           initialDelayMs: 1000

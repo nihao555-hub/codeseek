@@ -2,7 +2,7 @@
 
 基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的本机 **外贸团队**，对齐 [网易外贸通 AI 团队](https://waimao.163.com/knowledge/article/1462)：管家 + 获客专家 + 成交专家。只做两件事——**找到买家，跟到订单**。不是全能编程 Agent。
 
-闭环：挖客 → 开发信草稿（不代发）→ 询盘 → 报价 → 跟单。没有海关提单库、没有群发 IP。公开网页 + UN Comtrade 汇总 + 开源展会日历 + 本地 `mcp__trade-crm__*` 代替。
+闭环：挖客 → 核实官网邮箱 → 开发信代发（需 MAIL_FROM）→ 询盘 → 报价 → 跟单。没有海关提单库。公开网页 + UN Comtrade 汇总 + 开源展会日历 + 本地 `mcp__trade-crm__*` 代替。禁止编造邮箱、价格、认证、提单。
 
 - **获客**：营销 / 社媒 / 独立站货架 / 可选 Meta 广告
 - **成交**：询盘、报价、运营跟单、公开源背调、合规
@@ -54,6 +54,6 @@ npm start              # 或 bash scripts/start.sh web
 
 插件清单参考 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin)。社区 Cordis 皮肤/宠物/渗透不装；办公/附件类优先复用本仓库 NDJSON MCP，设置 → 插件 → 工具与 MCP 可看可开。
 
-`subagent` 的 description 必须是花名。产品只以 `store/data/catalog.json` 为准。不发真实邮件，不编造海关数据和邮箱。
+`subagent` 的 description 必须是花名。产品只以 `store/data/catalog.json` 为准。禁止编造海关数据和邮箱。官网公示邮箱核实后可以代发。
 
 外贸能力按 DSH **一切皆插件**：组合包 `plugins/harbor-trade`（官方 schedule + 本仓库 MCP），会话顶栏「港窑实时」`plugins/activity-panel`（和 Chat / Trajectory 一样注册 `conversation.view`，不装 [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) 那套终端工作台）。优先 GitHub 高星 / 官方 API，本仓库只做 NDJSON 包装和 `team/crm/` 落盘。

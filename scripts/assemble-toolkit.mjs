@@ -98,7 +98,7 @@ export function renderMcpPatch(catalog, enabled) {
       throw new Error(`serverName 不合法: ${serverName}`)
     }
     const expr = enableExpression(entry, forced.has(entry.id))
-    const timeout = ['meta-ads', 'playwright', 'searxng', 'web-search', 'open-websearch', 'documents'].includes(entry.id) ? 120000 : 60000
+    const timeout = ['meta-ads', 'playwright', 'searxng', 'web-search', 'open-websearch', 'documents', 'trade-crm'].includes(entry.id) ? 120000 : 60000
     const lines = [
       `    - id: mcp-${entry.id}`,
       `      name: '@deepseek-ai/dsh-mcp-client'`,

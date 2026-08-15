@@ -15,11 +15,11 @@ DeepSeek Harness **一切皆插件**。本目录是可 `dsh plugin add` 的组�
 | 办公附件 UI | awesome-dsh：`dsh-files` / `dsh-office-tools` | catalog 只展示 |
 | 会话顶栏获客视图 | 官方 `conversation.view`（Chat / Trajectory 同槽） | `plugins/activity-panel`。不装 better-sidebar |
 
-不要装：[WangM-A3/silicon-army-mcp](https://github.com/WangM-A3/silicon-army-mcp) 的发信 / 海关 Demo（我们不代发、不编提单）。MCP 设置页已有本仓库 `codeseek-toolkit-panel`，不必再装 `hyqhyq3/dsh-mcp-manager`。
+不要装：[WangM-A3/silicon-army-mcp](https://github.com/WangM-A3/silicon-army-mcp) 的海关 Demo（我们不编提单）。发信走本仓库 `send_outreach`，不装那套代发。MCP 设置页已有本仓库 `codeseek-toolkit-panel`，不必再装 `hyqhyq3/dsh-mcp-manager`。
 
 ## 本仓库自己写的（没有现成轮子才写）
 
-- `scripts/trade-crm-mcp.mjs`：线索 / 商机 / **catalog 报价** / 开发信草稿 / `record_reply`
+- `scripts/trade-crm-mcp.mjs`：线索 / 商机 / **catalog 报价** / 核实官网邮箱 / 代发 / `record_reply`
 - `scripts/trade-open-data-mcp.mjs`：kickoff + Comtrade preview + 展会日历包装
 - 人设与花名册：`.dsh/skills/trade-*`、`team/playbooks/`
 

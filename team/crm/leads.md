@@ -14,5 +14,6 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | L-2026-001 | Nordic Home Co. | SE | warm | 已有询盘 HK-2026-001 | replied | 等 200 pcs 镭雕与样品地址 | 2026-08-22 |
 | L-2026-002 | Demo: EU homeware importers (public web) | EU | nurture | 演示行：用 web_search 替换，勿把本行当真实买家 | none | 用户要挖客时按 `playbooks/marketing.md` 另起一行 | — |
+| L-2026-003 | Kitchenlab AB | SE | nurture | [KitchenLab](https://www.kitchenlab.se/om-oss/) | draft | 邮箱：TBD — 不要编 / 拟写开发信 | 2026-08-22 |
 
 真实邮箱、电话、WhatsApp 写 `team/deals/local/`，不要提交。

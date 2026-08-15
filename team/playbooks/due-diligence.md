@@ -4,8 +4,8 @@
 
 | 网易维度 | 我们用什么 | 做不到的 |
 | --- | --- | --- |
-| 企业是否存续 / 地址 / 编号 | `mcp__buyer-dd__company_search`（OpenCorporates）+ 目标国登记网站 | 付费深度年报、股东穿透付费库 |
-| 制裁 / 经营异常 | `mcp__buyer-dd__sanctions_search`（OpenSanctions）+ OFAC 公开检索 | 自动排除所有空壳、货代 |
+| 企业是否存续 / 地址 / 编号 | `mcp__buyer-dd__company_search`（OpenCorporates；401 时 GLEIF LEI）+ 目标国登记网站 | 付费深度年报、股东穿透付费库 |
+| 制裁 / 经营异常 | `mcp__buyer-dd__sanctions_search`（OpenSanctions API，401 时公开 HTML）+ OFAC 公开检索 | 自动排除所有空壳、货代。**未见命中 ≠ 放行** |
 | 官网 / 域名 / 社媒 | `web_search` + `mcp__web-search__web_fetch` | 私密联系人库、验证邮箱是否可投 |
 | 采购量 / 供应商 / HS | **没有**。写 `customs: none` | 历史提单、货值、采购节奏图 |
 | 决策人 | 公开 LinkedIn / 官网 team 页，抄得到才写 | 高置信采购经理电话包 |

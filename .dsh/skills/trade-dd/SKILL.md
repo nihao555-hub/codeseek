@@ -20,5 +20,7 @@ whenToUse: 客户背调、尽调、查空壳、OFAC/制裁、核验公司是否�
 
 - 没有提单就写 `customs: none (no local bill-of-lading database)`，禁止编造 HS、货值、供应商名单。
 - 制裁检索命中只写「possible match, human confirm」，不要说「已放行」或「已排除」。
+- **未见名单命中也不是 clearance**，只能写「公开名单未见命中，不是放行」。
+- OpenCorporates / OpenSanctions API 若 401，工具会回退 GLEIF LEI 与 OpenSanctions 公开 HTML；仍不是海关库。
 - 邮箱、电话只抄公开页，抄不到就 TBD。
 - 报告写进 `team/crm/leads.md` 的备注，或 `team/deals/` 对应成交；真实隐私进 `deals/local/`。

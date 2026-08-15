@@ -125,6 +125,8 @@ test('searchCompanies falls back to GLEIF when OpenCorporates 401s', async () =>
   const out = await searchCompanies('Demo AB', { fetchImpl })
   assert.equal(out.source, 'gleif')
   assert.match(out.text, /Demo AB/)
+  assert.match(out.text, /no public API token/)
+  assert.doesNotMatch(out.text, /\b401\b/)
 })
 
 test('searchSanctions falls back to HTML when API 401s', async () => {
@@ -142,4 +144,5 @@ test('searchSanctions falls back to HTML when API 401s', async () => {
   assert.equal(out.source, 'opensanctions-html')
   assert.match(out.text, /Possible Co/)
   assert.match(out.text, /POSSIBLE MATCH/)
+  assert.doesNotMatch(out.text, /\b401\b/)
 })

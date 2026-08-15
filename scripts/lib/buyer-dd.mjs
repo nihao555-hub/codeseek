@@ -146,6 +146,14 @@ async function fetchJson(url, opts = {}) {
   }))
 }
 
+function fallbackReason(error) {
+  const msg = error instanceof Error ? error.message : String(error)
+  if (/\b401\b|\b403\b/.test(msg)) return 'no public API token'
+  if (/\b429\b/.test(msg)) return 'rate limited'
+  if (/\b5\d{2}\b/.test(msg)) return 'upstream busy'
+  return 'temporarily unavailable'
+}
+
 function gleifQueries(query) {
   const q = normalizeCompanyName(query)
   const out = [q]
@@ -189,7 +197,7 @@ export async function searchCompanies(query, { fetchImpl = fetch } = {}) {
         used = attempt
         if (results.length) break
       }
-      const note = `OpenCorporates unavailable (${ocErr instanceof Error ? ocErr.message : ocErr}). Showing GLEIF LEI records instead${used && used !== q ? ` (query: ${used})` : ''}.`
+      const note = `OpenCorporates unavailable (${fallbackReason(ocErr)}). Showing GLEIF LEI records instead${used && used !== q ? ` (query: ${used})` : ''}.`
       return {
         source: 'gleif',
         results,
@@ -199,7 +207,7 @@ export async function searchCompanies(query, { fetchImpl = fetch } = {}) {
       return {
         source: 'opencorporates',
         results: [],
-        text: `OpenCorporates failed (${ocErr instanceof Error ? ocErr.message : ocErr}). GLEIF failed (${gleifErr instanceof Error ? gleifErr.message : gleifErr}). Fall back to web_search for the national company register.`,
+        text: `OpenCorporates failed (${fallbackReason(ocErr)}). GLEIF failed (${fallbackReason(gleifErr)}). Fall back to web_search for the national company register.`,
       }
     }
   }
@@ -224,7 +232,7 @@ export async function searchSanctions(query, { fetchImpl = fetch } = {}) {
         extraHeaders: { accept: 'text/html' },
       })
       const results = parseOpenSanctionsHtml(html)
-      const note = `OpenSanctions API unavailable (${apiErr instanceof Error ? apiErr.message : apiErr}). Parsed public HTML search.`
+      const note = `OpenSanctions API unavailable (${fallbackReason(apiErr)}). Parsed public HTML search.`
       return {
         source: 'opensanctions-html',
         results,
@@ -234,7 +242,7 @@ export async function searchSanctions(query, { fetchImpl = fetch } = {}) {
       return {
         source: 'opensanctions',
         results: [],
-        text: `OpenSanctions failed (${apiErr instanceof Error ? apiErr.message : apiErr}). HTML fallback failed (${htmlErr instanceof Error ? htmlErr.message : htmlErr}). Fall back to web_search site:sanctionssearch.ofac.treas.gov.`,
+        text: `OpenSanctions failed (${fallbackReason(apiErr)}). HTML fallback failed (${fallbackReason(htmlErr)}). Fall back to web_search site:sanctionssearch.ofac.treas.gov.`,
       }
     }
   }

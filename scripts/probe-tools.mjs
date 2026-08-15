@@ -81,7 +81,7 @@ async function main() {
     record(
       'lib.web_search',
       Boolean(search.results?.length) && !leaked,
-      leaked ? `leaked 429 in tool text: ${clip(search.text, 180)}` : `${search.source} · ${search.results?.[0]?.title} ${search.results?.[0]?.url}`,
+      leaked ? `leaked HTTP status in tool text: ${clip(search.text, 180)}` : `${search.source} · ${search.results?.[0]?.title} ${search.results?.[0]?.url}`,
     )
   } catch (error) {
     record('lib.web_search', false, error.message)
@@ -96,14 +96,16 @@ async function main() {
 
   try {
     const companies = await searchCompanies('IKEA of Sweden AB')
-    record('lib.company_search', /IKEA|opencorporates|company/i.test(companies.text), companies.text)
+    const leaked = /\bHTTP\s*[1-5]\d{2}\b/.test(companies.text || '')
+    record('lib.company_search', /IKEA|opencorporates|company|gleif/i.test(companies.text) && !leaked, leaked ? `leaked HTTP status: ${clip(companies.text, 180)}` : companies.text)
   } catch (error) {
     record('lib.company_search', false, error.message)
   }
 
   try {
     const sanctions = await searchSanctions('IKEA')
-    record('lib.sanctions_search', /OpenSanctions|no list hit|POSSIBLE MATCH/i.test(sanctions.text), sanctions.text)
+    const leaked = /\bHTTP\s*[1-5]\d{2}\b/.test(sanctions.text || '')
+    record('lib.sanctions_search', /OpenSanctions|no list hit|POSSIBLE MATCH/i.test(sanctions.text) && !leaked, leaked ? `leaked HTTP status: ${clip(sanctions.text, 180)}` : sanctions.text)
   } catch (error) {
     record('lib.sanctions_search', false, error.message)
   }
@@ -135,7 +137,9 @@ async function main() {
       name: 'company_search',
       arguments: { query: 'IKEA of Sweden AB' },
     }))
-    record('mcp.buyer-dd company_search', /IKEA|opencorporates|company/i.test(callText(replies)), callText(replies))
+    const text = callText(replies)
+    const leaked = /\bHTTP\s*[1-5]\d{2}\b/.test(text)
+    record('mcp.buyer-dd company_search', /IKEA|opencorporates|company|gleif/i.test(text) && !leaked, leaked ? `leaked HTTP status: ${clip(text, 180)}` : text)
   } catch (error) {
     record('mcp.buyer-dd company_search', false, error.message)
   }
@@ -145,7 +149,9 @@ async function main() {
       name: 'sanctions_search',
       arguments: { query: 'IKEA' },
     }))
-    record('mcp.buyer-dd sanctions_search', /OpenSanctions|list hit|POSSIBLE MATCH/i.test(callText(replies)), callText(replies))
+    const text = callText(replies)
+    const leaked = /\bHTTP\s*[1-5]\d{2}\b/.test(text)
+    record('mcp.buyer-dd sanctions_search', /OpenSanctions|list hit|POSSIBLE MATCH/i.test(text) && !leaked, leaked ? `leaked HTTP status: ${clip(text, 180)}` : text)
   } catch (error) {
     record('mcp.buyer-dd sanctions_search', false, error.message)
   }

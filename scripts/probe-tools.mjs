@@ -209,6 +209,22 @@ async function main() {
     record('mcp.documents read_document', false, error.message)
   }
 
+  try {
+    const replies = await rpc(process.execPath, [join(root, 'scripts/trade-crm-mcp.mjs')], handshakePlus({
+      name: 'pipeline_summary',
+      arguments: {},
+    }))
+    const names = replies.find((row) => row.id === 2)?.result?.tools?.map((row) => row.name) || []
+    const text = callText(replies)
+    record(
+      'mcp.trade-crm pipeline_summary',
+      names.includes('pipeline_summary') && names.includes('draft_outreach') && /leads|deals|pipeline/i.test(text),
+      `tools=${names.join(',') || '?'} ${text}`,
+    )
+  } catch (error) {
+    record('mcp.trade-crm pipeline_summary', false, error.message)
+  }
+
   const failed = rows.filter((row) => !row.ok)
   console.log(`\n${rows.length - failed.length}/${rows.length} passed`)
   if (failed.length) process.exitCode = 1

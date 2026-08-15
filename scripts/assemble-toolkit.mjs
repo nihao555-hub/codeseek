@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 装配超级员工的 skill / MCP / 主机工具。
+ * 装配港窑外贸团队的 skill / MCP / 主机工具。
  *
  *   node scripts/assemble-toolkit.mjs list
  *   node scripts/assemble-toolkit.mjs enable github playwright

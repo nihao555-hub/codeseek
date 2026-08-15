@@ -115,16 +115,6 @@ export const TEAM_MEMBERS = [
     tone: 'ember',
     skill: 'meta-ads',
   },
-  {
-    id: 'dev',
-    kind: 'dm',
-    name: '开发',
-    title: '本仓库代码',
-    handle: '@开发',
-    initials: '开',
-    tone: 'navy',
-    skill: 'software-dev',
-  },
 ]
 
 const LABEL_TO_ID = Object.fromEntries(
@@ -152,7 +142,6 @@ export function suggestAssignee(text) {
   if (/社媒|帖子|Instagram|内容日历/i.test(source)) return 'social'
   if (/样品|船期|跟单|订金|质检/i.test(source)) return 'ops'
   if (/广告|Meta|Facebook|投放/i.test(source)) return 'ads'
-  if (/改代码|bug|仓库|PR\b/i.test(source)) return 'dev'
   return ''
 }
 
@@ -223,9 +212,6 @@ function draftFor(memberId, text) {
   }
   if (memberId === 'ads') {
     return 'Meta 广告走官方 Ads MCP。没有 META_ACCESS_TOKEN 时先说缺口。新广告默认 PAUSED。'
-  }
-  if (memberId === 'dev') {
-    return '改本仓库请用 Harness 主会话或 @开发 说明文件路径。独立站代码在 /workspace/store/。'
   }
   return `${member?.name || memberId} 已记下：${text}`
 }

@@ -11,6 +11,8 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
     'team/roster.md',
     'team/company.md',
     'team/crm/leads.md',
+    'team/crm/leads.json',
+    'team/crm/deals.json',
     'team/pipeline.md',
     'team/playbooks/inquiry.md',
     'team/playbooks/quote.md',
@@ -20,6 +22,7 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
     'team/playbooks/social.md',
     'team/playbooks/site.md',
     'team/playbooks/wecom.md',
+    'team/playbooks/loop.md',
     'team/playbooks/tools.md',
     'team/playbooks/due-diligence.md',
     'team/templates/due-diligence.md',
@@ -47,7 +50,9 @@ test('trade team workspace has playbooks, templates and a sample deal', () => {
   const roster = readFileSync(join(root, 'team/roster.md'), 'utf8')
   assert.match(roster, /营销专家/)
   assert.match(roster, /背调专员/)
-  assert.match(roster, /subagent/)
+  assert.match(roster, /获客/)
+  assert.match(roster, /成交/)
+  assert.doesNotMatch(roster, /\| @开发 /)
   const pipeline = readFileSync(join(root, 'team/pipeline.md'), 'utf8')
   assert.match(pipeline, /HK-2026-001/)
 })

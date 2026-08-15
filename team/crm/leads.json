@@ -1,0 +1,47 @@
+{
+  "updatedAt": "2026-08-15T09:34:58.297Z",
+  "leads": [
+    {
+      "id": "L-2026-001",
+      "company": "Nordic Home Co.",
+      "market": "SE",
+      "group": "warm",
+      "source": "已有询盘 HK-2026-001",
+      "sourceUrl": "",
+      "touch": "replied",
+      "next": "等 200 pcs 镭雕与样品地址",
+      "due": "2026-08-22",
+      "sku": "HK-TB-500-SS",
+      "email": "",
+      "notes": "对应成交 HK-2026-001"
+    },
+    {
+      "id": "L-2026-002",
+      "company": "Demo: EU homeware importers (public web)",
+      "market": "EU",
+      "group": "nurture",
+      "source": "演示行：用 web_search 替换，勿把本行当真实买家",
+      "sourceUrl": "",
+      "touch": "none",
+      "next": "用户要挖客时按 playbooks/marketing.md 另起一行",
+      "due": "",
+      "sku": "",
+      "email": "",
+      "notes": "placeholder"
+    },
+    {
+      "id": "L-2026-003",
+      "company": "Kitchenlab AB",
+      "market": "SE",
+      "group": "nurture",
+      "source": "KitchenLab",
+      "sourceUrl": "https://www.kitchenlab.se/om-oss/",
+      "touch": "draft",
+      "next": "邮箱：TBD — 不要编 / 拟写开发信",
+      "due": "2026-08-22",
+      "sku": "HK-TB-500-SS",
+      "email": "",
+      "notes": ""
+    }
+  ]
+}

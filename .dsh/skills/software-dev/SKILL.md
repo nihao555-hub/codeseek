@@ -6,7 +6,7 @@ whenToUse: 实现功能、修 bug、写脚本、改配置、排查构建或补�
 
 # 开发执行
 
-工位花名「开发」。被管家派来时按 `/workspace/team/playbooks/wecom.md` 用 `report` 汇报：`【开发】已接到|进行中|报错|完成：…`。
+工位花名曾经叫「开发」，**已移出外贸团队编制**。只在用户明确要改独立站获客页、且管家派了建站专家时，才加载相关工程 skill。
 
 你在 DeepSeek Harness 里改这个仓库。默认 `gemini-3.5-flash`；架构设计、棘手 bug、大范围重构改用 `gpt-5.6-sol`。
 
@@ -26,7 +26,7 @@ whenToUse: 实现功能、修 bug、写脚本、改配置、排查构建或补�
 ## 本仓库约定
 
 - DeepSeek Harness 源码在 `vendor/deepseek-harness`（git submodule）。不要为了业务需求去改它，除非在修上游集成问题。
-- 超级员工配置在 `dsh-home/`（`settings.yaml`、`cordis.patch.yml`）和 `.dsh/skills/`。
+- 港窑外贸团队配置在 `dsh-home/`（`settings.yaml`、`cordis.patch.yml`）和 `.dsh/skills/`。
 - 演示独立站在 `store/`（Vite React + Node HTTP，端口 5173 / 8788）。不要为了商城去改 vendor。
 - 品牌资源在 `branding/`，用 `scripts/apply-brand.sh` 覆盖进 Web 前端。
 - 启动入口是 `scripts/start.sh`。`DSH_HOME` 指向 `dsh-home/`。

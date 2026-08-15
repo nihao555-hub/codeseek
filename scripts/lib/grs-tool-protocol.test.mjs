@@ -106,7 +106,7 @@ test('protocol forbids asking the user to continue after one tool', () => {
   assert.match(out.messages[0].content, /bash\/cat\/grep do not observe the file/)
   assert.match(out.messages[0].content, /file_path \(not path\/file\)/)
   assert.match(out.messages[0].content, /bash requires command and description/)
-  assert.match(out.messages[0].content, /if skill says unknown/)
+  assert.match(out.messages[0].content, /skip unknown skills/)
 })
 
 test('extracts unread edit paths from harness FS_NOT_OBSERVED errors', () => {
@@ -384,4 +384,5 @@ test('gpt-5 tool protocol lowers reasoning effort so visible tool_call survives'
   assert.match(out.messages[0].content, /Hidden reasoning/)
   assert.match(out.messages[0].content, /mcp__buyer-dd__/)
   assert.match(out.messages[0].content, /mcp__documents__read_document/)
+  assert.match(out.messages[0].content, /mcp__trade-crm__/)
 })

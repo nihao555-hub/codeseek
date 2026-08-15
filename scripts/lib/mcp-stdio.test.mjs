@@ -87,6 +87,7 @@ test('shipped MCP servers no longer speak LSP Content-Length', () => {
     'scripts/memory-mcp.mjs',
     'scripts/time-mcp.mjs',
     'scripts/documents-mcp.mjs',
+    'scripts/trade-crm-mcp.mjs',
   ]) {
     const body = readFileSync(join(root, file), 'utf8')
     assert.equal(body.includes('Content-Length:'), false, file)
@@ -125,4 +126,13 @@ test('memory/time/documents MCP speak NDJSON that DSH can handshake', async () =
   const documents = await rpcServer('scripts/documents-mcp.mjs', handshake)
   assert.equal(documents[0].result.serverInfo.name, 'documents')
   assert.ok(documents[1].result.tools.some((row) => row.name === 'read_document'))
+})
+
+test('trade-crm MCP speaks NDJSON and lists CRM tools', async () => {
+  const replies = await rpcServer('scripts/trade-crm-mcp.mjs', handshake)
+  assert.equal(replies[0].result.serverInfo.name, 'trade-crm')
+  const names = replies[1].result.tools.map((row) => row.name)
+  for (const id of ['list_leads', 'upsert_lead', 'quote_catalog', 'draft_outreach', 'search_queries']) {
+    assert.ok(names.includes(id), id)
+  }
 })

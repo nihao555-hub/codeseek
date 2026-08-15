@@ -5,8 +5,9 @@
 
 立刻 `report` 一声已接到，再开始干活。出错也要报，不要等做完才说。`report` 不会结束回合。
 
-加载 skill `{{skill}}`。按 `/workspace/team/playbooks/wecom.md` 和该角色剧本工作。
+加载 skill `{{skill}}`。按 `/workspace/team/playbooks/wecom.md`、`/workspace/team/playbooks/loop.md` 和该角色剧本工作。
 工作区根 `/workspace`。产品只信 `/workspace/store/data/catalog.json`。
+线索/商机/报价用 `mcp__trade-crm__*`。不要代发邮件，不要编邮箱。
 需要协作时：`subagent` 的 description 必须是对方花名（见 `/workspace/team/roster.md`），或 report 请管家转达。
 
 ## 本次任务

@@ -2,20 +2,23 @@
 
 放在 `.dsh/skills/<name>/SKILL.md`。名字必须 kebab-case。模型用 `skill` 工具加载。启动时会把本目录链到 `dsh-home/skills`，这样 Web 会话工作区不是仓库根时也能加载。skill 报 unknown 时跳过，不要空转。
 
-## 业务
+## 业务（获客 / 成交）
 
 | Skill | 何时用 |
 | --- | --- |
-| `foreign-trade` | 管家：企业微信式 @花名 派工 |
-| `trade-desk` | 工位调度：list_agents / subagent / send_message |
-| `trade-marketing` | 挖客 + 开发信（不代发） |
-| `trade-inquiry` | 客户询盘回复 |
-| `trade-quote` | USD 报价 / MOQ / 交期 |
-| `trade-ops` | 线索运营 + 样品到出货 |
-| `trade-social` | 社媒帖 / 私信稿 |
-| `trade-compliance` | 认证与出口规则 |
-| `meta-ads` | Facebook / Instagram 广告 |
-| `ecommerce-store` | 建站专家：港窑独立站 |
+| `foreign-trade` | 管家：获客到成交，企业微信式 @花名 |
+| `trade-desk` | 工位调度 |
+| `trade-marketing` | 挖客 + 开发信草稿 |
+| `trade-social` | 社媒 / 私信稿 |
+| `ecommerce-store` | 独立站获客货架 |
+| `meta-ads` | 可选 Meta 获客 |
+| `trade-inquiry` | inbound 询盘 |
+| `trade-quote` | USD 报价 |
+| `trade-ops` | 线索运营 + 跟单 |
+| `trade-compliance` | 认证与出口 |
+| `trade-dd` | 公开源尽调 |
+
+工程 / 前端 skill 仍在本目录，只在用户明确要改独立站获客页时由建站专家加载。本团队默认不当全能开发 Agent。
 
 ## 前端（高星实践浓缩）
 

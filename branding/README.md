@@ -1,6 +1,6 @@
 # 品牌资源
 
-codeseek 超级员工的视觉资产。运行 `scripts/apply-brand.sh` 会覆盖进 `vendor/deepseek-harness` 的 Web 前端（不提交 submodule 改动）。
+codeseek 港窑外贸团队的视觉资产。运行 `scripts/apply-brand.sh` 会覆盖进 `vendor/deepseek-harness` 的 Web 前端（不提交 submodule 改动）。
 
 ## 生成图
 

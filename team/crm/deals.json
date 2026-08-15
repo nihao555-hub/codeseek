@@ -1,0 +1,16 @@
+{
+  "updatedAt": "2026-08-15T09:34:58.297Z",
+  "deals": [
+    {
+      "id": "HK-2026-001",
+      "buyer": "Nordic Home Co. (SE)",
+      "sku": "HK-TB-500-SS",
+      "qty": 200,
+      "status": "quoted",
+      "next": "等对方确认 200 pcs 镭雕与样品地址",
+      "due": "2026-08-22",
+      "file": "deals/HK-2026-001-nordic.md",
+      "leadId": "L-2026-001"
+    }
+  ]
+}

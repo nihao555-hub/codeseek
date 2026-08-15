@@ -44,6 +44,7 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 | memory | 本仓库 `scripts/memory-mcp.mjs` | 本地图谱备忘，不写客户隐私 | 开 |
 | time | 本仓库 `scripts/time-mcp.mjs` | 时区转换 | 开 |
 | documents | 本仓库 `scripts/documents-mcp.mjs` | 读工作区 md/docx/xlsx/pdf | 开 |
+| trade-crm | 本仓库 `scripts/trade-crm-mcp.mjs` | 线索 / 商机 / 目录报价 / 开发信草稿（不代发） | 开 |
 | context7 | `@upstash/context7-mcp` | 按库名拉最新官方文档 | 开 |
 | trade-desk / foreign-trade / trade-marketing / trade-dd / … | 本仓库 `.dsh/skills` | 工位派工、港窑人设、公开源背调 | 开 |
 | doc-coauthoring / pdf / pptx / xlsx | `github.com/anthropics/skills` | 报价表、画册、介绍信 | 按许可证；docx/pdf/pptx/xlsx **默认不拉**，要办公套件再 `fetch-skills --include-restricted` |
@@ -53,13 +54,13 @@ Web 把工具挂在会话预设上，不是进程全局那一份。
 
 ## 建议打开（无密钥）
 
-`sequential-thinking`、`buyer-dd`、`memory`、`time`、`documents`、`context7` 已写入 `toolkit/enabled.json`。
+`sequential-thinking`、`buyer-dd`、`memory`、`time`、`documents`、`context7`、`trade-crm` 已写入 `toolkit/enabled.json`。
 
 Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页没有这个入口，本仓库 overlay 补上）。改完重启 Web。
 
 给管家拆「先查买家再写开发信」的步骤；背调用工商库 + 制裁名单，**仍然没有海关提单**。本地记忆不要写客户隐私。询盘 PDF/DOCX 用 `mcp__documents__read_document`。
 
-无密钥但不要默认开：`filesystem`（和 read/write 重复）、Playwright（要下载浏览器，在设置页再开）。Context7 已默认打开（拉库文档，偏开发）。
+无密钥但不要默认开：`filesystem`（和 read/write 重复）、Playwright（要下载浏览器，在设置页再开）。Context7 已默认打开（建站专家查库文档用，不是给全能开发准备的）。
 
 ## 有密钥再开
 
@@ -80,12 +81,14 @@ Web **设置 → 插件 → 工具与 MCP** 可以开关 MCP（官方设置页�
 
 ## 团员怎么用（不要发明工具名）
 
-- 营销 / 询盘：`web_search` → `mcp__web-search__web_fetch` → 对照 `store/data/catalog.json` 写开发信，草稿进 `team/outbox/`。
+- 营销：`mcp__trade-crm__search_queries` → `web_search` → `mcp__web-search__web_fetch` → `upsert_lead`；开发信 `draft_outreach`（不代发）。
+- 询盘 / 报价：`mcp__trade-crm__quote_catalog` → `upsert_deal`。数字只来自 `store/data/catalog.json`。
+- 运营：`list_leads` / `list_deals` 分层跟进；触达只允许 draft / user-sent / replied。
 - 背调：`mcp__buyer-dd__company_search` → `mcp__buyer-dd__sanctions_search` → 官网 `web_fetch`。模板 `team/templates/due-diligence.md`。
-- 建站：读 catalog + `webapp-testing` skill；改独立站走本仓库 `store/`。
-- 社媒：`trade-social` + 公开检索；不编互动数据。
+- 建站：读 catalog + `webapp-testing` skill；独立站是获客货架，走本仓库 `store/`。
+- 社媒：`trade-social` + 公开检索；不编互动数据、不登录对方后台。
 - 广告：仅在 Meta MCP 就绪时用官方工具；否则只出文案草稿。
-- 开发：本仓库代码；GitHub MCP 只读公开资料。难修 bug 可用 `ralph`，不要拿它派外贸工位。
+- 没有开发工位。用户要写无关代码就拒绝；难修的独立站获客页可由建站专家用 `ralph`，不要拿它派外贸工位。
 
 刷新 MCP 注册表（GitHub 上的官方服务器列表缓存）：
 

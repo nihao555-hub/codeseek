@@ -81,17 +81,23 @@ test('local memory/time/documents MCP use NDJSON node scripts', () => {
   assert.equal(ids.memory.command, 'node')
   assert.equal(ids.time.command, 'node')
   assert.equal(ids.documents.command, 'node')
-  const yaml = renderMcpPatch(catalog, { mcp: ['memory', 'time', 'documents'] })
+  assert.equal(ids['trade-crm'].command, 'node')
+  const yaml = renderMcpPatch(catalog, { mcp: ['memory', 'time', 'documents', 'trade-crm'] })
   assert.match(yaml, /scripts\/memory-mcp\.mjs/)
   assert.match(yaml, /scripts\/time-mcp\.mjs/)
   assert.match(yaml, /scripts\/documents-mcp\.mjs/)
+  assert.match(yaml, /scripts\/trade-crm-mcp\.mjs/)
   assert.ok(Array.isArray(catalog.communityPlugins))
-  assert.ok(catalog.communityPlugins.length >= 4)
+  const pluginIds = catalog.communityPlugins.map((row) => row.id)
+  for (const id of ['dsh-at-file', 'dsh-files', 'dsh-office-tools', 'dsh-cowork', 'dsh-tool-csv']) {
+    assert.ok(pluginIds.includes(id), id)
+  }
+  assert.ok(!pluginIds.some((id) => /pet|skin|reverse|balance/i.test(id)))
 })
 
 test('default enabled.json turns on no-key MCP and leaves playwright off', () => {
   const enabled = JSON.parse(readFileSync(new URL('../../toolkit/enabled.json', import.meta.url), 'utf8'))
-  for (const id of ['web-search', 'open-websearch', 'buyer-dd', 'memory', 'time', 'documents', 'sequential-thinking', 'context7']) {
+  for (const id of ['web-search', 'open-websearch', 'buyer-dd', 'memory', 'time', 'documents', 'sequential-thinking', 'context7', 'trade-crm']) {
     assert.ok(enabled.mcp.includes(id), id)
   }
   assert.ok(!enabled.mcp.includes('playwright'))

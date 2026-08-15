@@ -259,7 +259,7 @@ function assignCanonical(out, canonical, aliases) {
  */
 export const TEAM_ROSTER_LABELS = [
   '管家', '营销专家', '运营专家', '建站专家', '社媒专家',
-  '询盘专员', '报价专员', '合规专员', '背调专员', '广告专员', '开发',
+  '询盘专员', '报价专员', '合规专员', '背调专员', '广告专员',
 ]
 
 const TEAM_ROSTER_ALIASES = {
@@ -282,8 +282,6 @@ const TEAM_ROSTER_ALIASES = {
   尽调: '背调专员',
   广告: '广告专员',
   ads: '广告专员',
-  开发: '开发',
-  dev: '开发',
   lead: '管家',
   管家: '管家',
 }
@@ -564,13 +562,14 @@ export const TOOL_CONTINUE_HINT = [
   'Do not ask the human to reply 继续 / continue / keep going just to take the next step.',
   'edit on an existing file requires a successful `read` tool call on that path first (bash/cat/grep do not count).',
   'If cwd is empty or not the repo, use absolute paths under /workspace. The storefront lives at /workspace/store/.',
-  'If skill is unknown, skip it and keep implementing under /workspace/store/.',
+  'If skill is unknown, skip it and keep the 获客/成交 loop under /workspace/team/. Independent site lives at /workspace/store/.',
   'Prefer official web_search for live lookup (DuckDuckGo, then Wikipedia).',
   'Put titles and URLs in the reply text; the Search card is collapsed until the user clicks it.',
   'Extra engines: mcp__open-websearch__search. Official web_fetch is disabled; fetch URLs with mcp__web-search__web_fetch.',
   'Buyer due diligence: mcp__buyer-dd__company_search and mcp__buyer-dd__sanctions_search; never invent customs B/L.',
+  'CRM: mcp__trade-crm__search_queries, upsert_lead, draft_outreach, quote_catalog, upsert_deal. Outreach is draft-only.',
   'Local extras: mcp__memory__search_nodes, mcp__time__get_current_time, mcp__documents__read_document for workspace attachments.',
-  'Harbor Kiln team: @member means list_agents then send_message or subagent. subagent description must be the roster 花名 (营销专家, not the task summary). Members report with 【花名】进行中|报错|完成.',
+  'Harbor Kiln is a trade team (acquire buyers, close orders), not a general coding agent. @member means list_agents then send_message or subagent. subagent description must be the roster 花名 (营销专家, not the task summary). Members report with 【花名】进行中|报错|完成.',
 ].join(' ')
 
 const EDIT_NEEDS_READ_RE = /edit requires reading "([^"]+)" first/g
@@ -648,11 +647,12 @@ export function buildToolProtocolPrompt(tools) {
     '- glob requires pattern; skill requires name',
     '- search the web with official web_search (DuckDuckGo, then Wikipedia). Put result titles and URLs in the reply. Extra engines: mcp__open-websearch__search. Official web_fetch is off; fetch URLs with mcp__web-search__web_fetch',
     '- buyer due diligence: OpenCorporates / OpenSanctions via mcp__buyer-dd__* plus web_search; never invent customs bills of lading',
+    '- CRM: mcp__trade-crm__search_queries then web_search; upsert_lead with a public URL; draft_outreach is not sent; quote_catalog reads store/data/catalog.json',
     '- workspace attachments (pdf/docx/xlsx/md) via mcp__documents__read_document; local memory via mcp__memory__*; time zones via mcp__time__*',
     '- if the user @s a Harbor Kiln teammate, list_agents then send_message or subagent; do not do that person\'s job yourself',
     '- subagent description MUST be the roster 花名 (营销专家 / 建站专家 / …), never a task summary; that label is the sidebar and @ picker name',
     '- teammates report with report output like 【营销专家】进行中：… including errors',
-    '- if skill says unknown, skip it and keep editing /workspace/store/ with absolute paths',
+    '- this team acquires buyers and closes orders; skip unknown skills and keep the loop in /workspace/team/',
     '- escape newlines inside JSON strings as \\n; keep the object valid JSON',
     '- multiple tools: multiple <tool_call> blocks',
     '- do not wrap the block in markdown fences',

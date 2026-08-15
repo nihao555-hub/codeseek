@@ -1,7 +1,7 @@
 {
   "name": "codeseek",
   "private": true,
-  "description": "DeepSeek Harness 超级员工：外贸、Meta 广告与开发任务",
+  "description": "港窑外贸团队：获客到成交（DeepSeek Harness）",
   "engines": {
     "node": ">=22.19.0"
   },

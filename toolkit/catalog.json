@@ -311,6 +311,17 @@
       "docs": "https://github.com/nihao555-hub/codeseek"
     },
     {
+      "id": "trade-crm",
+      "title": "外贸 CRM（线索到订单）",
+      "description": "本仓库 NDJSON：线索池、商机看板、目录报价、开发信草稿。对齐网易外贸通闭环，不代发、没有海关库。工具名 mcp__trade-crm__list_leads / upsert_lead / quote_catalog / draft_outreach。",
+      "transport": "stdio",
+      "serverName": "trade-crm",
+      "command": "node",
+      "args": [{ "js": "(process.env.DSH_WORKSPACE || '/workspace') + '/scripts/trade-crm-mcp.mjs'" }],
+      "enableWhen": { "flag": "MCP_TRADE_CRM" },
+      "docs": "https://github.com/nihao555-hub/codeseek"
+    },
+    {
       "id": "git",
       "title": "Git",
       "description": "只读/受限 git 操作 MCP。日常仍优先用 bash git。",
@@ -486,43 +497,78 @@
       "id": "dsh-at-file",
       "repo": "omdsh-dev/dsh-at-file",
       "title": "@file 提及",
-      "why": "Web 输入框搜工作区文件并贴进提示。",
-      "install": "dsh plugin --profile web add github:omdsh-dev/dsh-at-file"
-    },
-    {
-      "id": "dsh-sticky-disclosure",
-      "repo": "Han-1413141/dsh-sticky-disclosure",
-      "title": "一键收起工具卡",
-      "why": "Search / Think 卡片默认折叠，这个能一次收起全部。",
-      "install": "dsh plugin --profile web add github:Han-1413141/dsh-sticky-disclosure"
-    },
-    {
-      "id": "modlens",
-      "repo": "liustack/modlens",
-      "title": "看图 OCR",
-      "why": "产品图、询盘截图。要审源码，预览期可能不兼容 rc.5。",
-      "install": "先读仓库 README，再用 overlay，不要改 vendor。"
+      "why": "把询盘 PDF / 报价表从输入框贴进会话。awesome-dsh-plugin 收录。本仓库已有 documents MCP，这个是 UI 糖。",
+      "install": "审源码后再 overlay；不要 dsh plugin add 进 gitignored profile 就当交付。"
     },
     {
       "id": "dsh-files",
       "repo": "taxueseek/dsh-files",
       "title": "拖文件进会话",
-      "why": "PDF/DOCX 卡片。本仓库已用 documents MCP 读工作区附件。",
+      "why": "询盘附件卡片。读内容优先 mcp__documents__read_document。",
       "install": "dsh plugin --profile web add github:taxueseek/dsh-files"
     },
     {
-      "id": "dsh-browser",
-      "repo": "Lum1104/dsh-browser",
-      "title": "Chrome 侧栏操控浏览器",
-      "why": "登录态站点。本机 Playwright MCP 可在本页打开，但会下载浏览器。",
-      "install": "dsh plugin --profile web add github:Lum1104/dsh-browser"
+      "id": "dsh-office-tools",
+      "repo": "kw78/dsh-office-tools",
+      "title": "Word / Excel / PPT",
+      "why": "awesome 上现成的办公轮子。报价数字本仓库用 mcp__trade-crm__quote_catalog，不要两套数。",
+      "install": "需要出 xlsx 客户稿时再 overlay。"
+    },
+    {
+      "id": "dsh-cowork",
+      "repo": "Jesse-njx/dsh-cowork",
+      "title": "单元格读写 xlsx/pdf/docx",
+      "why": "awesome 收录。询盘附件精读可复用；日常走 documents MCP。",
+      "install": "审 rc.5 兼容后再 overlay。"
+    },
+    {
+      "id": "dsh-tool-csv",
+      "repo": "omdsh-dev/dsh-tool-csv",
+      "title": "CSV 解析",
+      "why": "线索表。本仓库 mcp__trade-crm__export_leads_csv 已覆盖导出。",
+      "install": "不必装，除非要解析客户自己丢来的大 CSV。"
+    },
+    {
+      "id": "modlens",
+      "repo": "liustack/modlens",
+      "title": "看图 OCR",
+      "why": "产品图、询盘截图。awesome 收录。预览期可能不兼容 rc.5。",
+      "install": "先读仓库 README，再用 overlay，不要改 vendor。"
     },
     {
       "id": "dsh-notification",
       "repo": "omdsh-dev/dsh-notification",
       "title": "回合结束通知",
-      "why": "桌面通知。",
+      "why": "团员后台跑完提醒你接管谈单。",
       "install": "dsh plugin --profile web add github:omdsh-dev/dsh-notification"
+    },
+    {
+      "id": "dsh-sticky-disclosure",
+      "repo": "Han-1413141/dsh-sticky-disclosure",
+      "title": "一键收起工具卡",
+      "why": "Search / Think 卡片默认折叠。",
+      "install": "dsh plugin --profile web add github:Han-1413141/dsh-sticky-disclosure"
+    },
+    {
+      "id": "dsh-browser",
+      "repo": "Lum1104/dsh-browser",
+      "title": "Chrome 侧栏操控浏览器",
+      "why": "登录态买家站。不默认装；本产品不登录对方后台群发。",
+      "install": "不要为了获客去爬 LinkedIn / 海关付费站。"
+    },
+    {
+      "id": "treg",
+      "repo": "superdesigndev/treg",
+      "title": "TREG 数据目录",
+      "why": "awesome 上的 enrichment / SERP / 广告库目录。要 TREG_TOKEN，按次计费。有密钥再开。",
+      "install": "先读 README；不要默认打开。"
+    },
+    {
+      "id": "dsh-agent-team-room",
+      "repo": "ishuowang/dsh-agent-team-room",
+      "title": "Agent 会议室",
+      "why": "多 session 房间。本仓库已用企业微信式 @花名 + report，不必再装一层。",
+      "install": "不要和 trade-desk 叠两套工位。"
     }
   ]
 }
